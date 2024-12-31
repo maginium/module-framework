@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Check for updates to PHP dependencies in composer.json
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    ignore:
+      # Ignore specific packages if needed
+      - dependency-name: "maginium/module-foundation"
+        update-types: ["version-update:semver-patch"]
+  
+  # Check for updates to GitHub Actions workflows (if any)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
