@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace :NAMESPACE:\:MODULE:\Controller\Adminhtml;
+
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Framework\App\ResponseInterface;
+use Maginium\Framework\Support\Collection;
+use Magento\Backend\Model\View\Result\Redirect;
+use Maginium\Framework\Crud\AdminController;
+
+class :CONTROLLER: extends AdminController
+{
+     /**
+     * Default title of the page.
+     *
+     * @var string
+     */
+    protected string $title = 'Page Title';
+
+    /**
+     * Active menu identifier for the admin sidebar navigation.
+     *
+     * @var string
+     */
+    protected string $activeMenu = '';
+
+    /**
+     * Breadcrumb data for the current page.
+     *
+     * @var Collection
+     */
+    protected Collection $breadcrumbs;
+
+    /**
+     * Handles the controller action.
+     *
+     * This is an abstract method that must be implemented by subclasses.
+     * It provides the specific logic for each controller action.
+     *
+     * @return Page|ResponseInterface The result of the specific controller action (usually a Page object).
+     */
+    public function handle(): Page|Redirect|ResponseInterface
+    {
+        // Add some business logic here, for example, loading a model, processing data, etc.
+
+        // For example, setting a success message after processing
+        $this->success('The ExampleController action was successfully executed.');
+
+        // Return the page result object (the page that will be rendered in the backend)
+        return $this->page;
+    }
+}

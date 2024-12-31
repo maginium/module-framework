@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+<config
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd"
+>
+    <!-- Publisher for publishing event-related messages to the 'event.messages' topic via the 'event.messages'. -->
+    <publisher topic="event.messages">
+        <!-- Connection details for the event publisher, using the 'amqp' connection to the 'event.messages'. -->
+        <connection exchange="event.messages" name="amqp" />
+    </publisher>
+</config>

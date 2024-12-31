@@ -1,0 +1,46 @@
+<?php
+
+namespace {{namespace}}\{{lower_name}}\Commands;
+
+use Maginium\Framework\Console\Command;
+use Symfony\Component\Console\Attribute\AsCommand;
+
+/**
+ * {{studly_name}} Command
+ *
+ * @link https://docs.octobercms.com/3.x/extend/console-commands.html
+ */
+ #[AsCommand("{{studly_name}}")]
+class {{studly_name}} extends Command
+{
+    /**
+     * A brief description of the command.
+     *
+     * @var string|null
+     */
+    protected ?string $description = 'No description provided yet...';
+
+    /**
+     * The signature of the console command.
+     *
+     * @var string|null
+     */
+    protected ?string $signature = '{user}';
+
+    /**
+     * The arguments the command accepts.
+     *
+     * @var array
+     */
+    protected $arguments = [];
+
+    /**
+     * handle executes the console command.
+     */
+    public function handle()
+    {
+        $username = $this->argument('user');
+
+        $this->line("Hello {$username}!");
+    }
+}

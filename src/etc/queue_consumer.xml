@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<config
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd"
+>
+    <!-- Consumer for processing event-related messages from the 'event.messages' with 'amqp' connection -->
+    <consumer
+    connection="amqp"
+    consumerInstance="Magento\Framework\MessageQueue\Consumer"
+    handler="Maginium\Framework\Event\Consumers\EventMessageConsumer::process"
+    maxIdleTime="60"
+    maxMessages="100"
+    name="event.message.consumer"
+    onlySpawnWhenMessageAvailable="1"
+    queue="event.messages"
+    sleep="5"
+  />
+</config>

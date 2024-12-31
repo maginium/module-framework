@@ -1,0 +1,36 @@
+<?php
+
+namespace :NAMESPACE:\:MODULE:\Setup\Migrations;
+
+use Illuminate\Database\Schema\Blueprint;
+use IrishTitan\Handshake\Contracts\MigrationContract;
+use Maginium\Framework\Database\Setup\Migration\Migration;
+use IrishTitan\Handshake\Core\Schema;
+
+class :MIGRATION: extends Migration implements MigrationContract
+{
+    /**
+     * Run the migration.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('table-name', function (Blueprint $table) {
+            $table->increments('id');
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migration.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('table-name');
+    }
+
+}

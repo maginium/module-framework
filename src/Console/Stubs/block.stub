@@ -1,0 +1,10 @@
+<?php
+
+namespace :NAMESPACE:\:MODULE:\Models;
+
+use Maginium\Framework\Database\Model;
+
+class :MODEL: extends Model
+{
+
+}

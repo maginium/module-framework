@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<config
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="urn:magento:framework:communication/etc/communication.xsd"
+>
+    <!-- Defines a topic named "event.messages" with asynchronous processing -->
+    <topic is_synchronous="false" name="event.messages" request="string">
+        <!-- Specifies a handler named "event.message.handler" of type "Maginium\Framework\Event\Consumers\EventMessageConsumer" with a method named "process". -->
+        <handler
+      method="process"
+      name="event.message.handler"
+      type="Maginium\Framework\Event\Consumers\EventMessageConsumer"
+    />
+    </topic>
+
+    <!-- Defines a topic for the Dead Letter Queue for event messages -->
+    <topic is_synchronous="false" name="event.messages.dlq" request="string" />
+</config>

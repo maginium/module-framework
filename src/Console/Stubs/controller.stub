@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace :NAMESPACE:\:MODULE:\Controller\Index;
+
+use Maginium\Framework\Crud\HttpController;
+use Magento\Framework\Controller\Result\Redirect;
+use Magento\Framework\Controller\Result\Page;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\ResultInterface;
+
+class :CONTROLLER: extends HttpController implements HttpGetActionInterface
+{
+    /**
+     * Handle the logic for the controller action.
+     *
+     * This method implements the specific logic for the controller action.
+     * In this example, we are rendering a page and showing a success message.
+     *
+     * @return ResultInterface
+     */
+    public function handle(): ResultInterface
+    {
+        // Render a page with a custom title
+        $pageTitle = "Example Page Title";
+        $resultPage = $this->renderPage($pageTitle);
+
+        // Optionally, you can add a success message to the session
+        $this->success('This is a success message.');
+
+        // Returning the page result to display the page to the user
+        return $resultPage;
+
+        // Alternatively, you can redirect the user to another URL
+        // return $this->redirectToUrl('https://www.example.com');
+    }
+}
