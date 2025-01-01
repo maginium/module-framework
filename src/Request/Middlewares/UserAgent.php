@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Request\Middlewares;
 
 use Jenssegers\Agent\Agent;
+use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Request;

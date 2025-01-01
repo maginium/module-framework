@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Request\Interfaces;
 
+use Illuminate\Support\Stringable;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Customer as MagentoCustomer;
 use Magento\Framework\App\RequestInterface as BaseRequestInterface;
 use Magento\User\Model\User;
 use Maginium\Customer\Models\Customer;
 use Maginium\Framework\Support\Collection;
-use Maginium\Framework\Support\Stringable;
 
 /**
  * Interface for an enhanced HTTP request with extended capabilities.
@@ -116,7 +117,7 @@ interface RequestInterface extends BaseRequestInterface
      *
      * @param MagentoCustomer|Customer|User|null $user The user object to set as the current user, or null to reset.
      */
-    public function setUser(MagentoCustomer|Customer|User|null $user): void;
+    public function setUser(MagentoCustomer|CustomerInterface|Customer|User|null $user): void;
 
     /**
      * Sets the language or locale for the request.

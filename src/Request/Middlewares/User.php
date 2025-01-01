@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Maginium\Framework\Request\Middlewares;
 
 use Magento\Backend\Model\Auth\Session as AdminSession;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\User\Api\Data\UserInterface;
-use Maginium\Customer\Interfaces\Data\CustomerInterface;
 use Maginium\Foundation\Abstracts\AbstractMiddleware;
 use Maginium\Foundation\Enums\UserType;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
