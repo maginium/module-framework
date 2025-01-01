@@ -1,17 +1,10 @@
 <?xml version="1.0" ?>
-<config
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd"
->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
         <!-- Remove the "Message Queue Retry" menu item -->
         <remove id="RunAsRoot_MessageQueueRetry::message_queue_retry" />
 
         <!-- Update the parent of "Message Queue Manage" to appear under "System Tools" -->
-        <update
-      id="RunAsRoot_MessageQueueRetry::message_queue_manage"
-      parent="Magento_Backend::system_tools"
-      sortOrder="30"
-    />
+        <update id="RunAsRoot_MessageQueueRetry::message_queue_manage" parent="Magento_Backend::system_tools" sortOrder="30" />
     </menu>
 </config>

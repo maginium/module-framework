@@ -1,28 +1,14 @@
 <?xml version="1.0" ?>
-<config
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd"
->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
     <!-- Defines the Event Messages Exchange and Queue, used for routing event-related messages. -->
     <exchange connection="amqp" name="event.messages" type="topic">
         <!-- Binds the "event.messages" topic to the event.messages queue, setting up message routing. -->
-        <binding
-      destination="event.messages"
-      destinationType="queue"
-      id="event.messages"
-      topic="event.messages"
-    >
+        <binding destination="event.messages" destinationType="queue" id="event.messages" topic="event.messages">
             <arguments>
                 <!-- Specifies the dead-letter exchange for event messages in case of failure or rejection. -->
-                <argument
-          xsi:type="string"
-          name="x-dead-letter-exchange"
-        >event.messages.dlq</argument>
+                <argument xsi:type="string" name="x-dead-letter-exchange">event.messages.dlq</argument>
                 <!-- Specifies the dead-letter routing key for event messages, ensuring messages go to the dlq queue. -->
-                <argument
-          xsi:type="string"
-          name="x-dead-letter-routing-key"
-        >event.messages.dlq</argument>
+                <argument xsi:type="string" name="x-dead-letter-routing-key">event.messages.dlq</argument>
             </arguments>
         </binding>
     </exchange>
@@ -30,28 +16,14 @@
     <!-- Defines the Delay Queue for Event Messages, ensuring messages are delayed before retrying. -->
     <exchange connection="amqp" name="event.messages.dlq" type="topic">
         <!-- Binds the "event.messages.dlq" topic to the event.messages.dlq queue, enabling dlq handling. -->
-        <binding
-      destination="event.messages.dlq"
-      destinationType="queue"
-      id="event.messages.dlq"
-      topic="event.messages.dlq"
-    >
+        <binding destination="event.messages.dlq" destinationType="queue" id="event.messages.dlq" topic="event.messages.dlq">
             <arguments>
                 <!-- Sets a Time-To-Live (TTL) for the message in the dlq queue, here it is 5 minutes (300000 ms). -->
-                <argument
-          xsi:type="number"
-          name="x-message-ttl"
-        >300000</argument>
+                <argument xsi:type="number" name="x-message-ttl">300000</argument>
                 <!-- Specifies the dead-letter exchange for delayed event messages to be routed back to the main queue. -->
-                <argument
-          xsi:type="string"
-          name="x-dead-letter-exchange"
-        >event.messages</argument>
+                <argument xsi:type="string" name="x-dead-letter-exchange">event.messages</argument>
                 <!-- Specifies the dead-letter routing key for delayed event messages, enabling retry to the main queue. -->
-                <argument
-          xsi:type="string"
-          name="x-dead-letter-routing-key"
-        >event.messages</argument>
+                <argument xsi:type="string" name="x-dead-letter-routing-key">event.messages</argument>
             </arguments>
         </binding>
     </exchange>

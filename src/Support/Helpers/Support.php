@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Illuminate\Contracts\Support\Htmlable;
 use Maginium\Framework\Defer\DeferredCallback;
 use Maginium\Framework\Defer\DeferredCallbackCollection;
+use Maginium\Framework\Request\Interfaces\RequestInterface;
+use Maginium\Framework\Request\Request;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
@@ -1250,20 +1252,20 @@ if (! function_exists('title_case')) {
     }
 }
 
+/*
+ * Return a scalar value for the given value that might be an enum.
+ *
+ * @internal
+ *
+ * @template TValue
+ * @template TDefault
+ *
+ * @param  TValue  $value
+ * @param  TDefault|callable(TValue): TDefault  $default
+ *
+ * @return ($value is \empty ? TDefault : mixed)
+ */
 if (! function_exists('Maginium\Framework\Support\enum_value')) {
-    /**
-     * Return a scalar value for the given value that might be an enum.
-     *
-     * @internal
-     *
-     * @template TValue
-     * @template TDefault
-     *
-     * @param  TValue  $value
-     * @param  TDefault|callable(TValue): TDefault  $default
-     *
-     * @return ($value is \empty ? TDefault : mixed)
-     */
     function enum_value($value, $default = null)
     {
         return transform($value, fn($value) => match (true) {
@@ -1275,21 +1277,21 @@ if (! function_exists('Maginium\Framework\Support\enum_value')) {
     }
 }
 
+/*
+ * Defer execution of the given callback.
+ *
+ * @param  callable|null  $callback
+ * @param  string|null  $name
+ * @param  bool  $always
+ *
+ * @return DeferredCallback
+ */
 if (! function_exists('Maginium\Framework\Support\defer')) {
-    /**
-     * Defer execution of the given callback.
-     *
-     * @param  callable|null  $callback
-     * @param  string|null  $name
-     * @param  bool  $always
-     *
-     * @return DeferredCallback
-     */
     function defer(?callable $callback = null, ?string $name = null, bool $always = false)
     {
         // Return the current DeferredCallbackCollection if no callback is provided.
         if ($callback === null) {
-            return Container::get(DeferredCallbackCollection::class);
+            return Container::make(DeferredCallback::class);
         }
 
         // Create a new DeferredCallback instance.
@@ -1305,7 +1307,48 @@ if (! function_exists('Maginium\Framework\Support\defer')) {
         // Return the DeferredCallback instance.
         return tap(
             $deferredCallback,
-            fn($deferred) => Container::get(className: DeferredCallbackCollection::class)[] = $deferred,
+            fn($deferred) => Container::get(DeferredCallbackCollection::class)[] = $deferred,
         );
+    }
+}
+
+/*
+ * Get an instance of the current request or retrieve input from the request.
+ *
+ * This function serves two purposes:
+ * 1. If no `$key` is provided, it returns the entire request object instance.
+ * 2. If a `$key` is provided, it attempts to fetch that specific input item from the request.
+ *    If the input is not found, the `$default` value will be returned (if provided).
+ *
+ * @param  list<string>|string|null  $key    The key(s) of the input item(s) to retrieve.
+ *                                             If null, returns the entire request object.
+ * @param  mixed  $default           The default value to return if the key is not found.
+ *                                    Ignored if no key is provided.
+ * @return mixed|array<string, mixed> The request instance or the value(s) from the request.
+ *
+ * @see Request
+ */
+if (! function_exists('request')) {
+    function request($key = null, $default = null)
+    {
+        // Retrieve the current request instance from the container
+        /** @var Request $instance */
+        $instance = Container::make(RequestInterface::class);
+
+        // If no key is provided, return the entire request object instance
+        if ($key === null) {
+            return $instance;
+        }
+
+        // If an array of keys is provided, return only those keys from the request
+        if (is_array($key)) {
+            return $instance->only($key);
+        }
+
+        // If a single key is provided, attempt to get its value from the request
+        $value = $instance->__get($key);
+
+        // If the value is found, return it, otherwise return the default value (if provided)
+        return $value === null ? value($default) : $value;
     }
 }

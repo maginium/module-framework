@@ -61,9 +61,6 @@ use Maginium\User\Models\User;
  */
 trait AsController
 {
-    // Trait for handling response construction and manipulation
-    // use ResponseBuilder;
-
     /**
      * Get the current store.
      *
@@ -74,6 +71,8 @@ trait AsController
         // Retrieve the current store or fallback to the default store view if not available
         return StoreManager::getStore() ?? StoreManager::getDefaultStoreView();
     }
+    // Trait for handling response construction and manipulation
+    // use ResponseBuilder;
 
     /**
      * Get a specific request parameter.
@@ -85,9 +84,7 @@ trait AsController
      */
     public function query(string $key, $default = null): mixed
     {
-        $params = Request::getParams();
-
-        return $params[$key] ?? $default;
+        return Request::query($key, $default);
     }
 
     /**
@@ -256,21 +253,7 @@ trait AsController
     public function isLoggedIn(): bool
     {
         // Check if the user is authenticated by calling the user() method
-        return $this->user() !== null;
-    }
-
-    /**
-     * Get the authenticated user.
-     *
-     * @return User|Customer|null The authenticated user object, or null if not found.
-     */
-    public function user(): mixed
-    {
-        // Retrieve the authenticated user from the request
-        $user = Request::user();
-
-        // Check if a user is authenticated and has an ID
-        return $user && $user->getId() ? $user->getData() : null;
+        return $this->userId() !== null;
     }
 
     /**
@@ -285,6 +268,20 @@ trait AsController
 
         // Return the user ID or null if no authenticated user
         return $user ? $user->getId() : null;
+    }
+
+    /**
+     * Get the authenticated user.
+     *
+     * @return User|Customer|null The authenticated user object, or null if not found.
+     */
+    public function user(): mixed
+    {
+        // Retrieve the authenticated user from the request
+        $user = Request::user();
+
+        // Check if a user is authenticated and has an ID
+        return $user && $user->getId() ? $user->getData() : null;
     }
 
     /**
@@ -394,26 +391,37 @@ trait AsController
     }
 
     /**
-     * Get the columns specified in the request query parameter.
+     * Retrieve a specific column from the request query parameter.
      *
-     * This method will retrieve the 'columns' parameter from the request, split the string by
-     * either a comma or pipe (`|`), and return an array of column names.
+     * This method filters the retrieved columns to include only the specified column.
      *
-     * @return array Array of columns.
+     * @param string $column The column name to retrieve.
+     *
+     * @return array An array containing the specified column, if it exists.
+     */
+    public function getColumn(string $column): array
+    {
+        // Fetch all columns and filter by the specified column
+        return collect($this->getColumns())
+            ->only($column)
+            ->toArray();
+    }
+
+    /**
+     * Retrieve all columns specified in the request query parameter.
+     *
+     * This method retrieves the 'columns' parameter from the request, splits it by
+     * commas or pipes (`|`), and returns an array of column names. Defaults to ['*'].
+     *
+     * @return array An array of column names.
      */
     public function getColumns(): array
     {
-        // Retrieve the 'columns' query parameter from the request
+        // Fetch the 'columns' query parameter, defaulting to an empty string
         $columns = Request::query('columns', '');
 
         // If columns are provided, split by comma or pipe
-        if (! empty($columns)) {
-            // Split the string by comma or pipe
-            return preg_split('/[,|]+/', $columns);
-        }
-
-        // Return an empty array if no columns are provided
-        return ['*'];
+        return $columns ? preg_split('/[,|]+/', $columns) : ['*'];
     }
 
     /**

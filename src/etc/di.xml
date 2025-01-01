@@ -1,197 +1,91 @@
 <?xml version="1.0" ?>
-<config
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd"
->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- Support and Utilities -->
-    <preference
-    for="Magento\Framework\DataObject"
-    type="Maginium\Framework\Support\DataObject"
-  />
+    <preference for="Magento\Framework\DataObject" type="Maginium\Framework\Support\DataObject" />
 
     <!-- Custom implementation for Uuid management -->
-    <preference
-    for="Maginium\Framework\Uuid\Interfaces\UuidInterface"
-    type="Maginium\Framework\Uuid\UuidManager"
-  />
+    <preference for="Maginium\Framework\Uuid\Interfaces\UuidInterface" type="Maginium\Framework\Uuid\UuidManager" />
 
     <!-- Resizer functionality for managing image resizing -->
-    <preference
-    for="Maginium\Framework\Resize\Interfaces\ResizerInterface"
-    type="Maginium\Framework\Resize\Resizer"
-  />
+    <preference for="Maginium\Framework\Resize\Interfaces\ResizerInterface" type="Maginium\Framework\Resize\Resizer" />
 
     <!-- Deferred processing management -->
-    <preference
-    for="Maginium\Framework\Defer\Interfaces\DeferInterface"
-    type="Maginium\Framework\Defer\DeferManager"
-  />
+    <preference for="Maginium\Framework\Defer\Interfaces\DeferInterface" type="Maginium\Framework\Defer\DeferManager" />
 
     <!-- Component registration customization -->
-    <preference
-    for="Magento\Framework\Component\ComponentRegistrar"
-    type="Maginium\Framework\Component\ComponentRegistrar"
-  />
+    <preference for="Magento\Framework\Component\ComponentRegistrar" type="Maginium\Framework\Component\ComponentRegistrar" />
 
     <!-- Custom implementation for prompt management -->
-    <preference
-    for="Maginium\Framework\Prompts\Interfaces\PromptsInterface"
-    type="Maginium\Framework\Prompts\PromptsManager"
-  />
+    <preference for="Maginium\Framework\Prompts\Interfaces\PromptsInterface" type="Maginium\Framework\Prompts\PromptsManager" />
 
     <!-- Dependency container manager -->
-    <preference
-    for="Maginium\Framework\Container\Interfaces\ContainerInterface"
-    type="Maginium\Framework\Container\ContainerManager"
-  />
+    <preference for="Maginium\Framework\Container\Interfaces\ContainerInterface" type="Maginium\Framework\Container\ContainerManager" />
 
     <!-- Locale Management -->
-    <preference
-    for="Maginium\Framework\Locale\Interfaces\LocaleInterface"
-    type="Maginium\Framework\Locale\LocaleManager"
-  />
-    <preference
-    for="Maginium\Framework\Locale\Interfaces\TranslationInterface"
-    type="Maginium\Framework\Locale\TranslatorManager"
-  />
+    <preference for="Maginium\Framework\Locale\Interfaces\LocaleInterface" type="Maginium\Framework\Locale\LocaleManager" />
+    <preference for="Maginium\Framework\Locale\Interfaces\TranslationInterface" type="Maginium\Framework\Locale\TranslatorManager" />
 
     <!-- Cache and Redis -->
-    <preference
-    for="Maginium\Framework\Cache\Interfaces\CacheInterface"
-    type="Maginium\Framework\Cache\CacheManager"
-  />
-    <preference
-    for="Maginium\Framework\Redis\Interfaces\RedisInterface"
-    type="Maginium\Framework\Redis\RedisManager"
-  />
+    <preference for="Maginium\Framework\Cache\Interfaces\CacheInterface" type="Maginium\Framework\Cache\CacheManager" />
+    <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
 
     <!-- Serialization -->
-    <preference
-    for="Maginium\Framework\Serializer\Interfaces\JsonInterface"
-    type="Maginium\Framework\Serializer\Json"
-  />
-    <preference
-    for="Maginium\Framework\Serializer\Interfaces\SerializerInterface"
-    type="Maginium\Framework\Serializer\Serializer"
-  />
-    <preference
-    for="Maginium\Framework\Serializer\Interfaces\ClosureSerializerInterface"
-    type="Maginium\Framework\Serializer\ClosureSerializer"
-  />
+    <preference for="Maginium\Framework\Serializer\Interfaces\JsonInterface" type="Maginium\Framework\Serializer\Json" />
+    <preference for="Maginium\Framework\Serializer\Interfaces\SerializerInterface" type="Maginium\Framework\Serializer\Serializer" />
+    <preference for="Maginium\Framework\Serializer\Interfaces\ClosureSerializerInterface" type="Maginium\Framework\Serializer\ClosureSerializer" />
 
     <!-- Log Module -->
-    <preference
-    for="Maginium\Framework\Log\Interfaces\LoggerInterface"
-    type="Maginium\Framework\Log\Logger"
-  />
-    <preference
-    for="Maginium\Framework\Log\Interfaces\FactoryInterface"
-    type="Maginium\Framework\Log\LogManager"
-  />
+    <preference for="Maginium\Framework\Log\Interfaces\LoggerInterface" type="Maginium\Framework\Log\Logger" />
+    <preference for="Maginium\Framework\Log\Interfaces\FactoryInterface" type="Maginium\Framework\Log\LogManager" />
 
     <!-- Configure the custom Log class with its corresponding handlers. -->
     <type name="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument xsi:type="array" name="handlers">
                 <!-- File Handlers -->
-                <item
-          xsi:type="object"
-          name="info"
-        >Maginium\Framework\Log\Handlers\File\Info</item>
-                <item
-          xsi:type="object"
-          name="alert"
-        >Maginium\Framework\Log\Handlers\File\Alert</item>
-                <item
-          xsi:type="object"
-          name="debug"
-        >Maginium\Framework\Log\Handlers\File\Debug</item>
-                <item
-          xsi:type="object"
-          name="error"
-        >Maginium\Framework\Log\Handlers\File\Error</item>
-                <item
-          xsi:type="object"
-          name="notice"
-        >Maginium\Framework\Log\Handlers\File\Notice</item>
-                <item
-          xsi:type="object"
-          name="warning"
-        >Maginium\Framework\Log\Handlers\File\Warning</item>
-                <item
-          xsi:type="object"
-          name="critical"
-        >Maginium\Framework\Log\Handlers\File\Critical</item>
-                <item
-          xsi:type="object"
-          name="emergency"
-        >Maginium\Framework\Log\Handlers\File\Emergency</item>
+                <item xsi:type="object" name="info">Maginium\Framework\Log\Handlers\File\Info</item>
+                <item xsi:type="object" name="alert">Maginium\Framework\Log\Handlers\File\Alert</item>
+                <item xsi:type="object" name="debug">Maginium\Framework\Log\Handlers\File\Debug</item>
+                <item xsi:type="object" name="error">Maginium\Framework\Log\Handlers\File\Error</item>
+                <item xsi:type="object" name="notice">Maginium\Framework\Log\Handlers\File\Notice</item>
+                <item xsi:type="object" name="warning">Maginium\Framework\Log\Handlers\File\Warning</item>
+                <item xsi:type="object" name="critical">Maginium\Framework\Log\Handlers\File\Critical</item>
+                <item xsi:type="object" name="emergency">Maginium\Framework\Log\Handlers\File\Emergency</item>
             </argument>
         </arguments>
     </type>
 
     <!-- Event and Message Queue -->
-    <preference
-    for="Maginium\Framework\Event\Interfaces\EventInterface"
-    type="Maginium\Framework\Event\EventManager"
-  />
-    <preference
-    for="Magento\Framework\MessageQueue\Publisher"
-    type="Maginium\Framework\MessageQueue\PublisherManager"
-  />
-    <preference
-    for="Maginium\Framework\MessageQueue\Interfaces\PublisherInterface"
-    type="Maginium\Framework\MessageQueue\PublisherManager"
-  />
+    <preference for="Maginium\Framework\Event\Interfaces\EventInterface" type="Maginium\Framework\Event\EventManager" />
+    <preference for="Magento\Framework\MessageQueue\Publisher" type="Maginium\Framework\MessageQueue\PublisherManager" />
+    <preference for="Maginium\Framework\MessageQueue\Interfaces\PublisherInterface" type="Maginium\Framework\MessageQueue\PublisherManager" />
 
     <!-- Config Module -->
-    <preference
-    for="Maginium\Framework\Config\Interfaces\ConfigInterface"
-    type="Maginium\Framework\Config\Config"
-  />
-    <preference
-    for="Maginium\Framework\Config\Interfaces\FactoryInterface"
-    type="Maginium\Framework\Config\ConfigManager"
-  />
+    <preference for="Maginium\Framework\Config\Interfaces\ConfigInterface" type="Maginium\Framework\Config\Config" />
+    <preference for="Maginium\Framework\Config\Interfaces\FactoryInterface" type="Maginium\Framework\Config\ConfigManager" />
     <type name="Magento\Config\Model\Config\Processor\EnvironmentPlaceholder">
         <plugin
-      disabled="false"
-      name="environment_placeholder_plugin"
-      sortOrder="1"
-      type="Maginium\Framework\Config\Interceptors\Processor\EnvironmentPlaceholder"
-    />
+            disabled="false"
+            name="environment_placeholder_plugin"
+            sortOrder="1"
+            type="Maginium\Framework\Config\Interceptors\Processor\EnvironmentPlaceholder"
+        />
     </type>
     <type name="Magento\Framework\App\Http">
-        <plugin
-      disabled="false"
-      name="load_environment_variables"
-      type="Maginium\Framework\Config\Interceptors\App\Http"
-    />
+        <plugin disabled="false" name="load_environment_variables" type="Maginium\Framework\Config\Interceptors\App\Http" />
     </type>
 
     <!-- Pagination -->
+    <preference for="Maginium\Framework\Pagination\Interfaces\CursorInterface" type="Maginium\Framework\Pagination\Cursor" />
+    <preference for="Maginium\Framework\Pagination\Interfaces\PaginatorInterface" type="Maginium\Framework\Pagination\Paginator" />
+    <preference for="Maginium\Framework\Pagination\Interfaces\CursorPaginatorInterface" type="Maginium\Framework\Pagination\CursorPaginator" />
     <preference
-    for="Maginium\Framework\Pagination\Interfaces\CursorInterface"
-    type="Maginium\Framework\Pagination\Cursor"
-  />
-    <preference
-    for="Maginium\Framework\Pagination\Interfaces\PaginatorInterface"
-    type="Maginium\Framework\Pagination\Paginator"
-  />
-    <preference
-    for="Maginium\Framework\Pagination\Interfaces\CursorPaginatorInterface"
-    type="Maginium\Framework\Pagination\CursorPaginator"
-  />
-    <preference
-    for="Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface"
-    type="Maginium\Framework\Pagination\LengthAwarePaginator"
-  />
+        for="Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface"
+        type="Maginium\Framework\Pagination\LengthAwarePaginator"
+    />
     <!-- Middleware -->
     <type name="Magento\Webapi\Controller\Rest">
-        <plugin
-      name="pagination_state_plugin"
-      type="Maginium\Framework\Pagination\Middlewares\SetPaginationState"
-    />
+        <plugin name="pagination_state_plugin" type="Maginium\Framework\Pagination\Middlewares\SetPaginationState" />
     </type>
 
     <!-- Commands Plugin Configuration -->
@@ -200,135 +94,48 @@
             <argument xsi:type="array" name="commands">
                 <!-- Register the custom command for invoking serialized closures. -->
                 <item
-          xsi:type="object"
-          name="invoke_serialized_closure_command"
-        >Maginium\Framework\Concurrency\Commands\InvokeSerializedClosureCommand</item>
+                    xsi:type="object"
+                    name="invoke_serialized_closure_command"
+                >Maginium\Framework\Concurrency\Commands\InvokeSerializedClosureCommand</item>
 
                 <!-- General -->
-                <item
-          xsi:type="object"
-          name="app_about_command"
-        >Maginium\Framework\Console\Commands\AboutCommand</item>
-                <item
-          xsi:type="object"
-          name="app_list_commands_command"
-        >Maginium\Framework\Console\Commands\ListCommandsCommand</item>
-                <item
-          xsi:type="object"
-          name="app_static_deploy_command"
-        >Maginium\Framework\Console\Commands\StaticDeployCommand</item>
+                <item xsi:type="object" name="app_about_command">Maginium\Framework\Console\Commands\AboutCommand</item>
+                <item xsi:type="object" name="app_list_commands_command">Maginium\Framework\Console\Commands\ListCommandsCommand</item>
+                <item xsi:type="object" name="app_static_deploy_command">Maginium\Framework\Console\Commands\StaticDeployCommand</item>
 
                 <!-- Make -->
-                <item
-          xsi:type="object"
-          name="make_command"
-        >Maginium\Framework\Console\Commands\Make\Command</item>
-                <item
-          xsi:type="object"
-          name="make_dto_command"
-        >Maginium\Framework\Console\Commands\Make\DtoCommand</item>
-                <item
-          xsi:type="object"
-          name="make_job_command"
-        >Maginium\Framework\Console\Commands\Make\JobCommand</item>
-                <item
-          xsi:type="object"
-          name="make_enum_command"
-        >Maginium\Framework\Console\Commands\Make\EnumCommand</item>
-                <item
-          xsi:type="object"
-          name="make_model_command"
-        >Maginium\Framework\Console\Commands\Make\ModelCommand</item>
-                <item
-          xsi:type="object"
-          name="make_queue_command"
-        >Maginium\Framework\Console\Commands\Make\QueueCommand</item>
-                <item
-          xsi:type="object"
-          name="make_block_command"
-        >Maginium\Framework\Console\Commands\Make\BlockCommand</item>
-                <item
-          xsi:type="object"
-          name="make_action_command"
-        >Maginium\Framework\Console\Commands\Make\ActionCommand</item>
-                <item
-          xsi:type="object"
-          name="make_seeder_command"
-        >Maginium\Framework\Console\Commands\Make\SeederCommand</item>
-                <item
-          xsi:type="object"
-          name="make_module_command"
-        >Maginium\Framework\Console\Commands\Make\ModuleCommand</item>
-                <item
-          xsi:type="object"
-          name="make_service_command"
-        >Maginium\Framework\Console\Commands\Make\ServiceCommand</item>
-                <item
-          xsi:type="object"
-          name="make_factory_command"
-        >Maginium\Framework\Console\Commands\Make\FactoryCommand</item>
-                <item
-          xsi:type="object"
-          name="make_migration_command"
-        >Maginium\Framework\Console\Commands\Make\MigrationCommand</item>
-                <item
-          xsi:type="object"
-          name="make_middleware_command"
-        >Maginium\Framework\Console\Commands\Make\MiddlewareCommand</item>
-                <item
-          xsi:type="object"
-          name="make_controller_command"
-        >Maginium\Framework\Console\Commands\Make\ControllerCommand</item>
-                <item
-          xsi:type="object"
-          name="make_repository_command"
-        >Maginium\Framework\Console\Commands\Make\RepositoryCommand</item>
-                <item
-          xsi:type="object"
-          name="make_interceptor_command"
-        >Maginium\Framework\Console\Commands\Make\InterceptorCommand</item>
-                <item
-          xsi:type="object"
-          name="make_elastic_model_command"
-        >Maginium\Framework\Console\Commands\Make\ElasticModelCommand</item>
-                <item
-          xsi:type="object"
-          name="make_admin_controller_command"
-        >Maginium\Framework\Console\Commands\Make\AdminControllerCommand</item>
+                <item xsi:type="object" name="make_command">Maginium\Framework\Console\Commands\Make\Command</item>
+                <item xsi:type="object" name="make_dto_command">Maginium\Framework\Console\Commands\Make\DtoCommand</item>
+                <item xsi:type="object" name="make_job_command">Maginium\Framework\Console\Commands\Make\JobCommand</item>
+                <item xsi:type="object" name="make_enum_command">Maginium\Framework\Console\Commands\Make\EnumCommand</item>
+                <item xsi:type="object" name="make_model_command">Maginium\Framework\Console\Commands\Make\ModelCommand</item>
+                <item xsi:type="object" name="make_queue_command">Maginium\Framework\Console\Commands\Make\QueueCommand</item>
+                <item xsi:type="object" name="make_block_command">Maginium\Framework\Console\Commands\Make\BlockCommand</item>
+                <item xsi:type="object" name="make_action_command">Maginium\Framework\Console\Commands\Make\ActionCommand</item>
+                <item xsi:type="object" name="make_seeder_command">Maginium\Framework\Console\Commands\Make\SeederCommand</item>
+                <item xsi:type="object" name="make_module_command">Maginium\Framework\Console\Commands\Make\ModuleCommand</item>
+                <item xsi:type="object" name="make_service_command">Maginium\Framework\Console\Commands\Make\ServiceCommand</item>
+                <item xsi:type="object" name="make_factory_command">Maginium\Framework\Console\Commands\Make\FactoryCommand</item>
+                <item xsi:type="object" name="make_migration_command">Maginium\Framework\Console\Commands\Make\MigrationCommand</item>
+                <item xsi:type="object" name="make_middleware_command">Maginium\Framework\Console\Commands\Make\MiddlewareCommand</item>
+                <item xsi:type="object" name="make_controller_command">Maginium\Framework\Console\Commands\Make\ControllerCommand</item>
+                <item xsi:type="object" name="make_repository_command">Maginium\Framework\Console\Commands\Make\RepositoryCommand</item>
+                <item xsi:type="object" name="make_interceptor_command">Maginium\Framework\Console\Commands\Make\InterceptorCommand</item>
+                <item xsi:type="object" name="make_elastic_model_command">Maginium\Framework\Console\Commands\Make\ElasticModelCommand</item>
+                <item xsi:type="object" name="make_admin_controller_command">Maginium\Framework\Console\Commands\Make\AdminControllerCommand</item>
 
                 <!-- Database -->
-                <item
-          xsi:type="object"
-          name="db_seed_command"
-        >Maginium\Framework\Console\Commands\SeedCommand</item>
-                <item
-          xsi:type="object"
-          name="db_migrate_command"
-        >Maginium\Framework\Console\Commands\MigrateCommand</item>
+                <item xsi:type="object" name="db_seed_command">Maginium\Framework\Console\Commands\SeedCommand</item>
+                <item xsi:type="object" name="db_migrate_command">Maginium\Framework\Console\Commands\MigrateCommand</item>
 
                 <!-- Cache -->
-                <item
-          xsi:type="object"
-          name="cache_clear_command"
-        >Maginium\Framework\Console\Commands\Cache\CleanCommand</item>
-                <item
-          xsi:type="object"
-          name="cache_flush_command"
-        >Maginium\Framework\Console\Commands\Cache\FlushCommand</item>
+                <item xsi:type="object" name="cache_clear_command">Maginium\Framework\Console\Commands\Cache\CleanCommand</item>
+                <item xsi:type="object" name="cache_flush_command">Maginium\Framework\Console\Commands\Cache\FlushCommand</item>
 
                 <!-- Module -->
-                <item
-          xsi:type="object"
-          name="app_list_modules_command"
-        >Maginium\Framework\Component\Commands\ListModulesCommand</item>
-                <item
-          xsi:type="object"
-          name="app_enable_modules_command"
-        >Maginium\Framework\Component\Commands\DisableModuleCommand</item>
-                <item
-          xsi:type="object"
-          name="app_disable_modules_command"
-        >Maginium\Framework\Component\Commands\EnableModuleCommand</item>
+                <item xsi:type="object" name="app_list_modules_command">Maginium\Framework\Component\Commands\ListModulesCommand</item>
+                <item xsi:type="object" name="app_enable_modules_command">Maginium\Framework\Component\Commands\DisableModuleCommand</item>
+                <item xsi:type="object" name="app_disable_modules_command">Maginium\Framework\Component\Commands\EnableModuleCommand</item>
             </argument>
         </arguments>
     </type>

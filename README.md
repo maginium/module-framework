@@ -1,6 +1,7 @@
 # Maginium Framework Module for Magento 2
 
-The **Maginium Framework** is a utility and integration module for Magento 2, designed to extend the functionality of your Magento-based e-commerce application. This package provides essential tools and services to integrate various frameworks and packages seamlessly into your Magento 2 store.
+The **Maginium Framework** is a utility and integration module for Magento 2, designed to extend the functionality of your Magento-based e-commerce
+application. This package provides essential tools and services to integrate various frameworks and packages seamlessly into your Magento 2 store.
 
 ---
 
@@ -12,9 +13,7 @@ To install the Maginium Framework module, use Composer:
 composer require maginium/module-framework
 ```
 
-Requirements
-• PHP: >= 8.2
-• Magento 2: Compatible with all Magento 2.x versions
+Requirements • PHP: >= 8.2 • Magento 2: Compatible with all Magento 2.x versions
 
 Dependencies:
 
@@ -68,13 +67,11 @@ Features
 
 Documentation
 
-For detailed documentation, visit the official project page:
-Maginium Framework Documentation
+For detailed documentation, visit the official project page: Maginium Framework Documentation
 
 Issue Tracking
 
-If you encounter any issues or bugs, please open an issue on our GitHub repository:
-GitHub Issues
+If you encounter any issues or bugs, please open an issue on our GitHub repository: GitHub Issues
 
 Contributing
 
@@ -95,13 +92,11 @@ This package is open-source and available under the MIT License.
 
 Contact
 
-For support or inquiries, please contact us at:
-Email: <pixielity@gmail.com>
+For support or inquiries, please contact us at: Email: <pixielity@gmail.com>
 
 Security
 
-For security issues, please refer to our security page or contact us directly at:
-<pixielity@gmail.com>
+For security issues, please refer to our security page or contact us directly at: <pixielity@gmail.com>
 
 Compatibility
 
@@ -116,14 +111,14 @@ If you encounter issues during installation, try the following:
 
 composer clear-cache
 
-2.  Ensure Proper Permissions:
-    Make sure your system has the correct permissions to install and modify Magento files.
-3.  Composer Auth:
-    If you’re encountering authentication issues with private repositories, make sure your Composer configuration includes the correct credentials.
+2.  Ensure Proper Permissions: Make sure your system has the correct permissions to install and modify Magento files.
+3.  Composer Auth: If you’re encountering authentication issues with private repositories, make sure your Composer configuration includes the correct
+    credentials.
 
 Example Usage
 
-Once installed, you can begin using the framework in your Magento 2 application. For example, integrating third-party APIs or using built-in utilities.
+Once installed, you can begin using the framework in your Magento 2 application. For example, integrating third-party APIs or using built-in
+utilities.
 
 Support
 

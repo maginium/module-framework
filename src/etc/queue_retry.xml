@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:noNamespaceSchemaLocation="urn:RunAsRoot:module:RunAsRoot_MessageQueueRetry:/etc/queue_retry.xsd"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:RunAsRoot:module:RunAsRoot_MessageQueueRetry:/etc/queue_retry.xsd"
 >
     <!-- Retry limit configuration for event message topic -->
     <topic name="event.messages" retryLimit="3" />

@@ -9,7 +9,7 @@ updates:
       # Ignore specific packages if needed
       - dependency-name: "maginium/module-foundation"
         update-types: ["version-update:semver-patch"]
-  
+
   # Check for updates to GitHub Actions workflows (if any)
   - package-ecosystem: "github-actions"
     directory: "/"

@@ -1,7 +1,7 @@
 # ContainerManager
 
-ContainerManager is a utility class within the Maginium framework, designed for efficient dependency resolution and object management. It
-leverages Magento’s Object Manager to handle dependency injection, singleton retrieval, and module resolution.
+ContainerManager is a utility class within the Maginium framework, designed for efficient dependency resolution and object management. It leverages
+Magento’s Object Manager to handle dependency injection, singleton retrieval, and module resolution.
 
 Features • Dependency Management: Provides an interface for resolving dependencies and managing object instances. • Module Awareness: Verifies the
 presence and activation status of Magento modules. • Dynamic Object Creation: Supports runtime creation of class instances with constructor arguments.

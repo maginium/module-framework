@@ -100,8 +100,8 @@ You can reference this constant for database schema fields or application logic.
 
 Exceptions
 
-All methods throw the Maginium\Foundation\Exceptions\Exception in cases where UUID generation or validation fails. Ensure you wrap calls in
-try-catch blocks for error handling.
+All methods throw the Maginium\Foundation\Exceptions\Exception in cases where UUID generation or validation fails. Ensure you wrap calls in try-catch
+blocks for error handling.
 
 try { $uuid = Uuid::generate(6); // Invalid version } catch (Exception $e) { echo "Error: " . $e->getMessage(); }
 

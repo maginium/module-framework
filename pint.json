@@ -1,20 +1,8 @@
 {
   "preset": "psr12",
   "single_line": true,
-  "notPath": [
-    "_ide_helper.php",
-    "_ide_helper_models.php",
-    "SwaggerDecorator.php"
-  ],
-  "exclude": [
-    "tests",
-    "stubs",
-    "public",
-    "public",
-    "app/etc",
-    "Output.php",
-    "app/storage"
-  ],
+  "notPath": ["_ide_helper.php", "_ide_helper_models.php", "SwaggerDecorator.php"],
+  "exclude": ["tests", "stubs", "public", "public", "app/etc", "Output.php", "app/storage"],
   "notName": ["*.blade.php"],
   "rules": {
     "array_push": true,
@@ -397,18 +385,7 @@
       "namespaces": false
     },
     "no_unneeded_control_parentheses": {
-      "statements": [
-        "break",
-        "clone",
-        "continue",
-        "echo_print",
-        "negative_instanceof",
-        "others",
-        "return",
-        "switch_case",
-        "yield",
-        "yield_from"
-      ]
+      "statements": ["break", "clone", "continue", "echo_print", "negative_instanceof", "others", "return", "switch_case", "yield", "yield_from"]
     },
     "no_unneeded_braces": {
       "namespaces": false
@@ -436,17 +413,7 @@
       "case_sensitive": false
     },
     "phpdoc_inline_tag_normalizer": {
-      "tags": [
-        "example",
-        "id",
-        "internal",
-        "inheritdoc",
-        "inheritdocs",
-        "link",
-        "source",
-        "toc",
-        "tutorial"
-      ]
+      "tags": ["example", "id", "internal", "inheritdoc", "inheritdocs", "link", "source", "toc", "tutorial"]
     },
     "phpdoc_order": {
       "order": ["param", "throws", "return"]
