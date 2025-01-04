@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale\Interfaces;
+namespace Maginium\Framework\Locale\Interfaces;
 
 use Magento\Framework\App\Area;
 use Magento\Framework\Translate;
 use Magento\Framework\TranslateInterface;
-use Pixicommerce\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\Exception;
 
 /**
  * Interface TranslationInterface.

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Interfaces;
+namespace Maginium\Framework\Token\Interfaces;
 
-use Pixicommerce\Foundation\Exceptions\AuthenticationException;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\AuthenticationException;
+use Maginium\Foundation\Exceptions\LocalizedException;
 
 /**
  * Interface TokenServiceInterface.

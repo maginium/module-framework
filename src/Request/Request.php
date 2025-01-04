@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Request;
 
-use Illuminate\Support\Traits\Macroable;
-use Magento\Customer\Model\Customer as MagentoCustomer;
-use Magento\Framework\App\Request\Http as BaseHttp;
-use Magento\User\Api\Data\UserInterface;
 use Magento\User\Model\User;
-use Maginium\Customer\Interfaces\Data\CustomerInterface;
-use Maginium\Customer\Models\Customer;
-use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Arr;
-use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Str;
+use Maginium\Customer\Models\Customer;
+use Illuminate\Support\Traits\Macroable;
+use Magento\User\Api\Data\UserInterface;
 use Maginium\Framework\Support\Validator;
-use Symfony\Component\HttpFoundation\AcceptHeader;
+use Maginium\Framework\Support\Facades\Json;
 use Symfony\Component\HttpFoundation\InputBag;
+use Magento\Customer\Api\Data\CustomerInterface;
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Magento\Framework\App\Request\Http as BaseHttp;
+use Magento\Customer\Model\Customer as MagentoCustomer;
+use Maginium\Framework\Request\Interfaces\RequestInterface;
 
 /**
  * Represents an enhanced HTTP request with additional functionality.
@@ -136,7 +136,7 @@ class Request extends BaseHttp implements RequestInterface
      *
      * @param MagentoCustomer|Customer|User|null $user The user object to set as the current user, or null to reset.
      */
-    public function setUser(MagentoCustomer|Customer|User|null $user): void
+    public function setUser(MagentoCustomer|CustomerInterface|User|null $user): void
     {
         // Assign the provided user object to the request's user property.
         $this->user = $user;

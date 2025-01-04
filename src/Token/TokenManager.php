@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Services;
+namespace Maginium\Framework\Token\Services;
 
-use Pixicommerce\Framework\Token\Interfaces\AdminTokenServiceInterface;
-use Pixicommerce\Framework\Token\Interfaces\ApiKeyServiceInterface;
-use Pixicommerce\Framework\Token\Interfaces\CustomerTokenServiceInterface;
+use Maginium\Framework\Token\Interfaces\AdminTokenServiceInterface;
+use Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface;
+use Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface;
 
 /**
  * Service for managing user access tokens.

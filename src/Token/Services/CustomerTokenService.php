@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Services;
+namespace Maginium\Framework\Token\Services;
 
 use Exception;
 use Magento\Integration\Api\Exception\UserTokenException;
 use Magento\Integration\Model\CustomUserContext;
-use Pixicommerce\Foundation\Exceptions\AuthenticationException;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
-use Pixicommerce\Framework\Token\Interfaces\CustomerTokenServiceInterface;
+use Maginium\Foundation\Exceptions\AuthenticationException;
+use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface;
 
 /**
  * Service for managing customer access tokens.

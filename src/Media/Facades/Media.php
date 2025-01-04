@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Media\Facades;
+namespace Maginium\Framework\Media\Facades;
 
-use Pixicommerce\Framework\Media\Interfaces\MediaInterface;
-use Pixicommerce\Framework\Support\Facade;
+use Maginium\Framework\Media\Interfaces\MediaInterface;
+use Maginium\Framework\Support\Facade;
 
 /**
  * Facade for interacting with the Media service.
@@ -13,14 +13,14 @@ use Pixicommerce\Framework\Support\Facade;
  * This class acts as a simplified interface to access the MediaInterface.
  * By extending AbstractFacade, it inherits basic functionality for service access.
  *
- * @method static \Pixicommerce\Framework\Resize\Resizer resize(string $imageUrl, int $newWidth, int $newHeight, array $options = []) Resize and/or crop an image to the given dimensions.
- * @method static \Pixicommerce\Framework\Resize\Resizer crop(string $imageUrl, int $cropStartX, int $cropStartY, int $newWidth, int $newHeight, ?int $srcWidth = null, ?int $srcHeight = null) Crop an image to the specified dimensions from a starting point.
+ * @method static \Maginium\Framework\Resize\Resizer resize(string $imageUrl, int $newWidth, int $newHeight, array $options = []) Resize and/or crop an image to the given dimensions.
+ * @method static \Maginium\Framework\Resize\Resizer crop(string $imageUrl, int $cropStartX, int $cropStartY, int $newWidth, int $newHeight, ?int $srcWidth = null, ?int $srcHeight = null) Crop an image to the specified dimensions from a starting point.
  * @method static string|null upload(string $fileName, bool $withPrefix = false) Upload a media file.
  * @method static string url(string $file, bool $withPrefix = false) Get the URL of a media file.
  * @method static string absolutePath(string $file, bool $withPrefix = false) Get the absolute path of a media file.
  * @method static string relativePath(string $file, bool $withPrefix = false) Get the relative path of a media file.
  * @method static string baseUrl() Get the base URL for media assets.
- * @method static \Pixicommerce\Framework\Media\Interfaces\MediaInterface fromUrl(string $fileUrl) Chainable method to specify the file URL.
+ * @method static \Maginium\Framework\Media\Interfaces\MediaInterface fromUrl(string $fileUrl) Chainable method to specify the file URL.
  * @method static string|false toAbsolute() Set the path to be absolute or relative.
  *
  * @see MediaInterface

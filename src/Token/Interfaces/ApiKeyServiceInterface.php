@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Interfaces;
+namespace Maginium\Framework\Token\Interfaces;
 
 use Magento\Integration\Model\Integration as ApiKey;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\LocalizedException;
 
 /**
  * Interface ApiKeyServiceInterface.

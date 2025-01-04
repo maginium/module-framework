@@ -117,7 +117,7 @@ interface RequestInterface extends BaseRequestInterface
      *
      * @param MagentoCustomer|Customer|User|null $user The user object to set as the current user, or null to reset.
      */
-    public function setUser(MagentoCustomer|CustomerInterface|Customer|User|null $user): void;
+    public function setUser(MagentoCustomer|CustomerInterface|User|null $user): void;
 
     /**
      * Sets the language or locale for the request.

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Media\Interfaces;
+namespace Maginium\Framework\Media\Interfaces;
 
-use Pixicommerce\Framework\Resize\Resizer;
+use Maginium\Framework\Resize\Resizer;
 
 /**
  * Interface MediaInterface.
@@ -16,7 +16,7 @@ interface MediaInterface
     /**
      * Prefix for storing resized images.
      */
-    public const PREFIX_PATH = 'pixicommerce';
+    public const PREFIX_PATH = 'maginium';
 
     /**
      * Path for storing resized images.

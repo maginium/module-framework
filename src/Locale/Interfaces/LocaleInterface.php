@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale\Interfaces;
+namespace Maginium\Framework\Locale\Interfaces;
 
 /**
  * Interface LocaleInterface.

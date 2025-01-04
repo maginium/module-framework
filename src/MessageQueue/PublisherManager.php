@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\MessageQueue;
+namespace Maginium\Framework\MessageQueue;
 
 use Magento\Framework\Amqp\Config as AmqpConfig;
 use Magento\Framework\MessageQueue\ConfigInterface as MessageQueueConfig;
@@ -12,16 +12,16 @@ use Magento\Framework\MessageQueue\MessageEncoder;
 use Magento\Framework\MessageQueue\MessageValidator;
 use Magento\Framework\MessageQueue\Publisher as BasePublisher;
 use Magento\Framework\MessageQueue\Publisher\ConfigInterface as PublisherConfig;
-use Pixicommerce\Foundation\Enums\ContentType;
-use Pixicommerce\Foundation\Exceptions\Exception;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
-use Pixicommerce\Framework\MessageQueue\Interfaces\PublisherInterface;
-use Pixicommerce\Framework\Support\Facades\Config;
-use Pixicommerce\Framework\Support\Facades\Date;
-use Pixicommerce\Framework\Support\Facades\Json;
-use Pixicommerce\Framework\Support\Facades\Log;
-use Pixicommerce\Framework\Support\Str;
-use Pixicommerce\Framework\Support\Validator;
+use Maginium\Foundation\Enums\ContentType;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Framework\MessageQueue\Interfaces\PublisherInterface;
+use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Date;
+use Maginium\Framework\Support\Facades\Json;
+use Maginium\Framework\Support\Facades\Log;
+use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class PublisherManager.

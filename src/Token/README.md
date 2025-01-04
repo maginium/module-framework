@@ -5,7 +5,7 @@ Overview
 The Token Manager Module provides a comprehensive solution for managing access tokens across different user roles, including customers, admins, and
 API keys. It integrates with Magento’s native services to handle token creation, revocation, and management in a secure and scalable manner.
 
-This module is designed for use in the Pixicommerce framework and provides services for managing the lifecycle of authentication tokens for various
+This module is designed for use in the Maginium framework and provides services for managing the lifecycle of authentication tokens for various
 user types, ensuring secure access to APIs and resources.
 
 Features • Customer Token Management: • Create and revoke customer access tokens. • Integrates with Magento’s custom user context and token issuer for
@@ -49,7 +49,7 @@ TokenManager Class
 The TokenManager class is the central service for accessing token management functionality. It provides methods to interact with customer, admin, and
 API key services.
 
-use Pixicommerce\Framework\Token\Services\TokenManager;
+use Maginium\Framework\Token\Services\TokenManager;
 
 $tokenManager = new TokenManager($apiKeyService, $adminTokenService, $customerTokenService);
 
@@ -61,7 +61,7 @@ CustomerTokenService
 
 The CustomerTokenService allows you to generate and manage tokens for customer access.
 
-use Pixicommerce\Framework\Token\Services\CustomerTokenService;
+use Maginium\Framework\Token\Services\CustomerTokenService;
 
 // Create a customer token $tokenService = new CustomerTokenService();
 $customerToken = $tokenService->create($userId);
@@ -70,7 +70,7 @@ ApiKeyService
 
 The ApiKeyService is used to create API keys and associate them with access tokens.
 
-use Pixicommerce\Framework\Token\Services\ApiKeyService;
+use Maginium\Framework\Token\Services\ApiKeyService;
 
 // Create an API key and generate access token $apiKeyService = new ApiKeyService($oauthService, $baseApiKeyService);
 $apiKey =
@@ -95,7 +95,7 @@ channel. • Regularly rotate API keys and tokens to minimize the risk of exposu
 
 License
 
-This module is licensed under the Pixicommerce license. For more information, please refer to the license file included in the repository.
+This module is licensed under the Maginium license. For more information, please refer to the license file included in the repository.
 
 Contributing
 

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Services;
+namespace Maginium\Framework\Token\Services;
 
 use Exception;
 use Magento\Integration\Api\IntegrationServiceInterface as BaseApiKeyServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Model\Integration as ApiKey;
-use Pixicommerce\Foundation\Exceptions\InvalidArgumentException;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
-use Pixicommerce\Framework\Support\Facades\Config;
-use Pixicommerce\Framework\Token\Interfaces\ApiKeyServiceInterface;
+use Maginium\Foundation\Exceptions\InvalidArgumentException;
+use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface;
 
 /**
  * Service class for managing Magento 2 API apiKeys and access tokens.

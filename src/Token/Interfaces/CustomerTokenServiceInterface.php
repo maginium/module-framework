@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Interfaces;
+namespace Maginium\Framework\Token\Interfaces;
 
 /**
  * Interface CustomerTokenServiceInterface.

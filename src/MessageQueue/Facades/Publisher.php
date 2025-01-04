@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Support\Facades;
+namespace Maginium\Framework\Support\Facades;
 
-use Pixicommerce\Framework\MessageQueue\Interfaces\PublisherInterface;
-use Pixicommerce\Framework\Support\Facade;
+use Maginium\Framework\MessageQueue\Interfaces\PublisherInterface;
+use Maginium\Framework\Support\Facade;
 
 /**
  * Facade for interacting with the Queue service.

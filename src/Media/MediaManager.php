@@ -2,25 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Media;
+namespace Maginium\Framework\Media;
 
 use Magento\Backend\Model\UrlInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\File\UploaderFactory;
 use Magento\Framework\Filesystem\Directory\WriteInterface;
 use Magento\Framework\View\Asset\Repository;
-use Pixicommerce\Foundation\Exceptions\Exception;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
-use Pixicommerce\Foundation\Exceptions\NotFoundException;
-use Pixicommerce\Framework\Media\Interfaces\MediaInterface;
-use Pixicommerce\Framework\Resize\Resizer;
-use Pixicommerce\Framework\Support\Facades\Config;
-use Pixicommerce\Framework\Support\Facades\Filesystem;
-use Pixicommerce\Framework\Support\Facades\Log;
-use Pixicommerce\Framework\Support\Facades\StoreManager;
-use Pixicommerce\Framework\Support\Path;
-use Pixicommerce\Framework\Support\Str;
-use Pixicommerce\Store\Models\Store;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NotFoundException;
+use Maginium\Framework\Media\Interfaces\MediaInterface;
+use Maginium\Framework\Resize\Resizer;
+use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Filesystem;
+use Maginium\Framework\Support\Facades\Log;
+use Maginium\Framework\Support\Facades\StoreManager;
+use Maginium\Framework\Support\Path;
+use Maginium\Framework\Support\Str;
+use Maginium\Store\Models\Store;
 
 /**
  * Class MediaManager.

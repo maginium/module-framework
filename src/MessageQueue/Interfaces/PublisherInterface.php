@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\MessageQueue\Interfaces;
+namespace Maginium\Framework\MessageQueue\Interfaces;
 
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\LocalizedException;
 
 /**
  * Interface PublisherInterface.

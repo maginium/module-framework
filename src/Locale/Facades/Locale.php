@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale\Facades;
+namespace Maginium\Framework\Locale\Facades;
 
 use Magento\Framework\Locale\ResolverInterface;
-use Pixicommerce\Foundation\Exceptions\InvalidArgumentException;
-use Pixicommerce\Framework\Locale\Interfaces\LocaleInterface;
-use Pixicommerce\Framework\Locale\Interfaces\TranslationInterface;
-use Pixicommerce\Framework\Support\Facade;
-use Pixicommerce\Framework\Support\Reflection;
+use Maginium\Foundation\Exceptions\InvalidArgumentException;
+use Maginium\Framework\Locale\Interfaces\LocaleInterface;
+use Maginium\Framework\Locale\Interfaces\TranslationInterface;
+use Maginium\Framework\Support\Facade;
+use Maginium\Framework\Support\Reflection;
 
 /**
  * Class Locale.

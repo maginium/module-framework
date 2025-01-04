@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale;
+namespace Maginium\Framework\Locale;
 
 use LasseRafn\StringScript;
-use Pixicommerce\Framework\Locale\Interfaces\LocaleInterface;
-use Pixicommerce\Framework\Support\Php;
-use Pixicommerce\Framework\Support\Str;
+use Maginium\Framework\Locale\Interfaces\LocaleInterface;
+use Maginium\Framework\Support\Php;
+use Maginium\Framework\Support\Str;
 
 /**
  * Class LocaleManager.

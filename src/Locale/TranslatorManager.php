@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale;
+namespace Maginium\Framework\Locale;
 
 use Magento\Framework\App\Area;
 use Magento\Framework\Translate;
 use MessageFormatter;
-use Pixicommerce\Foundation\Exceptions\Exception;
-use Pixicommerce\Framework\Locale\Interfaces\TranslationInterface;
-use Pixicommerce\Framework\Support\Arr;
-use Pixicommerce\Framework\Support\Facades\Log;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Locale\Interfaces\TranslationInterface;
+use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Facades\Log;
 
 /**
  * Class TranslatorManager.

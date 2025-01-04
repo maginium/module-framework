@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Services;
+namespace Maginium\Framework\Token\Services;
 
 use Exception;
 use Magento\Integration\Api\UserTokenIssuerInterface;
 use Magento\Integration\Api\UserTokenRevokerInterface;
 use Magento\Integration\Model\CustomUserContextFactory;
 use Magento\Integration\Model\UserToken\UserTokenParametersFactory;
-use Pixicommerce\Foundation\Exceptions\AuthenticationException;
-use Pixicommerce\Foundation\Exceptions\LocalizedException;
-use Pixicommerce\Framework\Actions\Concerns\AsAction;
-use Pixicommerce\Framework\Support\Facades\Log;
+use Maginium\Foundation\Exceptions\AuthenticationException;
+use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Framework\Actions\Concerns\AsAction;
+use Maginium\Framework\Support\Facades\Log;
 
 /**
  * Class AbstractTokenService.

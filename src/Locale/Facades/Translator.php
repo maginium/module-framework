@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Locale\Facades;
+namespace Maginium\Framework\Locale\Facades;
 
-use Pixicommerce\Framework\Locale\Interfaces\TranslationInterface;
-use Pixicommerce\Framework\Support\Facade;
+use Maginium\Framework\Locale\Interfaces\TranslationInterface;
+use Maginium\Framework\Support\Facade;
 
 /**
  * Facade for accessing translation services.

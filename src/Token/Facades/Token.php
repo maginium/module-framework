@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Token\Facades;
+namespace Maginium\Framework\Token\Facades;
 
-use Pixicommerce\Framework\Support\Facade;
-use Pixicommerce\Framework\Token\Services\TokenManager;
+use Maginium\Framework\Support\Facade;
+use Maginium\Framework\Token\Services\TokenManager;
 
 /**
  * Class Token.

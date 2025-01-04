@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\MessageQueue\Abstracts;
+namespace Maginium\Framework\MessageQueue\Abstracts;
 
 use Exception;
 use Magento\Framework\MessageQueue\ConsumerConfiguration;
 use Override;
-use Pixicommerce\Framework\Support\DataObject;
-use Pixicommerce\Framework\Support\Facades\Json;
-use Pixicommerce\Framework\Support\Validator;
+use Maginium\Framework\Support\DataObject;
+use Maginium\Framework\Support\Facades\Json;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class AbstractConsumer.
