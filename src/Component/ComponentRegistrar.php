@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Component;
 
+use const VENDOR_AUTOLOAD;
+
 use Composer\Autoload\ClassLoader;
 use Exception;
 use Magento\Framework\Component\ComponentRegistrar as BaseComponentRegistrar;
@@ -92,7 +94,7 @@ class ComponentRegistrar extends BaseComponentRegistrar implements ComponentRegi
      *
      * @return ClassLoader Returns the Composer autoloader instance.
      */
-    public static function getAutoloader()
+    public static function getAutoloader(): ClassLoader
     {
         // Include the Composer autoload file and return the ClassLoader instance.
         // This file is responsible for managing the automatic loading of classes and componentNames.

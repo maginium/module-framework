@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Concerns;
 
-use Illuminate\Database\Schema\Blueprint;
+use Maginium\Framework\Database\Schema\Blueprint;
 use Maginium\Framework\Support\Debug\ConsoleOutput;
 use Maginium\Framework\Support\Facades\Schema;
 use Maginium\Framework\Support\Reflection;

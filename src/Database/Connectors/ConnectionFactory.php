@@ -58,7 +58,7 @@ class ConnectionFactory extends BaseConnectionFactory
      *
      * @return ConnectionInterface
      */
-    public function make(array $config, $name = null):ConnectionInterface
+    public function make(array $config, $name = null): ConnectionInterface
     {
         $config = $this->parseConfig($config, $name);
 

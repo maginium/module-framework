@@ -176,7 +176,7 @@ use Maginium\Framework\Support\Facade;
  * @method static bool acceptsHtml()
  * @method static bool matchesType(string $actual, string $type)
  * @method static string format(string $default = 'html')
- * @method static string|array|null old(string|null $key = null, \Illuminate\Database\Eloquent\Model|string|array|null $default = null)
+ * @method static string|array|null old(string|null $key = null, \Maginium\Framework\Database\EloquentModel|string|array|null $default = null)
  * @method static void flash()
  * @method static void flashOnly(array|mixed $keys)
  * @method static void flashExcept(array|mixed $keys)

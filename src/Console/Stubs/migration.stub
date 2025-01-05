@@ -2,7 +2,7 @@
 
 namespace :NAMESPACE:\:MODULE:\Setup\Migrations;
 
-use Illuminate\Database\Schema\Blueprint;
+use Maginium\Framework\Database\Schema\Blueprint;
 use IrishTitan\Handshake\Contracts\MigrationContract;
 use Maginium\Framework\Database\Setup\Migration\Migration;
 use IrishTitan\Handshake\Core\Schema;

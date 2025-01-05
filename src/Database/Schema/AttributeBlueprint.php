@@ -6,7 +6,6 @@ namespace Maginium\Framework\Database\Schema;
 
 use Closure;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\Grammar;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Database\Enums\AttributeType;
@@ -19,6 +18,7 @@ use Maginium\Framework\Database\Setup\Migration\Attribute\Context;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Fluent;
+use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
 use Override;
 
@@ -61,10 +61,10 @@ class AttributeBlueprint extends Blueprint
      * - $callback: An optional callback function for additional attribute configurations.
      *
      * @param Context $context The context object that holds the EAV services.
-     * @param string|null $attribute The name of the attribute.
+     * @param string $attribute The name of the attribute.
      * @param Closure|null $callback An optional callback for additional configurations.
      */
-    public function __construct(?Context $context, ?string $attribute, ?Closure $callback = null)
+    public function __construct(string $attribute, ?Context $context, ?Closure $callback = null)
     {
         $this->context = $context;
         $this->attribute = $attribute;
@@ -151,7 +151,7 @@ class AttributeBlueprint extends Blueprint
      * @return void
      */
     #[Override]
-    public function build(ConnectionInterface $connection, Grammar $grammar): void
+    public function build(ConnectionInterface $connection, ?Grammar $grammar): void
     {
         // Loop through each attribute and process it
         foreach ($this->getAttributes() as $attribute) {
@@ -374,78 +374,125 @@ class AttributeBlueprint extends Blueprint
      */
     private function map(AttributeDefinition $attribute): array
     {
+        // dd($attribute);
         // Retrieve the validation rules associated with the attribute, if any.
         $validationRule = $attribute->get(AttributeBlueprintInterface::VALIDATE_RULES, null);
 
-        // If the validation rules are an array, convert them to an associative array if needed.
-        if (Validator::isArray($validationRule)) {
-            // Convert array of strings like ['min:10', 'max:15'] to an associative array
-            $validationRule = Arr::reduce($validationRule, function($carry, $item) {
-                // Split each rule string into key-value format and add to the array
-                [$key, $value] = explode(':', $item);
-                $carry[$key] = (int)$value;  // Ensure the value is an integer
+        // Get attribute for property
+        $for = $attribute->get(AttributeBlueprintInterface::FOR, null);
 
-                return $carry;
-            }, []);
-
-            // Now serialize the rules into JSON format
-            $validationRule = Json::encode($validationRule);
-        }
+        // Get label and note for the attribute, constructing the note if not explicitly set.
+        $label = $attribute->get(AttributeBlueprintInterface::LABEL);
+        $note = $attribute->get(
+            AttributeBlueprintInterface::NOTE,
+            Str::format('%1 %2 Attribute', $label, Str::capital($for)),
+        );
 
         // Return the attribute data in an EAV-compatible array format.
         return [
             // Flags and visibility settings
-            AttributeBlueprintInterface::RAW_SYSTEM => $attribute->get(AttributeBlueprintInterface::RAW_SYSTEM, false), // Whether the attribute is a system attribute
-            AttributeBlueprintInterface::RAW_IS_GLOBAL => $attribute->get(AttributeBlueprintInterface::RAW_IS_GLOBAL, false), // Flag indicating if the attribute is global
-            AttributeBlueprintInterface::RAW_VISIBLE => $attribute->get(AttributeBlueprintInterface::RAW_VISIBLE, true), // Whether the attribute is visible in forms or not
-            AttributeBlueprintInterface::RAW_IS_SEARCHABLE => $attribute->get(AttributeBlueprintInterface::RAW_IS_SEARCHABLE, false), // Flag indicating if the attribute is searchable
-            AttributeBlueprintInterface::RAW_IS_FILTERABLE => $attribute->get(AttributeBlueprintInterface::RAW_IS_FILTERABLE, false), // Flag indicating if the attribute is filterable
-            AttributeBlueprintInterface::RAW_IS_COMPARABLE => $attribute->get(AttributeBlueprintInterface::RAW_IS_COMPARABLE, false), // Flag indicating if the attribute is comparable
-            AttributeBlueprintInterface::RAW_USED_FOR_SORT_BY => $attribute->get(AttributeBlueprintInterface::RAW_USED_FOR_SORT_BY, false), // Whether the attribute is used for sorting
-            AttributeBlueprintInterface::RAW_IS_WYSIWYG_ENABLED => $attribute->get(AttributeBlueprintInterface::RAW_IS_WYSIWYG_ENABLED, false), // Whether the attribute supports WYSIWYG editor
-            AttributeBlueprintInterface::RAW_IS_VISIBLE_ON_FRONT => $attribute->get(AttributeBlueprintInterface::RAW_IS_VISIBLE_ON_FRONT, false), // Whether the attribute is visible on the frontend
-            AttributeBlueprintInterface::RAW_IS_USED_FOR_PRICE_RULES => $attribute->get(AttributeBlueprintInterface::RAW_IS_USED_FOR_PRICE_RULES, false), // Whether the attribute is used in price rules
-            AttributeBlueprintInterface::RAW_IS_USED_FOR_PROMO_RULES => $attribute->get(AttributeBlueprintInterface::RAW_IS_USED_FOR_PROMO_RULES, false), // Whether the attribute is used in promo rules
-            AttributeBlueprintInterface::RAW_IS_FILTERABLE_IN_SEARCH => $attribute->get(AttributeBlueprintInterface::RAW_IS_FILTERABLE_IN_SEARCH, false), // Whether the attribute is filterable in search
-            AttributeBlueprintInterface::RAW_USED_IN_PRODUCT_LISTING => $attribute->get(AttributeBlueprintInterface::RAW_USED_IN_PRODUCT_LISTING, false), // Whether the attribute is used in product listings
-            AttributeBlueprintInterface::RAW_IS_REQUIRED_IN_ADMIN_STORE => $attribute->get(AttributeBlueprintInterface::RAW_IS_REQUIRED_IN_ADMIN_STORE, false), // Whether the attribute is required in the admin store
-            AttributeBlueprintInterface::RAW_IS_HTML_ALLOWED_ON_FRONT => $attribute->get(AttributeBlueprintInterface::RAW_IS_HTML_ALLOWED_ON_FRONT, false), // Whether HTML is allowed on the frontend for the attribute
-            AttributeBlueprintInterface::RAW_IS_VISIBLE_IN_ADVANCED_SEARCH => $attribute->get(AttributeBlueprintInterface::RAW_IS_VISIBLE_IN_ADVANCED_SEARCH, false), // Whether the attribute is visible in advanced search
+            AttributeBlueprintInterface::RAW_DEFAULT => $attribute->get(AttributeBlueprintInterface::DEFAULT, null), // Whether the attribute has default value
+            AttributeBlueprintInterface::RAW_REQUIRED => $attribute->get(AttributeBlueprintInterface::REQUIRED, false), // Whether the attribute is required
+            AttributeBlueprintInterface::RAW_SYSTEM => $attribute->get(AttributeBlueprintInterface::SYSTEM, false), // Whether the attribute is a system attribute
+            AttributeBlueprintInterface::RAW_IS_GLOBAL => $attribute->get(AttributeBlueprintInterface::IS_GLOBAL, false), // Flag indicating if the attribute is global
+            AttributeBlueprintInterface::RAW_VISIBLE => $attribute->get(AttributeBlueprintInterface::VISIBLE, true), // Whether the attribute is visible in forms or not
+            AttributeBlueprintInterface::RAW_USER_DEFINED => $attribute->get(AttributeBlueprintInterface::USER_DEFINED, false), // Whether the attribute is user defined
+            AttributeBlueprintInterface::RAW_IS_USED_IN_GRID => $attribute->get(AttributeBlueprintInterface::IS_USED_IN_GRID, null), // Whether the attribute is used in grid
+            AttributeBlueprintInterface::RAW_IS_COMPARABLE => $attribute->get(AttributeBlueprintInterface::IS_COMPARABLE, false), // Flag indicating if the attribute is comparable
+            AttributeBlueprintInterface::RAW_USED_FOR_SORT_BY => $attribute->get(AttributeBlueprintInterface::USED_FOR_SORT_BY, false), // Whether the attribute is used for sorting
+            AttributeBlueprintInterface::RAW_IS_WYSIWYG_ENABLED => $attribute->get(AttributeBlueprintInterface::IS_WYSIWYG_ENABLED, false), // Whether the attribute supports WYSIWYG editor
+            AttributeBlueprintInterface::RAW_IS_VISIBLE_IN_GRID => $attribute->get(AttributeBlueprintInterface::IS_VISIBLE_IN_GRID, false), // Whether the attribute is visible on the frontend
+            AttributeBlueprintInterface::RAW_IS_VISIBLE_ON_FRONT => $attribute->get(AttributeBlueprintInterface::IS_VISIBLE_ON_FRONT, false), // Whether the attribute is visible on the frontend
+            AttributeBlueprintInterface::RAW_IS_USED_FOR_PRICE_RULES => $attribute->get(AttributeBlueprintInterface::IS_USED_FOR_PRICE_RULES, false), // Whether the attribute is used in price rules
+            AttributeBlueprintInterface::RAW_IS_USED_FOR_PROMO_RULES => $attribute->get(AttributeBlueprintInterface::IS_USED_FOR_PROMO_RULES, false), // Whether the attribute is used in promo rules
+            AttributeBlueprintInterface::RAW_IS_FILTERABLE_IN_SEARCH => $attribute->get(AttributeBlueprintInterface::IS_FILTERABLE_IN_SEARCH, false), // Whether the attribute is filterable in search
+            AttributeBlueprintInterface::RAW_USED_IN_PRODUCT_LISTING => $attribute->get(AttributeBlueprintInterface::USED_IN_PRODUCT_LISTING, false), // Whether the attribute is used in product listings
+            AttributeBlueprintInterface::RAW_IS_REQUIRED_IN_ADMIN_STORE => $attribute->get(AttributeBlueprintInterface::IS_REQUIRED_IN_ADMIN_STORE, false), // Whether the attribute is required in the admin store
+            AttributeBlueprintInterface::RAW_IS_HTML_ALLOWED_ON_FRONT => $attribute->get(AttributeBlueprintInterface::IS_HTML_ALLOWED_ON_FRONT, false), // Whether HTML is allowed on the frontend for the attribute
+            AttributeBlueprintInterface::RAW_IS_VISIBLE_IN_ADVANCED_SEARCH => $attribute->get(AttributeBlueprintInterface::IS_VISIBLE_IN_ADVANCED_SEARCH, false), // Whether the attribute is visible in advanced search
+            $for === CustomerAttribute::ENTITY_TYPE ? AttributeBlueprintInterface::RAW_IS_SEARCHABLE_IN_GRID : AttributeBlueprintInterface::RAW_IS_SEARCHABLE => $attribute->get(AttributeBlueprintInterface::IS_SEARCHABLE, false), // Flag indicating if the attribute is searchable
+            $for === CustomerAttribute::ENTITY_TYPE ? AttributeBlueprintInterface::RAW_IS_FILTERABLE_IN_GRID : AttributeBlueprintInterface::RAW_IS_FILTERABLE => $attribute->get(AttributeBlueprintInterface::IS_FILTERABLE, false), // Flag indicating if the attribute is filterable
 
             // Input and frontend-related settings
-            AttributeBlueprintInterface::RAW_INPUT => $attribute->get(AttributeBlueprintInterface::RAW_INPUT, null), // Type of frontend input (e.g., text, select)
-            AttributeBlueprintInterface::RAW_FRONTEND_CLASS => $attribute->get(AttributeBlueprintInterface::RAW_FRONTEND_CLASS, null), // CSS class for the frontend input
-            AttributeBlueprintInterface::RAW_FRONTEND_MODEL => $attribute->get(AttributeBlueprintInterface::RAW_FRONTEND_MODEL, null), // The frontend model for the attribute
-            AttributeBlueprintInterface::RAW_INPUT_FILTER => $attribute->get(AttributeBlueprintInterface::RAW_INPUT_FILTER, null), // Input filter (validation or sanitization rules)
-            AttributeBlueprintInterface::RAW_MULTILINE_COUNT => $attribute->get(AttributeBlueprintInterface::RAW_MULTILINE_COUNT, null), // Number of lines for multiline input fields
-            AttributeBlueprintInterface::RAW_FRONTEND_INPUT_RENDERER => $attribute->get(AttributeBlueprintInterface::RAW_FRONTEND_INPUT_RENDERER, null), // Frontend input renderer for the attribute
+            AttributeBlueprintInterface::RAW_INPUT => $attribute->get(AttributeBlueprintInterface::INPUT, null), // Type of frontend input (e.g., text, select)
+            AttributeBlueprintInterface::RAW_FRONTEND_CLASS => $attribute->get(AttributeBlueprintInterface::FRONTEND_CLASS, null), // CSS class for the frontend input
+            AttributeBlueprintInterface::RAW_FRONTEND_MODEL => $attribute->get(AttributeBlueprintInterface::FRONTEND_MODEL, null), // The frontend model for the attribute
+            AttributeBlueprintInterface::RAW_INPUT_FILTER => $attribute->get(AttributeBlueprintInterface::INPUT_FILTER, null), // Input filter (validation or sanitization rules)
+            AttributeBlueprintInterface::RAW_MULTILINE_COUNT => $attribute->get(AttributeBlueprintInterface::MULTILINE_COUNT, null), // Number of lines for multiline input fields
+            AttributeBlueprintInterface::RAW_FRONTEND_INPUT_RENDERER => $attribute->get(AttributeBlueprintInterface::FRONTEND_INPUT_RENDERER, null), // Frontend input renderer for the attribute
 
             // Backend and system-related settings
-            AttributeBlueprintInterface::RAW_TYPE => $attribute->get(AttributeBlueprintInterface::RAW_TYPE, null), // Type of backend storage for the attribute
-            AttributeBlueprintInterface::RAW_BACKEND => $attribute->get(AttributeBlueprintInterface::RAW_BACKEND, default: null), // The backend model for this attribute
-            AttributeBlueprintInterface::RAW_BACKEND_TABLE => $attribute->get(AttributeBlueprintInterface::RAW_BACKEND_TABLE, null), // Database table for backend storage
-            AttributeBlueprintInterface::RAW_DATA_MODEL => $attribute->get(AttributeBlueprintInterface::RAW_DATA_MODEL, null), // Data model associated with the attribute
-            AttributeBlueprintInterface::RAW_ATTRIBUTE_MODEL => $attribute->get(AttributeBlueprintInterface::RAW_ATTRIBUTE_MODEL, null), // The model class used for this attribute
+            AttributeBlueprintInterface::RAW_TYPE => $attribute->get(AttributeBlueprintInterface::TYPE, null), // Type of backend storage for the attribute
+            AttributeBlueprintInterface::RAW_BACKEND => $attribute->get(AttributeBlueprintInterface::BACKEND, default: null), // The backend model for this attribute
+            AttributeBlueprintInterface::RAW_BACKEND_TABLE => $attribute->get(AttributeBlueprintInterface::BACKEND_TABLE, null), // Database table for backend storage
+            AttributeBlueprintInterface::RAW_DATA_MODEL => $attribute->get(AttributeBlueprintInterface::DATA_MODEL, null), // Data model associated with the attribute
+            AttributeBlueprintInterface::RAW_ATTRIBUTE_MODEL => $attribute->get(AttributeBlueprintInterface::ATTRIBUTE_MODEL, null), // The model class used for this attribute
 
             // Sorting, positioning, and ordering settings
-            AttributeBlueprintInterface::RAW_SORT_ORDER => $attribute->get(AttributeBlueprintInterface::RAW_SORT_ORDER, 0), // Order in which the attribute is sorted
-            AttributeBlueprintInterface::RAW_SEARCH_WEIGHT => $attribute->get(AttributeBlueprintInterface::RAW_SEARCH_WEIGHT, null), // Search weight for the attribute
-            AttributeBlueprintInterface::RAW_POSITION => $attribute->get(AttributeBlueprintInterface::RAW_POSITION, 0), // Position of the attribute (for display order)
+            AttributeBlueprintInterface::RAW_SORT_ORDER => $attribute->get(AttributeBlueprintInterface::SORT_ORDER, 0), // Order in which the attribute is sorted
+            AttributeBlueprintInterface::RAW_SEARCH_WEIGHT => $attribute->get(AttributeBlueprintInterface::SEARCH_WEIGHT, null), // Search weight for the attribute
+            AttributeBlueprintInterface::RAW_POSITION => $attribute->get(AttributeBlueprintInterface::POSITION, 0), // Position of the attribute (for display order)
 
             // Options and validation
-            AttributeBlueprintInterface::RAW_OPTIONS => ['values' => $attribute->get(AttributeBlueprintInterface::RAW_OPTIONS, default: [])], // Attribute options
-            AttributeBlueprintInterface::RAW_UNIQUE => $attribute->get(AttributeBlueprintInterface::RAW_UNIQUE, false), // Whether the attribute value must be unique
-            AttributeBlueprintInterface::RAW_VALIDATE_RULES => $validationRule, // Serialized validation rules for the attribute
+            AttributeBlueprintInterface::RAW_OPTIONS => ['values' => $attribute->get(AttributeBlueprintInterface::OPTIONS, default: [])], // Attribute options
+            AttributeBlueprintInterface::RAW_UNIQUE => $attribute->get(AttributeBlueprintInterface::UNIQUE, false), // Whether the attribute value must be unique
+            AttributeBlueprintInterface::RAW_VALIDATE_RULES => $validationRule ? $this->validateRules($validationRule) : null, // Serialized validation rules for the attribute
 
             // Additional data and identifiers
-            AttributeBlueprintInterface::RAW_NOTE => $attribute->get(AttributeBlueprintInterface::RAW_NOTE, null), // Any additional note for the attribute
-            AttributeBlueprintInterface::RAW_LABEL => $attribute->get(AttributeBlueprintInterface::RAW_LABEL, null), // Label for the attribute on the frontend
-            AttributeBlueprintInterface::RAW_APPLY_TO => $attribute->get(AttributeBlueprintInterface::RAW_APPLY_TO, null), // Product types to which the attribute applies
-            AttributeBlueprintInterface::RAW_ENTITY_TYPE_ID => $attribute->get(AttributeBlueprintInterface::RAW_ENTITY_TYPE_ID, null), // Entity type ID for the attribute
-            AttributeBlueprintInterface::RAW_ATTRIBUTE_CODE => $attribute->get(AttributeBlueprintInterface::RAW_ATTRIBUTE_CODE, null), // Attribute code (unique identifier)
-            AttributeBlueprintInterface::RAW_SOURCE => $attribute->get(AttributeBlueprintInterface::RAW_SOURCE, null), // Source model for the attribute (used for options or values)
-            AttributeBlueprintInterface::RAW_ADDITIONAL_DATA => $attribute->get(AttributeBlueprintInterface::RAW_ADDITIONAL_DATA, null), // Any additional data associated with the attribute
-            AttributeBlueprintInterface::RAW_GRID_FILTER_CONDITION_TYPE => $attribute->get(AttributeBlueprintInterface::RAW_GRID_FILTER_CONDITION_TYPE, null), // Filter condition type for the attribute in grids
+            AttributeBlueprintInterface::RAW_NOTE => $note, // Any additional note for the attribute
+            AttributeBlueprintInterface::RAW_ATTRIBUTE_CODE => $this->getAttribute(), // Attribute code (unique identifier)
+            AttributeBlueprintInterface::RAW_LABEL => $attribute->get(AttributeBlueprintInterface::LABEL, null), // Label for the attribute on the frontend
+            AttributeBlueprintInterface::RAW_APPLY_TO => $attribute->get(AttributeBlueprintInterface::APPLY_TO, null), // Product types to which the attribute applies
+            AttributeBlueprintInterface::RAW_ENTITY_TYPE_ID => $attribute->get(AttributeBlueprintInterface::ENTITY_TYPE_ID, null), // Entity type ID for the attribute
+            AttributeBlueprintInterface::RAW_SOURCE => $attribute->get(AttributeBlueprintInterface::SOURCE, null), // Source model for the attribute (used for options or values)
+            AttributeBlueprintInterface::RAW_ADDITIONAL_DATA => $attribute->get(AttributeBlueprintInterface::ADDITIONAL_DATA, null), // Any additional data associated with the attribute
+            AttributeBlueprintInterface::RAW_GRID_FILTER_CONDITION_TYPE => $attribute->get(AttributeBlueprintInterface::GRID_FILTER_CONDITION_TYPE, null), // Filter condition type for the attribute in grids
         ];
+    }
+
+    /**
+     * Set validation rules for the attribute.
+     *
+     * This method processes validation rules provided as either:
+     * - An array of strings (e.g., `['min:10', 'max:255']`), or
+     * - An associative array (e.g., `['max_text_length' => 255]`).
+     * If the input is neither an array nor a string, an exception will be thrown.
+     *
+     * The rules are ultimately stored as a JSON string.
+     *
+     * @param array|string $validationRule Validation rules array or JSON string.
+     *
+     * @throws InvalidArgumentException If the validationRule is not an array or a string.
+     *
+     * @return string The validation rule JSON string.
+     */
+    private function validateRules(array|string $validationRule): string
+    {
+        // If the validation rules are an array, process them.
+        if (Validator::isArray($validationRule)) {
+            // Check if it's an associative array or an array of strings.
+            $isAssociative = array_keys($validationRule) !== range(0, count($validationRule) - 1);
+
+            $validationRule = $isAssociative
+                ? $validationRule // Use the associative array directly.
+                : array_reduce($validationRule, function($carry, $item) {
+                    // Split each rule string into key-value format and add to the array.
+                    [$key, $value] = explode(':', $item);
+                    $carry[$key] = (int)$value; // Ensure the value is an integer.
+
+                    return $carry;
+                }, []);
+
+            // Serialize the rules into JSON format.
+            return Json::encode($validationRule);
+        }
+
+        // If it's already a string, assume it's a valid JSON or validation rule.
+        if (Validator::isString($validationRule)) {
+            return $validationRule;
+        }
+
+        // Throw an exception if the input is neither an array nor a string.
+        throw new InvalidArgumentException('Validation rules must be an array or a JSON string.');
     }
 }

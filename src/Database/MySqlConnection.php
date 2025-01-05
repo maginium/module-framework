@@ -6,14 +6,14 @@ namespace Maginium\Framework\Database;
 
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Grammar;
 use Illuminate\Database\PDO\MySqlDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar;
 use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
-use Illuminate\Database\Schema\MySqlBuilder;
 use Illuminate\Database\Schema\MySqlSchemaState;
+use Maginium\Framework\Database\Interfaces\BuilderInterface;
+use Maginium\Framework\Database\Schema\MySqlBuilder;
 use Maginium\Framework\Support\Facades\Container;
 use PDO;
 
@@ -95,9 +95,9 @@ class MySqlConnection extends Connection
     /**
      * Retrieves a schema builder instance for the connection.
      *
-     * @return MySqlBuilder The schema builder instance.
+     * @return BuilderInterface The schema builder instance.
      */
-    public function getSchemaBuilder(): MySqlBuilder
+    public function getSchemaBuilder(): BuilderInterface
     {
         // Ensure that the default schema grammar is used if not already set.
         if ($this->schemaGrammar === null) {

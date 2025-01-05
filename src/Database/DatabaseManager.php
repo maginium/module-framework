@@ -6,7 +6,6 @@ namespace Maginium\Framework\Database;
 
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Types\Type;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\DatabaseTransactionsManager;
 use Illuminate\Database\Events\ConnectionEstablished;
@@ -16,6 +15,7 @@ use InvalidArgumentException;
 use Magento\Framework\Event\ManagerInterface;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Database\Connectors\ConnectionFactory;
+use Maginium\Framework\Database\Interfaces\ConnectionInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Str;
@@ -137,7 +137,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @return ConnectionInterface
      */
-    public function connectUsing(string $name, array $config, bool $force = false)
+    public function connectUsing(string $name, array $config, bool $force = false): mixed
     {
         if ($force) {
             $this->purge($name);
@@ -191,7 +191,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @return void
      */
-    public function purge($name = null)
+    public function purge($name = null): void
     {
         $name = $name ?: $this->getDefaultConnection();
 
@@ -207,7 +207,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @return void
      */
-    public function disconnect($name = null)
+    public function disconnect($name = null): void
     {
         if (isset($this->connections[$name = $name ?: $this->getDefaultConnection()])) {
             $this->connections[$name]->disconnect();
@@ -240,7 +240,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @return mixed
      */
-    public function usingConnection($name, callable $callback)
+    public function usingConnection($name, callable $callback): mixed
     {
         $previousName = $this->getDefaultConnection();
 
@@ -280,7 +280,7 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @return string[]
      */
-    public function supportedDrivers()
+    public function supportedDrivers(): array
     {
         return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
     }

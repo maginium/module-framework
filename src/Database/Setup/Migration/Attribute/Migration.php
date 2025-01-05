@@ -106,6 +106,9 @@ abstract class Migration extends BaseMigration implements DataPatchInterface, Pa
             }
         }
 
+        // Log the start of the migration
+        ConsoleOutput::info('🔨 Starting migration for attribute: "' . static::$attribute . '"...', false);
+
         // Call the method to define the schema for the attribute based on the attribute
         $this->up();
 

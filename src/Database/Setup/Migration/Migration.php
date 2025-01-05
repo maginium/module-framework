@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Setup\Migration;
 
-use Illuminate\Database\Schema\Blueprint;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Framework\Setup\Patch\SchemaPatchInterface;
 use Maginium\Foundation\Exceptions\Exception;
@@ -14,6 +13,7 @@ use Maginium\Framework\Database\Interfaces\HasSoftDeletesInterface;
 use Maginium\Framework\Database\Interfaces\HasUserStampsInterface;
 use Maginium\Framework\Database\Interfaces\RevertablePatchInterface;
 use Maginium\Framework\Database\Model;
+use Maginium\Framework\Database\Schema\Blueprint;
 use Maginium\Framework\Database\Setup\BaseMigration;
 use Maginium\Framework\Support\Debug\ConsoleOutput;
 use Maginium\Framework\Support\Facades\Log;

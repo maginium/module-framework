@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Interfaces;
 
-use Illuminate\Database\Schema\Blueprint;
+use Maginium\Framework\Database\Schema\Blueprint;
 
 /**
  * Interface IndexableDataPatchInterface.

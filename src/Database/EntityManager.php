@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database;
 
 use Exception;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
 use LogicException;
 use Magento\Framework\EntityManager\EntityManager as BaseEntityManager;
 

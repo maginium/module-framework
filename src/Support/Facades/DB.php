@@ -13,8 +13,8 @@ use Maginium\Framework\Support\Facade;
 
 /**
  * @method static \Maginium\Framework\Database\Connection connection(string|null $name = null)
- * @method static \Illuminate\Database\ConnectionInterface build(array $config)
- * @method static \Illuminate\Database\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
+ * @method static \Maginium\Framework\Interfaces\ConnectionInterface build(array $config)
+ * @method static \Maginium\Framework\Interfaces\ConnectionInterface connectUsing(string $name, array $config, bool $force = false)
  * @method static void purge(string|null $name = null)
  * @method static void disconnect(string|null $name = null)
  * @method static \Maginium\Framework\Database\Connection reconnect(string|null $name = null)
@@ -36,7 +36,7 @@ use Maginium\Framework\Support\Facade;
  * @method static void useDefaultQueryGrammar()
  * @method static void useDefaultSchemaGrammar()
  * @method static void useDefaultPostProcessor()
- * @method static \Maginium\Framework\Database\Schema\Builder getSchemaBuilder()
+ * @method static \Maginium\Framework\Database\Interfaces\BuilderInterface getSchemaBuilder()
  * @method static \Maginium\Framework\Database\Query\Builder table(\Closure|\Maginium\Framework\Database\Query\Builder|\Illuminate\Contracts\Database\Query\Expression|string $table, string|null $as = null)
  * @method static \Maginium\Framework\Database\Query\Builder query()
  * @method static mixed selectOne(string $query, array $bindings = [], bool $useReadPdo = true)

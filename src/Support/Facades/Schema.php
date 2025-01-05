@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Support\Facades;
 
-use Closure;
 use Maginium\Framework\Database\Capsule\Manager as Capsule;
-use Maginium\Framework\Database\Connection;
+use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Database\Schema\Builder;
 use Maginium\Framework\Support\Facade;
 
@@ -48,14 +47,14 @@ use Maginium\Framework\Support\Facade;
  * @method static bool disableForeignKeyConstraints()
  * @method static mixed withoutForeignKeyConstraints(\Closure $callback)
  * @method static \Maginium\Framework\Database\Connection getConnection()
- * @method static \Maginium\Framework\Database\Schema\Builder setConnection(\Maginium\Framework\Database\Connection $connection)
+ * @method static BuilderInterface setConnection(\Maginium\Framework\Database\Connection $connection)
  * @method static void blueprintResolver(\Closure $resolver)
  * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
  *
- * @see Builder
+ * @see BuilderInterface
  */
 class Schema extends Facade
 {
@@ -78,11 +77,10 @@ class Schema extends Facade
      *
      * @param  string|null  $name  The name of the connection (optional).
      *
-     * @return Builder The schema builder instance.
+     * @return BuilderInterface The schema builder instance.
      */
-    public static function connection($name): Builder
+    public static function connection($name): BuilderInterface
     {
-        /** @var Connection $connection */
         $connection = Capsule::connection($name);
 
         return $connection->getSchemaBuilder();
@@ -94,27 +92,11 @@ class Schema extends Facade
      * This method retrieves the schema builder from the default
      * connection provided by the Capsule instance.
      *
-     * @return Builder The schema builder instance.
+     * @return BuilderInterface The schema builder instance.
      */
-    public static function get()
+    public static function get(): BuilderInterface
     {
         return Capsule::schema();
-    }
-
-    /**
-     * Create a new table in the schema.
-     *
-     * This method uses the schema builder to define the structure of a new table.
-     * The provided callback is executed to define the table's columns and constraints.
-     *
-     * @param  string  $table    The name of the table to create.
-     * @param  Closure  $callback  A callback defining the table's structure.
-     *
-     * @return void
-     */
-    public static function create(string $table, Closure $callback)
-    {
-        return static::get()->create($table, $callback);
     }
 
     /**
@@ -128,6 +110,23 @@ class Schema extends Facade
      */
     protected static function getAccessor(): string
     {
-        return '';
+        return Builder::class;
+    }
+
+    /**
+     * Proxy method calls to the database connection.
+     *
+     * @param string $method The method name being called.
+     * @param string[] $args The arguments passed to the method.
+     *
+     * @return mixed The result of the method call.
+     */
+    public static function __callStatic($method, $args)
+    {
+        // Resolve the database connection instance
+        $schema = static::get();
+
+        // Call the method on the connection instance
+        return call_user_func_array([$schema, $method], $args);
     }
 }

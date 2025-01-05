@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Capsule;
 
-use Illuminate\Database\ConnectionInterface;
 use Magento\Framework\Config\File\ConfigFilePool;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\FileSystemException;
@@ -14,8 +13,9 @@ use Maginium\Framework\Database\DatabaseManager;
 use Maginium\Framework\Database\DatabaseManagerFactory;
 use Maginium\Framework\Database\EloquentModel;
 use Maginium\Framework\Database\Facades\AdminConfig;
+use Maginium\Framework\Database\Interfaces\BuilderInterface;
+use Maginium\Framework\Database\Interfaces\ConnectionInterface;
 use Maginium\Framework\Database\Query\Builder as QueryBuilder;
-use Maginium\Framework\Database\Schema\Builder as SchemaBuilder;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Log;
 
@@ -96,8 +96,6 @@ class Manager
         /** @var Connection $connection */
         $connection = static::$instance->connection($connection);
 
-        dd($connection->query());
-
         return $connection->table($table, $as);
     }
 
@@ -106,9 +104,9 @@ class Manager
      *
      * @param  string|null  $connection
      *
-     * @return SchemaBuilder
+     * @return BuilderInterface
      */
-    public static function schema($connection = null): SchemaBuilder
+    public static function schema($connection = null): BuilderInterface
     {
         /** @var Connection $connection */
         $connection = static::$instance->connection($connection);

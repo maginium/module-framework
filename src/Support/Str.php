@@ -21,9 +21,10 @@ class Str extends BaseStr
     /**
      * Formats a string or phrase with the provided arguments.
      *
-     * This method accepts a string or phrase with placeholders (e.g., "{name}")
-     * and replaces them with the provided arguments. If the phrase is an instance
-     * of the Phrase class, it calls the render() method to retrieve the string first.
+     * Supports multiple placeholder formats including:
+     * - Numeric placeholders: `%1`, `%2`, etc.
+     * - String placeholders: `%s`, `%d`, etc.
+     * - Named placeholders: `{name}`, `{for}`, etc.
      *
      * @param string|Phrase $phrase The phrase or Phrase instance with placeholders.
      * @param mixed ...$args The arguments to replace the placeholders.
@@ -37,25 +38,27 @@ class Str extends BaseStr
             $phrase = $phrase->render();
         }
 
-        // Match placeholders like {name}, {comment}, etc. in the phrase
-        preg_match_all('/\{(\w+)\}/', $phrase, $matches);
+        // Named placeholders: {name}, {for}
+        $phrase = preg_replace_callback('/\{(\w+)\}/', function($matches) use ($args) {
+            $key = $matches[1];
 
-        // Prepare an array to store the replacements for each placeholder
-        $placeholders = [];
+            return array_key_exists($key, $args) ? $args[$key] : $matches[0];
+        }, $phrase);
 
-        // Replace placeholders with the corresponding arguments
-        foreach ($matches[1] as $index => $placeholder) {
-            // If an argument is provided for this placeholder, replace it
-            if (isset($args[$index])) {
-                $placeholders["{$placeholder}"] = $args[$index];
-            } else {
-                // If no argument for a placeholder, keep it as is
-                $placeholders["{$placeholder}"] = '{' . $placeholder . '}';
-            }
-        }
+        // Numeric placeholders: %1, %2
+        $phrase = preg_replace_callback('/%(\d+)/', function($matches) use ($args) {
+            $index = (int)$matches[1] - 1; // Convert 1-based index to 0-based
 
-        // Replace the placeholders in the phrase with the actual arguments
-        return static::swap($placeholders, $phrase);
+            return array_key_exists($index, $args) ? $args[$index] : $matches[0];
+        }, $phrase);
+
+        // Sequential placeholders: %s, %d
+        $placeholderIndex = 0;
+        $phrase = preg_replace_callback('/%[sd]/', function() use (&$placeholderIndex, $args) {
+            return array_key_exists($placeholderIndex, $args) ? $args[$placeholderIndex++] : '';
+        }, $phrase);
+
+        return $phrase;
     }
 
     /**

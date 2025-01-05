@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Schema;
 
 use Closure;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Builder as BaseBuilder;
+use Maginium\Framework\Database\Connection;
+use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Support\Facades\Container;
 
 /**
@@ -17,7 +17,7 @@ use Maginium\Framework\Support\Facades\Container;
  * schema creation and modification. This class introduces additional logic for
  * resolving blueprints, including prefix handling for table names.
  */
-class Builder extends BaseBuilder
+class Builder extends BaseBuilder implements BuilderInterface
 {
     /**
      * Create a new database Schema manager.
