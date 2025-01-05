@@ -162,9 +162,9 @@ abstract class Migration extends BaseMigration implements PatchRevertableInterfa
             if (! Validator::isEmpty(static::$tableName)) {
                 // Apply migration logic
                 $this->migrate();
+            } else {
+                $this->up();
             }
-
-            $this->up();
         } catch (Exception $e) {
             // Log any error that occurs during the patch application
             Log::error(
