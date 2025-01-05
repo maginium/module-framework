@@ -1,0 +1,263 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/system_file.xsd">
+    <section id="customer">
+        <group id="avatar" sortOrder="50" translate="label" type="text">
+            <label>Avatar Settings</label>
+
+            <!-- Image Driver -->
+            <field id="image_driver" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                <label>Image Driver</label>
+                <comment>Choose the image processing library for avatar images. Options: GD or Imagick.</comment>
+                <frontend_class>on-off-trigger</frontend_class>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                <options>
+                    <option value="gd">GD Library</option>
+                    <option value="imagick">Imagick</option>
+                </options>
+                <default>gd</default>
+            </field>
+
+            <!-- ASCII replacement -->
+            <field id="ascii" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="select">
+                <label>Replace Characters with ASCII</label>
+                <comment>Whether all characters supplied should be replaced with their closest ASCII counterparts.</comment>
+                <options>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </options>
+                <default>0</default>
+            </field>
+
+            <!-- Shape selection -->
+            <field id="shape" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="select">
+                <label>Avatar Shape</label>
+                <comment>Choose the shape of the avatar image.</comment>
+                <options>
+                    <option value="circle">Circle</option>
+                    <option value="square">Square</option>
+                </options>
+                <default>circle</default>
+            </field>
+
+            <!-- Avatar Width -->
+            <field id="width" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="number">
+                <label>Avatar Width (px)</label>
+                <comment>Set the width of the avatar image.</comment>
+                <default>100</default>
+            </field>
+
+            <!-- Avatar Height -->
+            <field id="height" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="number">
+                <label>Avatar Height (px)</label>
+                <comment>Set the height of the avatar image.</comment>
+                <default>100</default>
+            </field>
+
+            <!-- Number of Initials -->
+            <field id="chars" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60" translate="label" type="number">
+                <label>Number of Initials</label>
+                <comment>Specify the number of characters to use as initials in the avatar.</comment>
+                <default>2</default>
+            </field>
+
+            <!-- Font Size -->
+            <field id="font_size" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70" translate="label" type="number">
+                <label>Font Size</label>
+                <comment>Specify the font size for initials.</comment>
+                <default>48</default>
+            </field>
+
+            <!-- Uppercase Initials -->
+            <field id="uppercase" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80" translate="label" type="select">
+                <label>Uppercase Initials</label>
+                <comment>Whether the initials should be uppercase.</comment>
+                <options>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </options>
+                <default>0</default>
+            </field>
+
+            <!-- RTL support -->
+            <field id="rtl" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="90" translate="label" type="select">
+                <label>Right-to-Left (RTL) Support</label>
+                <comment>Enable support for RTL languages.</comment>
+                <options>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </options>
+                <default>0</default>
+            </field>
+
+            <!-- Avatar Themes -->
+            <field id="theme" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="100" translate="label" type="multiselect">
+                <label>Avatar Themes</label>
+                <comment>Choose one or more themes for the avatar.</comment>
+                <options>
+                    <option value="colorful">Colorful</option>
+                    <option value="grayscale-light">Grayscale Light</option>
+                    <option value="grayscale-dark">Grayscale Dark</option>
+                    <option value="pastel">Pastel</option>
+                    <!-- 'themes' => [
+                        'grayscale-light' => [
+                            'backgrounds' => ['#edf2f7', '#e2e8f0', '#cbd5e0'],
+                            'foregrounds' => ['#a0aec0'],
+                        ],
+                        'grayscale-dark' => [
+                            'backgrounds' => ['#2d3748', '#4a5568', '#718096'],
+                            'foregrounds' => ['#e2e8f0'],
+                        ],
+                        'colorful' => [
+                            'backgrounds' => [
+                                '#f44336',
+                                '#E91E63',
+                                '#9C27B0',
+                                '#673AB7',
+                                '#3F51B5',
+                                '#2196F3',
+                                '#03A9F4',
+                                '#00BCD4',
+                                '#009688',
+                                '#4CAF50',
+                                '#8BC34A',
+                                '#CDDC39',
+                                '#FFC107',
+                                '#FF9800',
+                                '#FF5722',
+                            ],
+                            'foregrounds' => ['#FFFFFF'],
+                        ],
+                        'pastel' => [
+                            'backgrounds' => [
+                                '#ef9a9a',
+                                '#F48FB1',
+                                '#CE93D8',
+                                '#B39DDB',
+                                '#9FA8DA',
+                                '#90CAF9',
+                                '#81D4FA',
+                                '#80DEEA',
+                                '#80CBC4',
+                                '#A5D6A7',
+                                '#E6EE9C',
+                                '#FFAB91',
+                                '#FFCCBC',
+                                '#D7CCC8',
+                            ],
+                            'foregrounds' => [
+                                '#FFF',
+                            ],
+                        ],
+                    ], -->
+                </options>
+                <default>colorful</default>
+            </field>
+
+            <!-- Predefined Themes -->
+            <field id="themes" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="110" translate="label" type="textarea">
+                <label>Predefined Themes</label>
+                <comment>Define custom themes in the format: name => [attributes].</comment>
+                <default>
+                    <![CDATA[
+                        "grayscale-light" => {
+                            "backgrounds" => ['#edf2f7', '#e2e8f0', '#cbd5e0'],
+                            "foregrounds" => ['#a0aec0']
+                        },
+                        "grayscale-dark" => {
+                            "backgrounds" => ['#2d3748', '#4a5568', '#718096'],
+                            "foregrounds" => ['#e2e8f0']
+                        },
+                        "colorful" => {
+                            "backgrounds" => [
+                                '#f44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
+                                '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
+                                '#8BC34A', '#CDDC39', '#FFC107', '#FF9800', '#FF5722'
+                            ],
+                            "foregrounds" => ['#FFFFFF']
+                        },
+                        "pastel" => {
+                            "backgrounds" => [
+                                '#ef9a9a', '#F48FB1', '#CE93D8', '#B39DDB', '#9FA8DA',
+                                '#90CAF9', '#81D4FA', '#80DEEA', '#80CBC4', '#A5D6A7',
+                                '#E6EE9C', '#FFAB91', '#FFCCBC', '#D7CCC8'
+                            ],
+                            "foregrounds" => ['#FFF']
+                        }
+                        ]]>
+                </default>
+            </field>
+
+            <!-- Font Configuration -->
+            <field id="fonts" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="120" translate="label" type="textarea">
+                <label>Fonts</label>
+                <comment>List of fonts used to render text. Multiple fonts can be supplied, and one will be randomly selected.</comment>
+                <default>
+                    <![CDATA[
+                        ["/../fonts/OpenSans-Bold.ttf", "/../fonts/rockwell.ttf"]
+                        ]]>
+                </default>
+            </field>
+
+            <field id="foregrounds" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="130" translate="label" type="text">
+                <label>Border Configuration</label>
+                <comment>Configure the avatar border size, color, and radius.</comment>
+                <default>
+                    <![CDATA[
+                       'foregrounds' => [
+                            '#FFFFFF',
+                        ],
+                        ]]>
+                </default>
+            </field>
+
+            <field id="backgrounds" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="130" translate="label" type="text">
+                <label>Border Configuration</label>
+                <comment>Configure the avatar border size, color, and radius.</comment>
+                <default>
+                    <![CDATA[
+                       'backgrounds' => [
+                        '#f44336',
+                        '#E91E63',
+                        '#9C27B0',
+                        '#673AB7',
+                        '#3F51B5',
+                        '#2196F3',
+                        '#03A9F4',
+                        '#00BCD4',
+                        '#009688',
+                        '#4CAF50',
+                        '#8BC34A',
+                        '#CDDC39',
+                        '#FFC107',
+                        '#FF9800',
+                        '#FF5722',
+                    ],
+                        ]]>
+                </default>
+            </field>
+
+            <!-- Border Configuration -->
+            <group id="border" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="130" translate="label" type="text">
+                <label>Border Configuration</label>
+                <field id="border" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="130" translate="label" type="text">
+                    <label>Border Configuration</label>
+                    <comment>Configure the avatar border size, color, and radius.</comment>
+                    <default>
+                        <![CDATA[
+                        {"size": 1, "color": "background", "radius": 0}
+                        ]]>
+                    </default>
+                </field>
+                <field id="border" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="130" translate="label" type="text">
+                    <label>Border Configuration</label>
+                    <comment>Configure the avatar border size, color, and radius.</comment>
+                    <default>
+                        <![CDATA[
+                        {"size": 1, "color": "background", "radius": 0}
+                        ]]>
+                    </default>
+                </field>
+            </group>
+        </group>
+    </section>
+</config>

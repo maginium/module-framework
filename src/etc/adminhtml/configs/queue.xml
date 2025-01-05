@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/system_file.xsd">
+    <!-- 'queue' is a subsection under the 'system' section -->
+    <section id="message_queue_retry" showInDefault="0" showInStore="0" showInWebsite="0" />
+</config>

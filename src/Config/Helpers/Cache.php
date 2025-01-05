@@ -7,12 +7,12 @@ namespace Maginium\Framework\Config\Helpers;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Store\Model\Store;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Log\Interfaces\LoggerInterface;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Serializer;
 use Maginium\Framework\Support\Str;
-use Maginium\Store\Models\Store;
 
 /**
  * Helper class for managing caching related to URL Rewrites.

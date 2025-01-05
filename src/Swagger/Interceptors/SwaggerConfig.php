@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Interceptors;
+namespace Maginium\Framework\Swagger\Interceptors;
 
 use Magento\Framework\App\State;
 use Magento\Store\Model\ScopeInterface;
-use Pixicommerce\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Config;
 
 /**
  * Class SwaggerConfig.

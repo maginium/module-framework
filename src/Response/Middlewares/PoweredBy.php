@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Middlewares;
 
+use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Str;
-use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
 
 /**
  * Class PoweredBy.

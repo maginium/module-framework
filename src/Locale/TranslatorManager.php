@@ -6,11 +6,11 @@ namespace Maginium\Framework\Locale;
 
 use Magento\Framework\App\Area;
 use Magento\Framework\Translate;
-use MessageFormatter;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Locale\Interfaces\TranslationInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Log;
+use MessageFormatter;
 
 /**
  * Class TranslatorManager.

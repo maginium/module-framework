@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Middlewares;
 
+use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Validator;
-use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
 
 /**
  * Class RequestId.

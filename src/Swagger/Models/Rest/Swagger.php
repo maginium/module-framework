@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Models\Rest;
+namespace Maginium\Framework\Swagger\Models\Rest;
 
 use Magento\Webapi\Model\Rest\Swagger as MagentoSwagger;
-use Pixicommerce\Framework\Support\Arr;
-use Pixicommerce\Framework\Support\Validator;
+use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Custom Swagger Specification Model

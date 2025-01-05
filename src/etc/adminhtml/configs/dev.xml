@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/system_file.xsd">
+    <!-- 'dev' is a subsection under the 'system' section -->
+    <section id="dev">
+        <!-- 'swagger' is a group within the 'dev' section, defining settings related to Swagger -->
+        <group id="swagger" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="220" translate="label" type="text">
+            <!-- 'label' defines the title or name of the group in the configuration -->
+            <label>Swagger Configuration</label>
+
+            <!-- 'field' is a configuration option within the 'swagger' group -->
+            <field canRestore="1" id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="select">
+                <!-- 'label' defines the title or name of the configuration option -->
+                <label>Enable Swagger</label>
+                <!-- 'source_model' specifies the source model to populate the dropdown options (Yes/No) -->
+                <frontend_class>on-off-trigger</frontend_class>
+                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            </field>
+            <group id="contact" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label" type="text">
+                <!-- 'label' defines the title or name of the group in the configuration -->
+                <label>Contact Information</label>
+                <!-- Add new fields for contact information -->
+                <field canRestore="1" id="name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>Contact Name</label>
+                    <comment>Specify the name for contact information.</comment>
+                </field>
+                <field canRestore="1" id="email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>Contact Email</label>
+                    <comment>Specify the email address for contact information.</comment>
+                </field>
+                <field canRestore="1" id="url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+                    <label>Contact URL</label>
+                    <comment>Specify the URL for contact information.</comment>
+                </field>
+            </group>
+            <group id="license" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                <!-- 'label' defines the title or name of the group in the configuration -->
+                <label>License Information</label>
+                <!-- Add license configuration options -->
+                <field canRestore="1" id="name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
+                    <label>License Name</label>
+                    <comment>Specify the name of the license.</comment>
+                </field>
+                <field canRestore="1" id="url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label" type="text">
+                    <label>License URL</label>
+                    <comment>Specify the URL of the license.</comment>
+                </field>
+            </group>
+        </group>
+    </section>
+</config>

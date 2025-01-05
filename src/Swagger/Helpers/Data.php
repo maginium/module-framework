@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Helpers;
+namespace Maginium\Framework\Swagger\Helpers;
 
-use Pixicommerce\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Config;
 
 /**
  * Class Data.

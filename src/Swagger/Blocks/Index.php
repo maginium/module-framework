@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Blocks;
+namespace Maginium\Framework\Swagger\Blocks;
 
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Swagger\Api\Data\SchemaTypeInterface;
 use Magento\Swagger\Block\Index as MagentoIndex;
-use Pixicommerce\Framework\Support\Facades\Config;
-use Pixicommerce\Framework\Support\Facades\Request;
-use Pixicommerce\Framework\Support\Php;
+use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Request;
+use Maginium\Framework\Support\Php;
 use UnexpectedValueException;
 
 /**

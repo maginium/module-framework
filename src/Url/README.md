@@ -12,7 +12,7 @@ To use the URL Manager module in your project:
 
 1.  Install via Composer (if applicable):
 
-composer require pixicommerce/framework-url
+composer require Maginium/framework-url
 
 2.  Add the service provider (if using a framework that supports service providers) or configure the module as per your application.
 

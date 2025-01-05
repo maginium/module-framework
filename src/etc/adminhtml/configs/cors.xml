@@ -11,32 +11,50 @@
             <label>CORS Requests Configuration</label>
 
             <!-- Field for specifying the CORS origin URL -->
-            <field id="origin_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+            <field id="origin_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label" type="text">
                 <label>CORS Origin Url</label>
+
                 <!-- Comment explaining the expected format of the origin URL -->
                 <comment>*, or fully qualified URLs without trailing '/' (slash) (e.g. http://example.com)</comment>
             </field>
 
             <!-- Field for enabling or disabling the Allow Credentials header -->
-            <field id="allow_credentials" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+            <field
+                canRestore="1"
+                id="allow_credentials"
+                showInDefault="1"
+                showInStore="1"
+                showInWebsite="1"
+                sortOrder="30"
+                translate="label comment"
+                type="select"
+            >
                 <label>CORS Allow Credentials</label>
+
                 <!-- Source model for Yes/No selection -->
+                <frontend_class>on-off-trigger</frontend_class>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+
                 <!-- Comment explaining the functionality of the Allow Credentials header -->
                 <comment>Enables Access-Control-Allow-Credentials response header to pass cookies</comment>
             </field>
 
             <!-- Field for enabling CORS settings specifically for AMP requests -->
-            <field id="enable_amp" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+            <field id="enable_amp" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="select">
                 <label>CORS Requests for AMP</label>
+
                 <!-- Source model for Yes/No selection -->
+                <frontend_class>on-off-trigger</frontend_class>
                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+
                 <!-- Comment explaining the AMP-specific CORS settings -->
                 <comment>Enables AMP-Access-Control-Allow-Source-Origin response header for AMP CORS requests</comment>
             </field>
+
             <!-- Field for specifying the max age for CORS requests -->
-            <field id="max_age" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label" type="text">
+            <field id="max_age" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label" type="text">
                 <label>CORS Request Max Age</label>
+
                 <!-- Comment explaining the max age setting -->
                 <comment>Enables Access-Control-Max-Age response header for CORS requests (max age in seconds)</comment>
             </field>

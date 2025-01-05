@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Models\Rest\Swagger;
+namespace Maginium\Framework\Swagger\Models\Rest\Swagger;
 
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Reflection\TypeProcessor;
@@ -13,12 +13,12 @@ use Magento\Webapi\Model\Config\Converter;
 use Magento\Webapi\Model\Rest\Swagger\Generator as MagentoGenerator;
 use Magento\Webapi\Model\Rest\SwaggerFactory;
 use Magento\Webapi\Model\ServiceMetadata;
-use Pixicommerce\Framework\Support\Arr;
-use Pixicommerce\Framework\Support\Facades\Config;
-use Pixicommerce\Framework\Support\Php;
-use Pixicommerce\Framework\Support\Str;
-use Pixicommerce\Framework\Support\Validator;
-use Pixicommerce\Framework\Swagger\Helpers\Data as SwaggerHelper;
+use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Php;
+use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
+use Maginium\Framework\Swagger\Helpers\Data as SwaggerHelper;
 
 /**
  * REST Swagger schema generator.

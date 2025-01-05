@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Pixicommerce\Framework\Swagger\Interceptors\Webapi;
+namespace Maginium\Framework\Swagger\Interceptors\Webapi;
 
 use Magento\Webapi\Model\Config;
 use Magento\Webapi\Model\ServiceMetadata as BaseServiceMetadata;
-use Pixicommerce\Foundation\Exceptions\InvalidArgumentException;
-use Pixicommerce\Framework\Support\Arr;
+use Maginium\Foundation\Exceptions\InvalidArgumentException;
+use Maginium\Framework\Support\Arr;
 
 /**
  * Custom implementation of ServiceMetadata to modify API class pattern.

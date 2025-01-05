@@ -20,11 +20,11 @@ use Magento\Framework\Url\RouteParamsResolver;
 use Magento\Framework\Url\RouteParamsResolverFactory;
 use Magento\Framework\Url\ScopeResolverInterface;
 use Magento\Framework\Url\SecurityInfoInterface;
-use Override;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Path;
 use Maginium\Framework\Url\Interfaces\UrlInterface;
+use Override;
 
 /**
  * UrlManager.

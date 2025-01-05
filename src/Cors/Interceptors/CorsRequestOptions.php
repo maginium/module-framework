@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Maginium\Framework\Cors\Interceptors;
 
 use Magento\Framework\Webapi\Rest\Request as MagentoRequest;
+use Maginium\Foundation\Enums\HttpMethod;
 use Maginium\Foundation\Exceptions\InputException;
-use Maginium\Framework\Http\Enums\HttpMethod;
 
 /**
  * Class CorsRequestOptions.

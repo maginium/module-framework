@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <!-- Include configuration for development settings -->
+        <include path="Maginium_Framework::configs/dev.xml" />
+
+        <!-- Include configuration for development settings -->
+        <include path="Maginium_Framework::configs/queue.xml" />
+
+        <!-- Include configuration for cors-related settings -->
+        <include path="Maginium_Framework::configs/cors.xml" />
+
+        <!-- Include configuration for avatar-related settings -->
+        <!-- <include path="Maginium_Framework::configs/avatar.xml" /> -->
+    </system>
+</config>

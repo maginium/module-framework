@@ -11,6 +11,7 @@ use Maginium\Framework\Support\Facades\Response;
 
 /**
  * Class CorsCheck.
+ *
  * Handles CORS preflight requests by setting appropriate response headers.
  */
 class CorsCheck implements CorsCheckInterface
@@ -54,12 +55,15 @@ class CorsCheck implements CorsCheckInterface
      * This method extracts the allowed methods from the request and returns them.
      * The methods are set in the 'Access-Control-Allow-Methods' response header.
      *
-     * @return string|null The allowed methods or null if not provided.
+     * @return string|null The allowed methods or null if not provided or invalid.
      */
     private function getAllowedMethods(): ?string
     {
         // Retrieve the value of the 'Access-Control-Request-Method' header from the incoming request.
-        return Request::header(self::HEADER_REQUEST_METHOD) ?? null;
+        $method = Request::header(self::HEADER_REQUEST_METHOD);
+
+        // Check if the method header exists and has a valid value
+        return ! empty($method) ? $method : null;
     }
 
     /**
@@ -68,11 +72,14 @@ class CorsCheck implements CorsCheckInterface
      * This method extracts the allowed headers from the request and returns them.
      * The headers are set in the 'Access-Control-Allow-Headers' response header.
      *
-     * @return string|null The allowed headers or null if not provided.
+     * @return string|null The allowed headers or null if not provided or invalid.
      */
     private function getAllowedHeaders(): ?string
     {
         // Retrieve the value of the 'Access-Control-Request-Headers' header from the incoming request.
-        return Request::header(self::HEADER_REQUEST_HEADERS) ?? null;
+        $headers = Request::header(self::HEADER_REQUEST_HEADERS);
+
+        // Check if the headers header exists and has a valid value
+        return ! empty($headers) ? $headers : null;
     }
 }

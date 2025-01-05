@@ -8,7 +8,6 @@ use Magento\Framework\Serialize\Serializer\Json as BaseJson;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Serializer\Interfaces\JsonInterface;
-use Maginium\Framework\Support\Str;
 
 /**
  * JSON Serializer.
@@ -65,10 +64,6 @@ class Json extends BaseJson implements JsonInterface
     public function decode(string $string): mixed
     {
         try {
-            if (! Str::contains($string, 'FORM_KEY')) {
-                return $string;
-            }
-
             // Attempt to unserialize the provided JSON string.
             $decodedData = $this->unserialize($string);
 

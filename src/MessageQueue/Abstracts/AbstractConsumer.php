@@ -6,10 +6,10 @@ namespace Maginium\Framework\MessageQueue\Abstracts;
 
 use Exception;
 use Magento\Framework\MessageQueue\ConsumerConfiguration;
-use Override;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Validator;
+use Override;
 
 /**
  * Class AbstractConsumer.

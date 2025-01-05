@@ -3,6 +3,9 @@
     <!-- Support and Utilities -->
     <preference for="Magento\Framework\DataObject" type="Maginium\Framework\Support\DataObject" />
 
+    <!-- Custom implementation for Url Manager -->
+    <preference for="Maginium\Framework\Url\Interfaces\UrlInterface" type="Maginium\Framework\Url\UrlManager" />
+
     <!-- Custom implementation for Uuid management -->
     <preference for="Maginium\Framework\Uuid\Interfaces\UuidInterface" type="Maginium\Framework\Uuid\UuidManager" />
 
@@ -34,6 +37,29 @@
     <preference for="Maginium\Framework\Serializer\Interfaces\SerializerInterface" type="Maginium\Framework\Serializer\Serializer" />
     <preference for="Maginium\Framework\Serializer\Interfaces\ClosureSerializerInterface" type="Maginium\Framework\Serializer\ClosureSerializer" />
 
+    <!-- Token & Api Key -->
+    <preference for="Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface" type="Maginium\Framework\Token\Services\ApiKeyService" />
+    <preference for="Maginium\Framework\Token\Interfaces\AdminTokenServiceInterface" type="Maginium\Framework\Token\Services\AdminTokenService" />
+    <preference
+        for="Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface"
+        type="Maginium\Framework\Token\Services\CustomerTokenService"
+    />
+
+    <!-- Cors -->
+    <preference for="Maginium\Framework\Cors\Interfaces\CorsCheckInterface" type="Maginium\Framework\Cors\Actions\CorsCheck" />
+    <type name="Magento\Webapi\Controller\Rest">
+        <plugin name="cors_headers" type="Maginium\Framework\Cors\Interceptors\CorsHeaders" />
+    </type>
+    <type name="Magento\Framework\Webapi\Rest\Request">
+        <plugin name="cors_request_options" type="Maginium\Framework\Cors\Interceptors\CorsRequestOptions" />
+    </type>
+    <type name="Magento\Webapi\Controller\Rest\Router">
+        <plugin name="cors_request_match" type="Maginium\Framework\Cors\Interceptors\CorsRequestMatch" />
+    </type>
+
+    <!-- Database and CRUD -->
+    <preference for="Magento\Framework\EntityManager\EntityManager" type="Maginium\Framework\Database\EntityManager" />
+
     <!-- Log Module -->
     <preference for="Maginium\Framework\Log\Interfaces\LoggerInterface" type="Maginium\Framework\Log\Logger" />
     <preference for="Maginium\Framework\Log\Interfaces\FactoryInterface" type="Maginium\Framework\Log\LogManager" />
@@ -53,6 +79,48 @@
                 <item xsi:type="object" name="emergency">Maginium\Framework\Log\Handlers\File\Emergency</item>
             </argument>
         </arguments>
+    </type>
+
+    <!-- Requests -->
+    <preference for="Magento\Framework\App\Request\Http" type="Maginium\Framework\Request\Request" />
+    <preference for="Maginium\Framework\Request\Interfaces\RequestInterface" type="Maginium\Framework\Request\Request" />
+
+    <!-- Response -->
+    <preference for="Magento\Framework\App\Response\Http" type="Maginium\Framework\Response\Response" />
+    <preference for="Maginium\Framework\Response\Interfaces\ResponseInterface" type="Maginium\Framework\Response\Response" />
+    <preference for="Maginium\Framework\Response\Interfaces\Data\ResponseInterface" type="Maginium\Framework\Response\Models\Response" />
+    <!-- <preference for="Magento\Framework\Webapi\Rest\Response" type="Maginium\Framework\Response\Interceptors\Framework\Webapi\ErrorHandler" /> -->
+
+    <type name="Magento\Webapi\Controller\Rest">
+        <!-- Request Middleware -->
+        <plugin disabled="false" name="request_user_middleware" sortOrder="100" type="Maginium\Framework\Request\Middlewares\User" />
+        <plugin disabled="false" name="request_store_id_middleware" sortOrder="80" type="Maginium\Framework\Request\Middlewares\StoreId" />
+        <plugin disabled="false" name="request_currency_middleware" sortOrder="90" type="Maginium\Framework\Request\Middlewares\Currency" />
+        <plugin disabled="false" name="request_timezone_middleware" sortOrder="50" type="Maginium\Framework\Request\Middlewares\Timezone" />
+        <plugin disabled="false" name="request_language_middleware" sortOrder="20" type="Maginium\Framework\Request\Middlewares\Language" />
+        <plugin disabled="false" name="request_timestamp_middleware" sortOrder="40" type="Maginium\Framework\Request\Middlewares\Timestamp" />
+        <plugin disabled="false" name="request_snake_case_middleware" sortOrder="0" type="Maginium\Framework\Request\Middlewares\SnakeCase" />
+        <plugin disabled="false" name="request_request_id_middleware" sortOrder="30" type="Maginium\Framework\Request\Middlewares\RequestId" />
+        <plugin disabled="false" name="request_user_agent_middleware" sortOrder="60" type="Maginium\Framework\Request\Middlewares\UserAgent" />
+        <plugin disabled="false" name="request_store_code_middleware" sortOrder="70" type="Maginium\Framework\Request\Middlewares\StoreCode" />
+        <plugin disabled="false" name="request_metadata_middleware" sortOrder="10" type="Maginium\Framework\Request\Middlewares\RequestMetadata" />
+
+        <!-- Response Middleware -->
+        <plugin disabled="false" name="response_store_id_middleware" sortOrder="80" type="Maginium\Framework\Response\Middlewares\StoreId" />
+        <plugin disabled="false" name="response_language_middleware" sortOrder="20" type="Maginium\Framework\Response\Middlewares\Language" />
+        <plugin disabled="false" name="response_timezone_middleware" sortOrder="50" type="Maginium\Framework\Response\Middlewares\Timezone" />
+        <plugin disabled="false" name="response_currency_middleware" sortOrder="90" type="Maginium\Framework\Response\Middlewares\Currency" />
+        <plugin disabled="false" name="response_timestamp_middleware" sortOrder="40" type="Maginium\Framework\Response\Middlewares\Timestamp" />
+        <plugin disabled="false" name="response_powered_by_middleware" sortOrder="10" type="Maginium\Framework\Response\Middlewares\PoweredBy" />
+        <plugin disabled="false" name="response_request_id_middleware" sortOrder="30" type="Maginium\Framework\Response\Middlewares\RequestId" />
+        <plugin disabled="false" name="response_store_code_middleware" sortOrder="70" type="Maginium\Framework\Response\Middlewares\StoreCode" />
+        <plugin disabled="false" name="response_camel_case_middleware" sortOrder="20" type="Maginium\Framework\Response\Middlewares\CamelCase" />
+        <plugin
+            disabled="false"
+            name="response_transformer_middleware"
+            sortOrder="998"
+            type="Maginium\Framework\Response\Middlewares\TransformResponse"
+        />
     </type>
 
     <!-- Event and Message Queue -->
@@ -83,9 +151,17 @@
         for="Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface"
         type="Maginium\Framework\Pagination\LengthAwarePaginator"
     />
-    <!-- Middleware -->
     <type name="Magento\Webapi\Controller\Rest">
         <plugin name="pagination_state_plugin" type="Maginium\Framework\Pagination\Middlewares\SetPaginationState" />
+    </type>
+
+    <!-- Swagger -->
+    <preference for="Magento\Swagger\Block\Index" type="Maginium\Framework\Swagger\Blocks\Index" />
+    <preference for="Magento\Webapi\Model\Rest\Swagger" type="Maginium\Framework\Swagger\Models\Rest\Swagger" />
+    <preference for="Magento\Webapi\Model\ServiceMetadata" type="Maginium\Framework\Swagger\Interceptors\Webapi\ServiceMetadata" />
+    <preference for="Magento\Webapi\Model\Rest\Swagger\Generator" type="Maginium\Framework\Swagger\Models\Rest\Swagger\Generator" />
+    <type name="Magento\Swagger\Model\Config">
+        <plugin disabled="false" name="allow_swagger_dev" type="Maginium\Framework\Swagger\Interceptors\SwaggerConfig" />
     </type>
 
     <!-- Commands Plugin Configuration -->

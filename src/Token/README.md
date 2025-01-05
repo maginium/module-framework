@@ -5,8 +5,8 @@ Overview
 The Token Manager Module provides a comprehensive solution for managing access tokens across different user roles, including customers, admins, and
 API keys. It integrates with Magento’s native services to handle token creation, revocation, and management in a secure and scalable manner.
 
-This module is designed for use in the Maginium framework and provides services for managing the lifecycle of authentication tokens for various
-user types, ensuring secure access to APIs and resources.
+This module is designed for use in the Maginium framework and provides services for managing the lifecycle of authentication tokens for various user
+types, ensuring secure access to APIs and resources.
 
 Features • Customer Token Management: • Create and revoke customer access tokens. • Integrates with Magento’s custom user context and token issuer for
 seamless customer authentication. • Admin Token Management: • Handle admin token generation and revocation for administrative access to the backend. •

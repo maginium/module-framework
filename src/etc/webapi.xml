@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Define a REST API route for CORS -->
+    <route method="GET" url="/V1/cors/check">
+        <!-- Specify the service class and method for handling the request -->
+        <service class="Maginium\Framework\Cors\Interfaces\CorsCheckInterface" method="check" />
+        <!-- Define resources that can access this route -->
+        <resources>
+            <!-- Allow anonymous access -->
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+</routes>

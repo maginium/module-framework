@@ -10,8 +10,8 @@ use Magento\Framework\Webapi\Exception;
 use Magento\Framework\Webapi\Rest\Request as MagentoRequest;
 use Magento\Webapi\Controller\Rest\Router;
 use Magento\Webapi\Controller\Rest\Router\Route;
-use Maginium\Framework\Cors\Interfaces\Services\CorsCheckServiceInterface;
-use Maginium\Framework\Http\Enums\HttpMethod;
+use Maginium\Foundation\Enums\HttpMethod;
+use Maginium\Framework\Cors\Interfaces\CorsCheckInterface;
 
 /**
  * Class CorsRequestMatch.
@@ -91,7 +91,7 @@ class CorsRequestMatch
         );
 
         // Set properties for the CORS route
-        $route->setServiceClass(CorsCheckServiceInterface::class)  // The service class for handling the CORS check
+        $route->setServiceClass(CorsCheckInterface::class)  // The service class for handling the CORS check
             ->setServiceMethod('check')  // The method within the service class to call
             ->setSecure(false)  // Whether the route requires HTTPS (false for preflight OPTIONS requests)
             ->setAclResources(['anonymous'])  // The ACL resources associated with the route

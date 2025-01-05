@@ -12,6 +12,7 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
+use Maginium\Framework\Response\Traits\ResponseBuilder;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Emulation;
@@ -61,6 +62,9 @@ use Maginium\User\Models\User;
  */
 trait AsController
 {
+    // Trait for handling response construction and manipulation
+    use ResponseBuilder;
+
     /**
      * Get the current store.
      *
@@ -71,8 +75,6 @@ trait AsController
         // Retrieve the current store or fallback to the default store view if not available
         return StoreManager::getStore() ?? StoreManager::getDefaultStoreView();
     }
-    // Trait for handling response construction and manipulation
-    // use ResponseBuilder;
 
     /**
      * Get a specific request parameter.
