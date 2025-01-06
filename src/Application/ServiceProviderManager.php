@@ -12,15 +12,8 @@ use Maginium\Framework\Support\ServiceProvider;
  *
  * This class manages multiple service providers, allowing dynamic access to providers.
  */
-class ServiceProviderManager
+class ServiceProviderManager extends Collection
 {
-    /**
-     * A collection of service providers.
-     *
-     * @var Collection
-     */
-    private Collection $providers;
-
     /**
      * Constructor to initialize the service providers.
      *
@@ -28,19 +21,6 @@ class ServiceProviderManager
      */
     public function __construct(array $providers = [])
     {
-        $this->providers = Collection::make($providers);
-    }
-
-    /**
-     * Dynamically pass methods.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     *
-     * @return mixed
-     */
-    public function __call($method, $parameters): mixed
-    {
-        return $this->providers->{$method}(...$parameters);
+        $this->items = $providers;
     }
 }

@@ -18,6 +18,13 @@
     <!-- Component registration customization -->
     <preference for="Magento\Framework\Component\ComponentRegistrar" type="Maginium\Framework\Component\ComponentRegistrar" />
 
+    <!-- Custom implementation for Color Thief -->
+    <preference for="Maginium\Framework\ColorThief\Interfaces\ColorThiefInterface" type="Maginium\Framework\ColorThief\ColorThief" />
+
+    <!-- Custom implementation for Figlet -->
+    <preference for="Maginium\Framework\Figlet\Interfaces\FontInterface" type="Maginium\Framework\Figlet\Models\Font" />
+    <preference for="Maginium\Framework\Figlet\Interfaces\FigletInterface" type="Maginium\Framework\Figlet\FigletManager" />
+
     <!-- Custom implementation for prompt management -->
     <preference for="Maginium\Framework\Prompts\Interfaces\PromptsInterface" type="Maginium\Framework\Prompts\PromptsManager" />
 
@@ -158,6 +165,14 @@
     <type name="Magento\Swagger\Model\Config">
         <plugin disabled="false" name="allow_swagger_dev" type="Maginium\Framework\Swagger\Interceptors\SwaggerConfig" />
     </type>
+
+    <!-- Firestore -->
+    <preference for="Maginium\Framework\Firestore\Interfaces\ClientInterface" type="Maginium\Framework\Firestore\Client" />
+    <preference for="Maginium\Framework\Firestore\Interfaces\FirestoreInterface" type="Maginium\Framework\Firestore\FirestoreManager" />
+
+    <!-- Pusher -->
+    <preference for="Maginium\Framework\Pusher\Interfaces\ClientInterface" type="Maginium\Framework\Pusher\Client" />
+    <preference for="Maginium\Framework\Pusher\Interfaces\PusherInterface" type="Maginium\Framework\Pusher\PusherManager" />
 
     <!-- Commands Plugin Configuration -->
     <type name="Magento\Framework\Console\CommandList">
