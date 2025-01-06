@@ -7,6 +7,7 @@ namespace Maginium\Framework\Console;
 use Maginium\Foundation\Concerns\ResolvesDumpSource;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
@@ -47,11 +48,11 @@ class CliDumper extends BaseCliDumper
     /**
      * Create a new CLI dumper instance.
      *
-     * @param  ConsoleOutputInterface  $output  The output instance for CLI.
+     * @param  ConsoleOutput  $output  The output instance for CLI.
      * @param  VarCloner  $cloner  The VarCloner instance for cloning variables.
      * @param  string  $basePath  The base path of the application.
      */
-    public function __construct(ConsoleOutputInterface $output, string $basePath)
+    public function __construct(ConsoleOutput $output, string $basePath)
     {
         $this->output = $output;
         $this->basePath = $basePath;

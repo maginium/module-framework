@@ -73,6 +73,7 @@
   "autoload": {
     "files": [
       "src/registration.php",
+      "src/Application/Bootstrap.php",
       "src/Support/Helpers/Support.php",
       "src/Support/Helpers/Polyfills.php"
     ],

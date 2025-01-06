@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Database\Interceptors\Processor;
+namespace Maginium\Framework\Database\Providers;
 
-use Magento\Config\Model\Config\Processor\EnvironmentPlaceholder as BaseEnvironmentPlaceholder;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Database\Capsule\Manager;
 use Maginium\Framework\Database\Capsule\ManagerFactory as CapsuleFactory;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\ServiceProvider;
 
 /**
- * Class EnvironmentPlaceholder.
+ * Class DatabaseServiceProvider.
  *
- * This class is responsible for managing the loading and setting of environment variables
- * prior to application launch. It intercepts the bootstrapping process to ensure all necessary
- * environment configurations are properly loaded.
+ * This service provider is responsible for registering and bootstrapping database-related
+ * services.
  */
-class EnvironmentPlaceholder
+class DatabaseServiceProvider extends ServiceProvider
 {
     /**
      * Factory to create Capsule ORM Manager instances.
@@ -28,7 +27,7 @@ class EnvironmentPlaceholder
     private CapsuleFactory $capsuleFactory;
 
     /**
-     * Constructor.
+     * DatabaseServiceProvider Constructor.
      *
      * Initializes the CapsuleFactory dependency required for database management.
      *
@@ -40,14 +39,15 @@ class EnvironmentPlaceholder
     }
 
     /**
-     * Before plugin for the process method of EnvironmentPlaceholder.
+     * Register any application services.
      *
-     * @param BaseEnvironmentPlaceholder $subject
-     * @param array $config
+     * This method is invoked during the service provider registration phase.
+     * It is used to bind services, classes, or configurations into the application's container.
+     * In this case, it ensures that environment configurations are loaded early in the application lifecycle.
      *
      * @return void
      */
-    public function beforeProcess(BaseEnvironmentPlaceholder $subject, array $config): void
+    public function register(): void
     {
         // Prepares database connections before launching the application.
         $this->initializeDatabaseConnections();
