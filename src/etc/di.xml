@@ -32,6 +32,10 @@
     <preference for="Maginium\Framework\Cache\Interfaces\CacheInterface" type="Maginium\Framework\Cache\CacheManager" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
 
+    <!-- Filesystem -->
+    <preference for="Maginium\Framework\Filesystem\Interfaces\FilesystemInterface" type="Maginium\Framework\Filesystem\Filesystem" />
+    <preference for="Maginium\Framework\Filesystem\Interfaces\FactoryInterface" type="Maginium\Framework\Filesystem\FilesystemManager" />
+
     <!-- Serialization -->
     <preference for="Maginium\Framework\Serializer\Interfaces\JsonInterface" type="Maginium\Framework\Serializer\Json" />
     <preference for="Maginium\Framework\Serializer\Interfaces\SerializerInterface" type="Maginium\Framework\Serializer\Serializer" />
@@ -40,10 +44,7 @@
     <!-- Token & Api Key -->
     <preference for="Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface" type="Maginium\Framework\Token\Services\ApiKeyService" />
     <preference for="Maginium\Framework\Token\Interfaces\AdminTokenServiceInterface" type="Maginium\Framework\Token\Services\AdminTokenService" />
-    <preference
-        for="Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface"
-        type="Maginium\Framework\Token\Services\CustomerTokenService"
-    />
+    <preference for="Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface" type="Maginium\Framework\Token\Services\CustomerTokenService" />
 
     <!-- Cors -->
     <preference for="Maginium\Framework\Cors\Interfaces\CorsCheckInterface" type="Maginium\Framework\Cors\Actions\CorsCheck" />
@@ -65,12 +66,7 @@
         <plugin disabled="false" name="boot_elquonet" type="Maginium\Framework\Database\Interceptors\App\Http" />
     </type>
     <type name="Magento\Config\Model\Config\Processor\EnvironmentPlaceholder">
-        <plugin
-            disabled="false"
-            name="boot_elquonet_plugin"
-            sortOrder="1"
-            type="Maginium\Framework\Database\Interceptors\Processor\EnvironmentPlaceholder"
-        />
+        <plugin disabled="false" name="boot_elquonet_plugin" sortOrder="1" type="Maginium\Framework\Database\Interceptors\Processor\EnvironmentPlaceholder" />
     </type>
 
     <!-- Log Module -->
@@ -128,12 +124,7 @@
         <plugin disabled="false" name="response_request_id_middleware" sortOrder="30" type="Maginium\Framework\Response\Middlewares\RequestId" />
         <plugin disabled="false" name="response_store_code_middleware" sortOrder="70" type="Maginium\Framework\Response\Middlewares\StoreCode" />
         <plugin disabled="false" name="response_camel_case_middleware" sortOrder="20" type="Maginium\Framework\Response\Middlewares\CamelCase" />
-        <plugin
-            disabled="false"
-            name="response_transformer_middleware"
-            sortOrder="998"
-            type="Maginium\Framework\Response\Middlewares\TransformResponse"
-        />
+        <plugin disabled="false" name="response_transformer_middleware" sortOrder="998" type="Maginium\Framework\Response\Middlewares\TransformResponse" />
     </type>
 
     <!-- Event and Message Queue -->
@@ -145,12 +136,7 @@
     <preference for="Maginium\Framework\Config\Interfaces\ConfigInterface" type="Maginium\Framework\Config\Config" />
     <preference for="Maginium\Framework\Config\Interfaces\FactoryInterface" type="Maginium\Framework\Config\ConfigManager" />
     <type name="Magento\Config\Model\Config\Processor\EnvironmentPlaceholder">
-        <plugin
-            disabled="false"
-            name="environment_placeholder_plugin"
-            sortOrder="1"
-            type="Maginium\Framework\Config\Interceptors\Processor\EnvironmentPlaceholder"
-        />
+        <plugin disabled="false" name="environment_placeholder_plugin" sortOrder="1" type="Maginium\Framework\Config\Interceptors\Processor\EnvironmentPlaceholder" />
     </type>
     <type name="Magento\Framework\App\Http">
         <plugin disabled="false" name="load_environment_variables" type="Maginium\Framework\Config\Interceptors\App\Http" />
@@ -160,10 +146,7 @@
     <preference for="Maginium\Framework\Pagination\Interfaces\CursorInterface" type="Maginium\Framework\Pagination\Cursor" />
     <preference for="Maginium\Framework\Pagination\Interfaces\PaginatorInterface" type="Maginium\Framework\Pagination\Paginator" />
     <preference for="Maginium\Framework\Pagination\Interfaces\CursorPaginatorInterface" type="Maginium\Framework\Pagination\CursorPaginator" />
-    <preference
-        for="Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface"
-        type="Maginium\Framework\Pagination\LengthAwarePaginator"
-    />
+    <preference for="Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface" type="Maginium\Framework\Pagination\LengthAwarePaginator" />
     <type name="Magento\Webapi\Controller\Rest">
         <plugin name="pagination_state_plugin" type="Maginium\Framework\Pagination\Middlewares\SetPaginationState" />
     </type>
@@ -182,10 +165,7 @@
         <arguments>
             <argument xsi:type="array" name="commands">
                 <!-- Register the custom command for invoking serialized closures. -->
-                <item
-                    xsi:type="object"
-                    name="invoke_serialized_closure_command"
-                >Maginium\Framework\Concurrency\Commands\InvokeSerializedClosureCommand</item>
+                <item xsi:type="object" name="invoke_serialized_closure_command">Maginium\Framework\Concurrency\Commands\InvokeSerializedClosureCommand</item>
 
                 <!-- General -->
                 <item xsi:type="object" name="app_about_command">Maginium\Framework\Console\Commands\AboutCommand</item>
