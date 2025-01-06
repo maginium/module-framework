@@ -126,15 +126,9 @@ abstract class Seeder implements DataPatchInterface
         // Start setup process (begin database transaction)
         $this->getConnection()->startSetup();
 
-        // Set area code if defined in the class constant
+        // Attempt to set the area code if defined
         if ($areaCode = static::AREA_CODE) {
-            try {
-                // Attempt to set the area code for the operation (e.g., admin, frontend)
-                $this->context->getState()->setAreaCode($areaCode);
-            } catch (Exception $th) {
-                // If area code is already set, no need to set it again
-                // Log the error if needed (can be added for debugging purposes)
-            }
+            $this->initializeAreaCode($areaCode);
         }
 
         // Execute the patch's migration logic
@@ -198,10 +192,10 @@ abstract class Seeder implements DataPatchInterface
 
         try {
             // Normalize data to an array if it's a DataObject or Collection
-            $dataToInsert = $this->normalizeData($data);
+            $data = $this->normalizeData($data);
 
             // Insert the provided data into the table
-            $connection->insertOnDuplicate($tableName, $dataToInsert);
+            $connection->insertOnDuplicate($tableName, $data);
 
             // Log details of seeded record
             $this->processLogging($data);
@@ -376,12 +370,15 @@ abstract class Seeder implements DataPatchInterface
      * to the console for confirmation and debugging purposes. It can be customized in child
      * classes to implement any additional logic (such as rollback logic) if needed.
      *
-     * @param DataObject|Collection $data The collection of seeded records.
+     * @param array $data The collection of seeded records.
      *
      * @return void
      */
-    private function processLogging(DataObject|Collection $data): void
+    private function processLogging(array $data): void
     {
+        // Convert the data array to data object
+        $data = DataObject::make($data);
+
         // Use the modelName directly from the instance
         $modelName = $this->modelName;
 
@@ -471,5 +468,22 @@ abstract class Seeder implements DataPatchInterface
 
         // Return false if no alias is found
         return false;
+    }
+
+    /**
+     * Handles setting up the area code if required, with error logging.
+     *
+     * @param string $areaCode The area code to set (e.g., admin, frontend).
+     */
+    private function initializeAreaCode(string $areaCode): void
+    {
+        try {
+            $this->context->getState()->setAreaCode($areaCode);
+        } catch (Exception $e) {
+            Log::warning(
+                __('Failed to set area code "%1": %2', [$areaCode, $e->getMessage()]),
+            );
+            // Proceed even if setting the area code fails
+        }
     }
 }

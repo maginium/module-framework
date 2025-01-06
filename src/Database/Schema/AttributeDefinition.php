@@ -34,7 +34,7 @@ use Maginium\Framework\Support\Fluent;
  * @method $this source(string $source) Specifies the source model used to retrieve the attribute's options.
  * @method $this position(int $postion) Defines the position of the attribute in a form, grid, or UI element.
  * @method $this unique(bool $isUnique) Indicates if the attribute must have a unique value for each model.
- * @method $this default(string $default) The default value to be assigned to the attribute when not specified by the user.
+ * @method $this defaultValue(string $value) The default value to be assigned to the attribute when not specified by the user.
  * @method $this visibleInAdvancedSearch(bool $isEnabled) Specifies whether the attribute is visible in advanced search forms.
  * @method $this wysiwygEnabled(bool $isEnabled) Indicates whether the attribute supports WYSIWYG (What You See Is What You Get) editing.
  * @method $this usedForPromoRules(bool $isEnabled) States whether the attribute can be used in promotional rules.
@@ -66,6 +66,7 @@ use Maginium\Framework\Support\Fluent;
  * @method $this comparable(bool $comparable = false) Enable comparability for the attribute
  * @method $this validateRules(array $validateRules = null) Define validation rules for the attribute
  * @method $this usedInForms(array $forms) Set the attribute as used in forms
+ * @method string getAttributeCode() Retrieve the attribute code
  */
 class AttributeDefinition extends Fluent
 {

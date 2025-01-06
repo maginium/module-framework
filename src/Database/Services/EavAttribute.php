@@ -18,13 +18,12 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\NoSuchEntityException;
+use Maginium\Framework\Locale\Facades\Locale;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\AppState;
-use Maginium\Framework\Support\Facades\Config as ConfigFacade;
 use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Facades\Translator;
 use Maginium\Framework\Support\Validator;
-use Maginium\Store\Helpers\Data as DataHelper;
 
 /**
  * Abstract class for managing EAV (Entity-Attribute-Value) attributes.
@@ -212,12 +211,15 @@ abstract class EavAttribute implements ScopedAttributeInterface
      * attribute by its code in the defined model type and returns the attribute if found.
      *
      * @param string $code The attribute code to retrieve.
-     * @param string $modelType The model type to which the attribute belongs (optional, defaults to self::ENTITY_TYPE).
+     * @param string $modelType The model type to which the attribute belongs.
      *
      * @return AbstractAttribute|null The attribute object if it exists, null if it does not exist.
      */
-    public function get(string $code, string $modelType = self::ENTITY_TYPE): ?AbstractAttribute
+    public function get(string $code, ?string $modelType = null): ?AbstractAttribute
     {
+        // The model type to which the attribute belongs.
+        $modelType ??= static::ENTITY_TYPE;
+
         // Retrieve the attribute from the EAV configuration by its code
         $attribute = $this->config->getAttribute($modelType, $code);
 
@@ -233,12 +235,15 @@ abstract class EavAttribute implements ScopedAttributeInterface
      *
      * @param string $code The attribute code.
      * @param array $data The data to define the attribute.
-     * @param string $modelType The model type to which the attribute belongs (optional, defaults to self::ENTITY_TYPE).p
+     * @param string $modelType The model type to which the attribute belongs.
      *
      * @return EavSetup The EavSetup instance used for the operation.
      */
-    public function create($code, $data, string $modelType = self::ENTITY_TYPE): EavSetup
+    public function create($code, $data, ?string $modelType = null): EavSetup
     {
+        // The model type to which the attribute belongs.
+        $modelType ??= static::ENTITY_TYPE;
+
         return $this->getEavSetup()->addAttribute(
             $modelType, // Entity type defined in the child class
             $code, // Attribute code
@@ -255,12 +260,15 @@ abstract class EavAttribute implements ScopedAttributeInterface
      *
      * @param string $code The attribute code to be updated.
      * @param array $data The updated data for the attribute (e.g., label, type, etc.).
-     * @param string $modelType The model type to which the attribute belongs (optional, defaults to self::ENTITY_TYPE).
+     * @param string $modelType The model type to which the attribute belongs.
      *
      * @return EavSetup The EavSetup instance used for updating the attribute.
      */
-    public function update($code, $data, string $modelType = self::ENTITY_TYPE): EavSetup
+    public function update($code, $data, ?string $modelType = null): EavSetup
     {
+        // The model type to which the attribute belongs.
+        $modelType ??= static::ENTITY_TYPE;
+
         return $this->getEavSetup()->updateAttribute(
             $modelType, // Entity type defined in the child class
             $code, // Attribute code
@@ -336,7 +344,7 @@ abstract class EavAttribute implements ScopedAttributeInterface
             // Step 8: Prepare localized values for each store view
             foreach ($storeIds as $storeId) {
                 // Get the locale code for the current store
-                $localeCode = ConfigFacade::getString(DataHelper::XML_PATH_LOCALE_CONFIG, $storeId);
+                $localeCode = Locale::getLocale();
 
                 // Set the translator to the correct locale
                 Translator::setLocale($localeCode);
@@ -368,13 +376,16 @@ abstract class EavAttribute implements ScopedAttributeInterface
      * under the defined model type.
      *
      * @param string $code The attribute code to check for existence.
-     * @param string $modelType The model type to which the attribute belongs (optional, defaults to self::ENTITY_TYPE).
+     * @param string $modelType The model type to which the attribute belongs.
 
      *
      * @return bool True if the attribute exists, false otherwise.
      */
-    public function exists($code, string $modelType = self::ENTITY_TYPE): bool
+    public function exists($code, ?string $modelType = null): bool
     {
+        // The model type to which the attribute belongs.
+        $modelType ??= static::ENTITY_TYPE;
+
         // Checks if the attribute exists by fetching its ID from the EAV config
         return (bool)$this->config->getAttribute($modelType, $code)->getId();
     }
@@ -420,10 +431,13 @@ abstract class EavAttribute implements ScopedAttributeInterface
      *
      * @param string $attributeCode The code of the attribute to unassign.
      * @param int $attributeSetId The ID of the attribute set to remove the attribute from.
-     * @param string $modelType The model type to which the attribute belongs (optional, defaults to self::ENTITY_TYPE).
+     * @param string $modelType The model type to which the attribute belongs.
      */
-    public function unassignFromAttributeSet($attributeCode, $attributeSetId = null, string $modelType = self::ENTITY_TYPE): void
+    public function unassignFromAttributeSet($attributeCode, $attributeSetId = null, ?string $modelType = null): void
     {
+        // The model type to which the attribute belongs.
+        $modelType ??= static::ENTITY_TYPE;
+
         // If no attribute set ID is provided, use the default set ID
         $attributeSetId = $attributeSetId ?: $this->getEavSetup()
             ->getDefaultAttributeSetId($modelType);

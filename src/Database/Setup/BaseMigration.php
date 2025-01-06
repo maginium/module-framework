@@ -9,7 +9,6 @@ use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Framework\Setup\Patch\SchemaPatchInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Maginium\Foundation\Exceptions\Exception;
-use Maginium\Framework\Database\Concerns\HasIndexes;
 use Maginium\Framework\Database\Interfaces\RevertablePatchInterface;
 use Maginium\Framework\Database\Model;
 use Maginium\Framework\Support\Facades\Log;
@@ -27,11 +26,17 @@ use Zend_Db_Statement_Interface;
  *
  * @template TModel of Model
  *
- * @mixin HasIndexes
  * @mixin RevertablePatchInterface
  */
 abstract class BaseMigration implements PatchRevertableInterface, SchemaPatchInterface
 {
+    /**
+     * The name of the database table that this migration will operate on.
+     *
+     * @var string
+     */
+    protected static ?string $tableName = null;
+
     /**
      * The area code for the patch, can be overridden in child classes.
      *
@@ -123,34 +128,22 @@ abstract class BaseMigration implements PatchRevertableInterface, SchemaPatchInt
     }
 
     /**
-     * {@inheritdoc}
+     * Run code inside patch
+     * If code fails, patch must be reverted, in case when we are speaking about schema - then under revert
+     * means run PatchInterface::revert().
      *
-     * Applies the patch. This method is called to execute the patch's changes to the database.
-     * It checks if the patch has already been applied (to avoid reapplying), sets the area code if needed,
-     * and invokes the `execute()` method to apply the migration logic.
+     * If we speak about data, under revert means: $transaction->rollback()
+     *
+     * @return $this
      */
     abstract public function apply(): void;
 
     /**
-     * {@inheritdoc}
-     *
-     * Reverts the patch. This method is called to undo the changes made by the patch.
-     * It invokes the `rollback()` method to allow for custom undo logic.
-     */
-    abstract public function revert(): void;
-
-    /**
-     * Optionally define additional table schema settings.
-     *
-     * This method can be implemented in subclasses to add comments,
-     * foreign keys, or other table-level configurations as necessary.
+     * Rollback all changes, done by this patch.
      *
      * @return void
      */
-    public function schema(): void
-    {
-        // This method can be implemented in subclasses as needed.
-    }
+    abstract public function revert(): void;
 
     /**
      * Retrieve the schema setup instance.
@@ -223,6 +216,16 @@ abstract class BaseMigration implements PatchRevertableInterface, SchemaPatchInt
     {
         // Return the database connection from the setup instance
         return $this->getSetup()->getConnection();
+    }
+
+    /**
+     * Retrieve the table name.
+     *
+     * @return string|null The fully prefixed table name if provided, or `null` if no table name is defined.
+     */
+    protected function getTable(): ?string
+    {
+        return static::$tableName;
     }
 
     /**
@@ -367,6 +370,23 @@ abstract class BaseMigration implements PatchRevertableInterface, SchemaPatchInt
                     $charset,
                 ),
             );
+        }
+    }
+
+    /**
+     * Handles setting up the area code if required, with error logging.
+     *
+     * @param string $areaCode The area code to set (e.g., admin, frontend).
+     */
+    protected function initializeAreaCode(string $areaCode): void
+    {
+        try {
+            $this->context->getState()->setAreaCode($areaCode);
+        } catch (Exception $e) {
+            Log::warning(
+                __('Failed to set area code "%1": %2', [$areaCode, $e->getMessage()]),
+            );
+            // Proceed even if setting the area code fails
         }
     }
 }

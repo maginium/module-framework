@@ -24,6 +24,16 @@ use Maginium\Framework\Enum\Enum;
 class AttributeType extends Enum
 {
     /**
+     * Represents a variable-length string used for storing short text fields.
+     *
+     * The STATIC type is typically used for shorter text fields like names or single words.
+     * It can store a string with a maximum length of 255 characters.
+     */
+    #[Label('Static')]
+    #[Description('Stores a variable-length string with a maximum length of 255 characters.')]
+    public const STATIC = 'static';
+
+    /**
      * Represents a variable-length string up to 255 characters.
      *
      * VARCHAR is typically used for shorter text fields like names or single words.

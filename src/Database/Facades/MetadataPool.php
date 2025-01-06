@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Support\Facades;
+namespace Maginium\Framework\Database\Facades;
 
 use Magento\Framework\EntityManager\EntityMetadataInterface;
 use Magento\Framework\EntityManager\MetadataPool as MagentoMetadataPool;

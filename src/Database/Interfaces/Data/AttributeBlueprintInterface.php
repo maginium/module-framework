@@ -139,7 +139,7 @@ interface AttributeBlueprintInterface
     /**
      * Constant representing the default value of the attribute.
      */
-    public const DEFAULT = 'default';
+    public const DEFAULT_VALUE = 'defaultValue';
 
     /**
      * Constant representing whether the attribute is visible in advanced search.
@@ -379,7 +379,7 @@ interface AttributeBlueprintInterface
     /**
      * Constant representing the raw value for the default value of the attribute.
      */
-    public const RAW_DEFAULT = 'default_value';
+    public const RAW_DEFAULT_VALUE = 'default_value';
 
     /**
      * Constant representing the raw value for whether the attribute is visible in advanced search.

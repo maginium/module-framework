@@ -5,30 +5,25 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Setup\Migration\Attribute;
 
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Magento\Framework\Setup\Patch\PatchRevertableInterface;
-use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Database\Interfaces\RevertablePatchInterface;
 use Maginium\Framework\Database\Model;
 use Maginium\Framework\Database\Setup\BaseMigration;
 use Maginium\Framework\Support\Debug\ConsoleOutput;
 use Maginium\Framework\Support\Facades\Log;
-use Maginium\Framework\Support\Reflection;
 
 /**
  * Attribute Migration Class.
  *
  * This abstract class serves as the base for database patchers that modify the schema
  * during module setup. It is responsible for managing database attribute modifications,
- * supporting both patch application and rollback. It includes methods for database interaction
+ * supporting both patch application It includes methods for database interaction
  * and managing migration context, attributes, and schema updates.
  *
  * @template TModel of Model
  *
- * @method void down() Revert the changes made by the `down` method.
- *
  * @mixin RevertablePatchInterface
  */
-abstract class Migration extends BaseMigration implements DataPatchInterface, PatchRevertableInterface
+abstract class Migration extends BaseMigration implements DataPatchInterface
 {
     /**
      * The code identifier for the attribute.
@@ -68,7 +63,6 @@ abstract class Migration extends BaseMigration implements DataPatchInterface, Pa
     public function __construct(
         Context $context,
     ) {
-        // Initialize the migration with the provided context and services
         $this->context = $context;
     }
 
@@ -95,48 +89,16 @@ abstract class Migration extends BaseMigration implements DataPatchInterface, Pa
         // Start setup process (begin database transaction)
         $this->getConnection()->startSetup();
 
-        // Set area code if defined in the class constant
+        // Attempt to set the area code if defined
         if ($areaCode = static::AREA_CODE) {
-            try {
-                // Attempt to set the area code for the operation (e.g., admin, frontend)
-                $this->context->getState()->setAreaCode($areaCode);
-            } catch (Exception $th) {
-                // If area code is already set, no need to set it again
-                // Log the error if needed (can be added for debugging purposes)
-            }
+            $this->initializeAreaCode($areaCode);
         }
 
         // Log the start of the migration
-        ConsoleOutput::info('🔨 Starting migration for attribute: "' . static::$attribute . '"...', false);
+        ConsoleOutput::info("🔨 Starting migration for attribute: '{$this->getAttribute()}' ...", false);
 
         // Call the method to define the schema for the attribute based on the attribute
         $this->up();
-
-        // End setup process (commit database transaction)
-        $this->getConnection()->endSetup();
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * Reverts the patch. This method is called to undo the changes made by the patch.
-     * It invokes the `rollback()` method to allow for custom undo logic.
-     */
-    final public function revert(): void
-    {
-        // Start setup process (begin database transaction)
-        $this->getConnection()->startSetup();
-
-        // Revert the patch's changes (if any custom rollback logic is implemented)
-        if (Reflection::methodExists($this, 'down')) {
-            // Log the start of the rollback
-            ConsoleOutput::info('🗑️ Starting rollback for attribute: "' . static::$attribute . '"...', false);
-
-            $this->down();
-
-            // Log the completion of the rollback
-            ConsoleOutput::success('Rollback completed: "' . static::$attribute . '" attribute dropped successfully!');
-        }
 
         // End setup process (commit database transaction)
         $this->getConnection()->endSetup();
@@ -152,4 +114,14 @@ abstract class Migration extends BaseMigration implements DataPatchInterface, Pa
      * @return void
      */
     abstract public function up(): void;
+
+    /**
+     * Retrieve the attribute name.
+     *
+     * @return string|null The fully prefixed attribute name if provided, or `null` if no attribute name is defined.
+     */
+    protected function getAttribute(): ?string
+    {
+        return static::$attribute;
+    }
 }
