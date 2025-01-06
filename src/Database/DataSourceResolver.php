@@ -10,6 +10,7 @@ use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Database\Interfaces\DataSourceInterface;
 use Maginium\Framework\Support\DataObject;
+use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
@@ -161,9 +162,12 @@ abstract class DataSourceResolver
             );
         }
 
+        // Getting StoreId
+        $storeId = $model->getStoreId() ?? StoreManager::getStore()->getId();
+
         // Getting data from the data source by calling its addData method.
         /** @var DataSourceInterface $dataSource */
-        $dataFromSource = $dataSource->addData($model);
+        $dataFromSource = $dataSource->addData($model, $storeId);
 
         // If the data source provides any data, add it to the response.
         // Fetch the key using the getDataKey method.

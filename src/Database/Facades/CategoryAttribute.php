@@ -9,6 +9,7 @@ use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\CategoryAttributeInterface;
 use Magento\Catalog\Model\Category;
 use Magento\Eav\Model\AttributeManagement;
+use Magento\Eav\Model\AttributeRepository;
 use Magento\Eav\Model\AttributeSetRepository;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Setup\EavSetupFactory;
@@ -47,16 +48,18 @@ class CategoryAttribute extends EavAttribute
      * @param EavSetupFactory $eavSetupFactory The factory used for setting up EAV attributes.
      * @param ResourceConnection $resourceConnection The resource connection to interact with the database.
      * @param AttributeManagement $attributeManagement The manager for handling attribute configurations.
-     * @param CategoryRepositoryInterface $categoryRepository The repository used to manage category models.
      * @param AttributeSetRepository $attributeSetRepository The repository for handling attribute sets.
+     * @param AttributeRepository $attributeRepository The repository for handling attribute.
+     * @param CategoryRepositoryInterface $categoryRepository The repository used to manage category models.
      */
     public function __construct(
         Config $config,
         EavSetupFactory $eavSetupFactory,
         ResourceConnection $resourceConnection,
         AttributeManagement $attributeManagement,
-        CategoryRepositoryInterface $categoryRepository,
         AttributeSetRepository $attributeSetRepository,
+        AttributeRepository $attributeRepository,
+        CategoryRepositoryInterface $categoryRepository,
     ) {
         // Call the parent constructor to initialize shared dependencies
         parent::__construct(
@@ -64,6 +67,7 @@ class CategoryAttribute extends EavAttribute
             $eavSetupFactory,
             $resourceConnection,
             $attributeManagement,
+            $attributeRepository,
             $attributeSetRepository,
         );
 

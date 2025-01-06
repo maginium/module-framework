@@ -8,6 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 use Magento\Catalog\Api\Data\ProductAttributeInterface;
 use Magento\Catalog\Model\Product\Action as ProductAction;
 use Magento\Eav\Model\AttributeManagement;
+use Magento\Eav\Model\AttributeRepository;
 use Magento\Eav\Model\AttributeSetRepository;
 use Magento\Eav\Model\Config;
 use Magento\Eav\Model\Entity\Attribute\Source\Table;
@@ -53,6 +54,7 @@ class ProductAttribute extends EavAttribute
      * @param ProductAction $productAction The action handler for performing operations on product attributes.
      * @param ResourceConnection $resourceConnection The resource connection to interact with the database.
      * @param AttributeManagement $attributeManagement The manager for handling attribute configurations.
+     * @param AttributeRepository $attributeRepository The repository for handling attribute.
      * @param AttributeSetRepository $attributeSetRepository The repository for handling attribute sets.
      */
     public function __construct(
@@ -61,6 +63,7 @@ class ProductAttribute extends EavAttribute
         EavSetupFactory $eavSetupFactory,
         ResourceConnection $resourceConnection,
         AttributeManagement $attributeManagement,
+        AttributeRepository $attributeRepository,
         AttributeSetRepository $attributeSetRepository,
     ) {
         // Call the parent constructor to initialize common dependencies
@@ -69,6 +72,7 @@ class ProductAttribute extends EavAttribute
             $eavSetupFactory,
             $resourceConnection,
             $attributeManagement,
+            $attributeRepository,
             $attributeSetRepository,
         );
 

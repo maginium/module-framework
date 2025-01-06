@@ -105,6 +105,15 @@ abstract class Migration extends BaseMigration implements DataPatchInterface
     }
 
     /**
+     * Rollback all changes, done by this patch.
+     *
+     * @return void
+     */
+    public function revert(): void
+    {
+    }
+
+    /**
      * Creates the database schema for the respective attribute attribute.
      *
      * This method must be implemented by the subclass to define the database columns,

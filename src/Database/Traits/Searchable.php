@@ -6,6 +6,7 @@ namespace Maginium\Framework\Database\Traits;
 
 use Maginium\Foundation\Enums\DataType;
 use Maginium\Framework\Database\Enums\Searcher;
+use Maginium\Framework\Database\Enums\SearcherEngines;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Str;
@@ -108,12 +109,12 @@ trait Searchable
      * it defaults to ElasticSearch. You can extend this method if you wish to support
      * other search engines in the future.
      *
-     * @return Searcher The search engine constant.
+     * @return SearcherEngines The search engine constant.
      */
-    public function searchableUsing(): Searcher
+    public function searchableUsing(): SearcherEngines
     {
         // Return the default search engine (ElasticSearch)
-        return Searcher::ELASTIC_SEARCH();
+        return SearcherEngines::ELASTIC_SEARCH();
     }
 
     /**

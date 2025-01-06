@@ -6,6 +6,7 @@ namespace Maginium\Framework\Database\Services;
 
 use Illuminate\Support\Traits\Macroable;
 use Magento\Eav\Model\AttributeManagement;
+use Magento\Eav\Model\AttributeRepository;
 use Magento\Eav\Model\AttributeSetRepository;
 use Magento\Eav\Model\Config as EavConfig;
 use Magento\Eav\Model\Entity\Attribute\AbstractAttribute;
@@ -14,6 +15,8 @@ use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 use Magento\Eav\Model\Entity\Attribute\Set as AttributeSet;
 use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
+use Magento\Framework\App\Cache\Frontend\Pool;
+use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
@@ -21,6 +24,7 @@ use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Framework\Locale\Facades\Locale;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\AppState;
+use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Facades\Translator;
 use Maginium\Framework\Support\Validator;
@@ -142,6 +146,13 @@ abstract class EavAttribute implements ScopedAttributeInterface
     public const ATTRIBUTE_CODE = 'attribute_code';
 
     /**
+     * Column name for attribute form code in database queries.
+     *
+     * This constant represents the column name 'form_code' used to reference the attribute form code.
+     */
+    public const FORM_CODE = 'form_code';
+
+    /**
      * The EAV configuration object.
      *
      * @var EavConfig
@@ -179,6 +190,14 @@ abstract class EavAttribute implements ScopedAttributeInterface
     private AttributeSetRepository $attributeSetRepository;
 
     /**
+     * Represents the repository responsible for managing attribute.
+     * This class is used to retrieve and persist attribute for products.
+     *
+     * @var AttributeRepository
+     */
+    private AttributeRepository $attributeRepository;
+
+    /**
      * Constructor for the EavAttribute class.
      *
      * Initializes the necessary dependencies for the EavAttribute class.
@@ -187,6 +206,7 @@ abstract class EavAttribute implements ScopedAttributeInterface
      * @param EavSetupFactory $eavSetupFactory The factory used for setting up EAV attributes.
      * @param ResourceConnection $resourceConnection The resource connection to interact with the database.
      * @param AttributeManagement $attributeManagement The manager for handling attribute configurations.
+     * @param AttributeRepository $attributeRepository The repository for handling attribute.
      * @param AttributeSetRepository $attributeSetRepository The repository for handling attribute sets.
      */
     public function __construct(
@@ -194,12 +214,14 @@ abstract class EavAttribute implements ScopedAttributeInterface
         EavSetupFactory $eavSetupFactory,
         ResourceConnection $resourceConnection,
         AttributeManagement $attributeManagement,
+        AttributeRepository $attributeRepository,
         AttributeSetRepository $attributeSetRepository,
     ) {
         $this->config = $config;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->resourceConnection = $resourceConnection;
         $this->attributeManagement = $attributeManagement;
+        $this->attributeRepository = $attributeRepository;
         $this->attributeSetRepository = $attributeSetRepository;
     }
 
@@ -274,6 +296,47 @@ abstract class EavAttribute implements ScopedAttributeInterface
             $code, // Attribute code
             $data, // Updated attribute data
         );
+    }
+
+    /**
+     * Retrieve the attribute repository instance.
+     *
+     * This method directly returns the attribute repository instance.
+     *
+     * @return AttributeRepository|null The attribute repository instance or null if not set.
+     */
+    public function getRepository(): ?AttributeRepository
+    {
+        return $this->attributeRepository;
+    }
+
+    public function flush()
+    {
+        $_types = [
+            'config',
+            'layout',
+            'block_html',
+            'collections',
+            'reflection',
+            'db_ddl',
+            'eav',
+            'config_integration',
+            'config_integration_api',
+            'full_page',
+            'translate',
+            'config_webservice',
+        ];
+
+        $cacheFrontendPool = Container::resolve(Pool::class);
+        $cacheTypeList = Container::resolve(TypeListInterface::class);
+
+        foreach ($_types as $type) {
+            $cacheTypeList->cleanType($type);
+        }
+
+        foreach ($cacheFrontendPool as $cacheFrontend) {
+            $cacheFrontend->getBackend()->clean();
+        }
     }
 
     /**
@@ -460,6 +523,19 @@ abstract class EavAttribute implements ScopedAttributeInterface
     }
 
     /**
+     * Database facade for quick operations.
+     *
+     * This method returns the database connection, which can be used for direct database
+     * operations, such as selecting data or executing queries.
+     *
+     * @return AdapterInterface The database connection instance.
+     */
+    public function getConnection(): AdapterInterface
+    {
+        return $this->resourceConnection->getConnection();
+    }
+
+    /**
      * Retrieve a fresh instance of EavSetup.
      *
      * This method returns a fresh instance of the EavSetup factory, which is used to
@@ -470,19 +546,6 @@ abstract class EavAttribute implements ScopedAttributeInterface
     protected function getEavSetup(): EavSetup
     {
         return $this->eavSetupFactory->create();
-    }
-
-    /**
-     * Database facade for quick operations.
-     *
-     * This method returns the database connection, which can be used for direct database
-     * operations, such as selecting data or executing queries.
-     *
-     * @return AdapterInterface The database connection instance.
-     */
-    protected function getConnection(): AdapterInterface
-    {
-        return $this->resourceConnection->getConnection();
     }
 
     /**
