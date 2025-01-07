@@ -11,7 +11,7 @@ Installation
 
 To install the Figlet Module, use Composer:
 
-composer require pixicommerce/figlet
+composer require maginium/figlet
 
 Usage
 

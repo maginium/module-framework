@@ -123,6 +123,26 @@ class Arr extends BaseArr
     }
 
     /**
+     * Flip the keys and values of the given array.
+     *
+     * This method swaps the keys with their corresponding values in the input array.
+     * If a value is not a string or integer, it will be skipped to avoid errors.
+     * Note that if a value is duplicated, the last key-value pair will overwrite the others.
+     *
+     * @param array $array The input array to flip.
+     *
+     * @return array The array with keys and values swapped.
+     */
+    public static function flip(array $array): array
+    {
+        // Filter the array to include only string or integer values.
+        $filteredArray = array_filter($array, fn($value) => is_string($value) || is_int($value));
+
+        // Perform the flip operation on the filtered array.
+        return array_flip($filteredArray);
+    }
+
+    /**
      * Remove and return the first element of the array.
      *
      * This method is a wrapper for PHP's `array_shift`, which removes the first

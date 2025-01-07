@@ -14,9 +14,9 @@ use Maginium\Framework\Token\Services\TokenManager;
  *
  * Provides access to customer, admin, and API key token management services.
  *
- * @method static CustomerTokenServiceInterface customer() Returns the service responsible for managing customer tokens.
- * @method static AdminTokenServiceInterface admin() Returns the service responsible for managing admin tokens.
- * @method static ApiKeyServiceInterface apiKey() Returns the service responsible for managing API keys.
+ * @method static \Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface apiKey() Returns the service responsible for managing API keys.
+ * @method static \Maginium\Framework\Token\Interfaces\AdminTokenServiceInterface admin() Returns the service responsible for managing admin tokens.
+ * @method static \Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface customer() Returns the service responsible for managing customer tokens.
  *
  * @see TokenManager
  */
