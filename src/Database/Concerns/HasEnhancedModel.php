@@ -7,15 +7,14 @@ namespace Maginium\Framework\Database\Concerns;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
-use Maginium\Foundation\Enums\DataType;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Database\Helpers\Model as ModelHelper;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Database\Traits\Identifiable;
 use Maginium\Framework\Database\Traits\Searchable;
-use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Database\Traits\Traitable;
 use Maginium\Framework\Support\Facades\Container;
-use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Validator;
 use Override;
 
@@ -57,23 +56,12 @@ trait HasEnhancedModel
 
     // Adds search functionality to the model.
     use Searchable;
-
-    /**
-     * The name of the database table associated with the model.
-     * This can be used by the ORM to determine the target table for queries.
-     *
-     * @var string|null
-     */
-    public static string $table;
-
-    /**
-     * The name of the primary key field for the model.
-     *
-     * This is typically 'id', but could be customized based on the model.
-     *
-     * @var string
-     */
-    public static string $primaryKey = 'id';
+    // Adds traitable functionality to the model.
+    use Traitable {
+        boot as traitBoot;
+        __wakeup as traitWakeup;
+        _construct as traitConstruct;
+    }
 
     /**
      * The event prefix used when firing model-related events.
@@ -94,16 +82,6 @@ trait HasEnhancedModel
     public static string $eventObject = 'object';
 
     /**
-     * The "type" of the primary key ID.
-     *
-     * This defines the data type of the primary key, usually 'int', but could be 'string'
-     * for UUIDs or other types.
-     *
-     * @var string
-     */
-    public static string $keyType = DataType::INT;
-
-    /**
      * The array of booted models.
      *
      * Tracks the models that have been booted to avoid multiple booting calls.
@@ -111,13 +89,6 @@ trait HasEnhancedModel
      * @var array
      */
     protected static $booted = [];
-
-    /**
-     * The array of trait initializers that will be called on each new instance.
-     *
-     * @var array
-     */
-    protected static $traitInitializers = [];
 
     /**
      * Create a new instance of the model and optionally populate it with the provided data.
@@ -147,7 +118,7 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    protected static function booting()
+    protected static function booting(): void
     {
         // Placeholder for pre-boot actions.
     }
@@ -160,9 +131,9 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    protected static function boot()
+    protected static function boot(): void
     {
-        static::bootTraits();
+        static::traitBoot();
     }
 
     /**
@@ -172,52 +143,9 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    protected static function booted()
+    protected static function booted(): void
     {
         // Placeholder for post-boot actions.
-    }
-
-    /**
-     * Boot all of the bootable traits on the model.
-     *
-     * This method is responsible for invoking trait-specific boot or initialize methods.
-     * It ensures that traits used in the class are properly initialized by calling their
-     * respective `boot` and `initialize` methods if they exist. This is an essential
-     * part of the model's lifecycle.
-     *
-     * @return void
-     */
-    protected static function bootTraits(): void
-    {
-        // Get the current class name.
-        $class = static::class;
-
-        // Initialize an array to track already booted methods to avoid duplicates.
-        $booted = [];
-
-        // Initialize trait-specific initializers for the current class.
-        static::$traitInitializers[$class] = [];
-
-        // Iterate over all traits used by this class and its parent classes.
-        foreach (class_uses_recursive($class) as $trait) {
-            // Construct the boot method name for the trait.
-            $method = 'boot' . class_basename($trait);
-
-            // Check if the trait has a boot method and it hasn't been called yet.
-            if (Reflection::methodExists($class, $method) && ! in_array($method, $booted)) {
-                // Invoke the boot method.
-                forward_static_call([$class, $method]);
-
-                // Mark the method as booted to prevent re-execution.
-                $booted[] = $method;
-            }
-
-            // Look for an initializer method for the trait and add it to the initializer list.
-            if (Reflection::methodExists($class, $method = 'initialize' . class_basename($trait))) {
-                static::$traitInitializers[$class][] = $method;
-                static::$traitInitializers[$class] = Arr::unique(static::$traitInitializers[$class]);
-            }
-        }
     }
 
     /**
@@ -229,7 +157,7 @@ trait HasEnhancedModel
      *
      * @throws Exception If saving the data fails.
      *
-     * @return $this The current instance of the model after save operation.
+     * @return static The current instance of the model after save operation.
      */
     public function save(): static
     {
@@ -240,6 +168,16 @@ trait HasEnhancedModel
     }
 
     /**
+     * Retrieve model resource.
+     *
+     * @return AbstractDb|mixed
+     */
+    public function getResource(): mixed
+    {
+        return $this->_getResource();
+    }
+
+    /**
      * Load object data.
      *
      * @param int $modelId
@@ -247,11 +185,9 @@ trait HasEnhancedModel
      *
      * @return $this
      */
-    public function load($modelId, $field = null)
+    public function load($modelId, $field = null): static
     {
         $this->_getResource()->load($this, $modelId, $field);
-
-        $this->model->setData($this->getData());
 
         return $this;
     }
@@ -288,7 +224,7 @@ trait HasEnhancedModel
      * @return string
      */
     #[Override]
-    public function getIdFieldName()
+    public function getIdFieldName(): string
     {
         return $this->getKeyName();
     }
@@ -298,7 +234,7 @@ trait HasEnhancedModel
      *
      * @return string
      */
-    public function getKeyName()
+    public function getKeyName(): string
     {
         return static::$primaryKey ?? parent::getIdFieldName();
     }
@@ -398,7 +334,7 @@ trait HasEnhancedModel
      *
      * @return array Qualified column names.
      */
-    public function qualifyColumns($columns)
+    public function qualifyColumns($columns): array
     {
         // Use the 'collect' method to wrap the columns array into a collection.
         // Then, map each column to its qualified name using the 'qualifyColumn' method.
@@ -498,14 +434,11 @@ trait HasEnhancedModel
     public function toArray(array $keys = ['*']): array
     {
         // Get the initial data source (either `dataArray` or model data)
-        $data = collect($this->getData());
-
-        // Clear the `dataArray` to avoid unintended reuse
-        $this->dataArray = null;
+        $data = collect(value: $this->getData());
 
         // Return the full data if no specific keys are provided or '*' is included
-        if (empty($keys) || in_array('*', $keys, true)) {
-            return $data->toArray();
+        if (Validator::isEmpty($keys) || Validator::inArray('*', $keys, true)) {
+            return $this->getData();
         }
 
         // Filter and return only the specified keys
@@ -526,7 +459,7 @@ trait HasEnhancedModel
     public function toDataArray(array $keys = ['*']): array
     {
         // Delegate to the `toArray` method for conversion and key filtering
-        return $this->toArray($keys);
+        return parent::toArray($keys);
     }
 
     /**
@@ -584,7 +517,7 @@ trait HasEnhancedModel
      *
      * Resolves and initializes the original Magento model and ensures the boot process is handled.
      */
-    public function _construct()
+    public function _construct(): void
     {
         // Call the parent constructor to ensure necessary initialization
         parent::_construct();
@@ -593,10 +526,7 @@ trait HasEnhancedModel
         $this->bootIfNotBooted();
 
         // Initialize any traits on the model that require initialization
-        $this->initializeTraits();
-
-        // Resolve and set the model specified by the subclass
-        $this->resolveBaseModel();
+        $this->traitConstruct();
 
         // Set up event prefix and object
         $this->setEventProperties();
@@ -616,7 +546,7 @@ trait HasEnhancedModel
      *
      * @return mixed The result of the event dispatch.
      */
-    public function fireModelEvent(string $event)
+    public function fireModelEvent(string $event): void
     {
         // Dispatch a model-specific event using the event prefix and event name.
         $this->dispatch($this->_eventPrefix . $event, $this->_getEventData());
@@ -643,7 +573,7 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    private function setEventProperties()
+    private function setEventProperties(): void
     {
         // Set the event prefix by calling the getEventPrefix method
         $this->_eventPrefix = $this->getEventPrefix();
@@ -657,7 +587,7 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    private function initializeResourceModel()
+    private function initializeResourceModel(): void
     {
         // Check if a resource model is statically defined for the class, otherwise fallback to the helper
         $resourceModel = static::$resourceModel ?? ModelHelper::getResourceModel(static::class);
@@ -681,7 +611,7 @@ trait HasEnhancedModel
      *
      * @return mixed The result of the event dispatch.
      */
-    private function dispatch(string $event, array $data = [])
+    private function dispatch(string $event, array $data = []): mixed
     {
         // If data is not empty, dispatch the event with the provided data
         if (! Validator::isEmpty($data)) {
@@ -700,7 +630,7 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    private function bootIfNotBooted()
+    private function bootIfNotBooted(): void
     {
         // Check if the model has already been booted
         if (! isset(static::$booted[static::class])) {
@@ -721,23 +651,6 @@ trait HasEnhancedModel
     }
 
     /**
-     * Initialize traits that require initialization during model creation.
-     *
-     * This method loops over all traits used by the model and calls their initialization
-     * methods (e.g., `initializeSomeTrait`) if they exist.
-     *
-     * @return void
-     */
-    private function initializeTraits()
-    {
-        // Loop through the traits that this model uses
-        foreach (static::$traitInitializers[static::class] as $method) {
-            // Call the initialization method for each trait
-            $this->{$method}();
-        }
-    }
-
-    /**
      * When a model is being unserialized, check if it needs to be booted.
      *
      * This method is invoked when the model object is unserialized from storage (e.g., session, cache).
@@ -745,18 +658,18 @@ trait HasEnhancedModel
      *
      * @return void
      */
-    #[Override]
-    public function __wakeup()
-    {
-        // Boot the model when the object is unserialized
-        $this->bootIfNotBooted();
+    // #[Override]
+    // public function __wakeup()
+    // {
+    //     // Boot the model when the object is unserialized
+    //     $this->bootIfNotBooted();
 
-        // Initialize traits when the object is unserialized
-        $this->initializeTraits();
+    //     // Initialize traits when the object is unserialized
+    //     $this->traitWakeup();
 
-        // Call the parent class's wakeup method to perform any additional restoration logic
-        parent::__wakeup();
-    }
+    //     // Call the parent class's wakeup method to perform any additional restoration logic
+    //     parent::__wakeup();
+    // }
 
     /**
      * Dynamically handle method calls to the instance.

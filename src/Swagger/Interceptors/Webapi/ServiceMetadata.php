@@ -8,6 +8,7 @@ use Magento\Webapi\Model\Config;
 use Magento\Webapi\Model\ServiceMetadata as BaseServiceMetadata;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Str;
 
 /**
  * Custom implementation of ServiceMetadata to modify API class pattern.
@@ -58,7 +59,7 @@ class ServiceMetadata extends BaseServiceMetadata
         }
         // Throw an exception if no patterns match the interface name.
         else {
-            throw InvalidArgumentException::make(sprintf('The service interface name "%s" is invalid.', $interfaceName));
+            throw InvalidArgumentException::make(Str::format('The service interface name "%s" is invalid.', $interfaceName));
         }
 
         // Concatenate the service name parts into a single string and make the first character lowercase.

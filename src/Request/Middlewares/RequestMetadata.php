@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Request\Middlewares;
 
 use Laminas\Http\Headers;
-use Maginium\Foundation\Abstracts\AbstractMiddleware;
+use Maginium\Foundation\Abstracts\Middleware\AbstractMiddleware;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Facades\Log;
 

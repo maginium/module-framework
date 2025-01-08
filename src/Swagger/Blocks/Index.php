@@ -8,6 +8,7 @@ use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Swagger\Api\Data\SchemaTypeInterface;
 use Magento\Swagger\Block\Index as MagentoIndex;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Php;
@@ -69,7 +70,7 @@ class Index extends MagentoIndex
      */
     public function getConsoleData()
     {
-        $storeName = Config::getString(self::CONFIG_PATH_STORE_NAME);
+        $storeName = Config::driver(ConfigDrivers::ENV)->getString(self::CONFIG_PATH_STORE_NAME);
         $versionParts = Php::explode('.', $this->productMetadata->getVersion());
 
         if (! isset($versionParts[0]) || ! isset($versionParts[1])) {
@@ -87,27 +88,27 @@ class Index extends MagentoIndex
 
         return [
             'appName' => $storeName,
-            'description' => Config::getString('APP_KEYWORDS'),
+            'description' => Config::driver(ConfigDrivers::ENV)->getString('APP_KEYWORDS'),
             'systemInfo' => [
                 // ENV AND VERSION INFO
                 'magentoVersion' => $majorMinorVersion,
-                'environment' => Config::getString('APP_ENV'),
+                'environment' => Config::driver(ConfigDrivers::ENV)->getString('APP_ENV'),
 
-                'host' => Config::getString('APP_HOST'),
-                'port' => Config::getString('APP_PORT'),
+                'host' => Config::driver(ConfigDrivers::ENV)->getString('APP_HOST'),
+                'port' => Config::driver(ConfigDrivers::ENV)->getString('APP_PORT'),
                 'devServerUrl' => $dummyValues['DEV_SERVER_URL'],
                 'prodServerUrl' => $dummyValues['PROD_SERVER_URL'],
-                'apiVersion' => Config::getString('SWAGGER_API_VERSION'),
+                'apiVersion' => Config::driver(ConfigDrivers::ENV)->getString('SWAGGER_API_VERSION'),
 
                 // CONTACT INFO
-                'contactUrl' => Config::getString('TECHNICAL_CONTACT_URL'),
-                'contactName' => Config::getString('TECHNICAL_CONTACT_NAME'),
-                'contactEmail' => Config::getString('TECHNICAL_CONTACT_EMAIL'),
+                'contactUrl' => Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_URL'),
+                'contactName' => Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_NAME'),
+                'contactEmail' => Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_EMAIL'),
             ],
             'developerInfo' => [
-                'name' => Config::getString('AUTHOR'),
-                'email' => Config::getString('AUTHOR_EMAIL'),
-                'github' => Config::getString('AUTHOR_GITHUB'),
+                'name' => Config::driver(ConfigDrivers::ENV)->getString('AUTHOR'),
+                'email' => Config::driver(ConfigDrivers::ENV)->getString('AUTHOR_EMAIL'),
+                'github' => Config::driver(ConfigDrivers::ENV)->getString('AUTHOR_GITHUB'),
             ],
         ];
     }

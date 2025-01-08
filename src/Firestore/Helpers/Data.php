@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Firestore\Helpers;
 
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 
 /**
@@ -70,7 +71,7 @@ class Data
      */
     public static function getProjectId(): ?string
     {
-        return Config::getString('FIREBASE_PROJECT_ID');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_PROJECT_ID');
     }
 
     /**
@@ -80,7 +81,7 @@ class Data
      */
     public static function getPrivateKeyId(): ?string
     {
-        return Config::getString('FIREBASE_PRIVATE_KEY_ID');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_PRIVATE_KEY_ID');
     }
 
     /**
@@ -90,7 +91,7 @@ class Data
      */
     public static function getPrivateKey(): ?string
     {
-        return Config::getString('FIREBASE_PRIVATE_KEY');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_PRIVATE_KEY');
     }
 
     /**
@@ -100,7 +101,7 @@ class Data
      */
     public static function getClientEmail(): ?string
     {
-        return Config::getString('FIREBASE_CLIENT_EMAIL');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_CLIENT_EMAIL');
     }
 
     /**
@@ -110,7 +111,7 @@ class Data
      */
     public static function getClientId(): ?string
     {
-        return Config::getString('FIREBASE_CLIENT_ID');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_CLIENT_ID');
     }
 
     /**
@@ -120,7 +121,7 @@ class Data
      */
     public static function getAuthUri(): ?string
     {
-        return Config::getString('FIREBASE_AUTH_URI');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_AUTH_URI');
     }
 
     /**
@@ -130,7 +131,7 @@ class Data
      */
     public static function getTokenUri(): ?string
     {
-        return Config::getString('FIREBASE_TOKEN_URI');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_TOKEN_URI');
     }
 
     /**
@@ -140,7 +141,7 @@ class Data
      */
     public static function getAuthProviderX509CertUrl(): ?string
     {
-        return Config::getString('FIREBASE_AUTH_PROVIDER_X509_CERT_URL');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_AUTH_PROVIDER_X509_CERT_URL');
     }
 
     /**
@@ -150,7 +151,7 @@ class Data
      */
     public static function getClientX509CertUrl(): ?string
     {
-        return Config::getString('FIREBASE_CLIENT_X509_CERT_URL');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_CLIENT_X509_CERT_URL');
     }
 
     /**
@@ -160,7 +161,7 @@ class Data
      */
     public static function getUniverseDomain(): ?string
     {
-        return Config::getString('FIREBASE_UNIVERSE_DOMAIN');
+        return Config::driver(ConfigDrivers::ENV)->getString('FIREBASE_UNIVERSE_DOMAIN');
     }
 
     /**

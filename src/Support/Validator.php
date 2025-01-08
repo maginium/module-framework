@@ -8,6 +8,7 @@ use Countable;
 use Magento\Framework\Validator\EmailAddress as EmailValidator;
 use Maginium\Country\Helpers\Countries as CountriesHelper;
 use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Date;
@@ -43,7 +44,7 @@ class Validator
         ]);
 
         // Get the app domain from the configuration to ensure that emails from the app's own domain are valid.
-        $appDomain = Config::getString('APP_DOMAIN');
+        $appDomain = Config::driver(ConfigDrivers::ENV)->getString('APP_DOMAIN');
 
         // Optionally, add the application's domain to the whitelist.
         // This ensures that users can register with their own email addresses from the app's domain.

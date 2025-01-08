@@ -590,7 +590,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         }
 
         // Construct the base URL for Gravatar
-        $url = sprintf('https://www.gravatar.com/avatar/%s', $hash);
+        $url = Str::format('https://www.gravatar.com/avatar/%s', $hash);
 
         // If there are any additional attributes, add them to the URL
         if (! empty($attributes)) {

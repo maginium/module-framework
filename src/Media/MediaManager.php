@@ -12,6 +12,7 @@ use Magento\Framework\View\Asset\Repository;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Foundation\Exceptions\NotFoundException;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Media\Interfaces\MediaInterface;
 use Maginium\Framework\Resize\Resizer;
 use Maginium\Framework\Support\Facades\Config;
@@ -313,7 +314,7 @@ class MediaManager implements MediaInterface
     private function _prepareFilePath(string $file, bool $withPrefix = false): string
     {
         // Get the prefix from the config, or use a default prefix if not set.
-        $prefix = Config::getString('APP_NAME') ?? self::PREFIX_PATH;
+        $prefix = Config::driver(ConfigDrivers::ENV)->getString('APP_NAME') ?? self::PREFIX_PATH;
 
         // If a prefix is requested and it's not already present in the file path, prepend it to the file name.
         if ($withPrefix && ! str_contains($file, $prefix)) {

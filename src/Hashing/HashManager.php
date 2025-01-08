@@ -7,6 +7,7 @@ namespace Maginium\Framework\Hashing;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\RuntimeException;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Hashing\Enums\HashAlgorithm;
 use Maginium\Framework\Hashing\Interfaces\HashInterface;
 use Maginium\Framework\Support\Facades\Config;
@@ -207,7 +208,7 @@ class HashManager implements HashInterface
     protected function cost(array $options = []): int
     {
         // Check if a cost is provided in the options; if not, retrieve from configuration
-        return $options['cost'] ?? Config::getInt('BCRYPT_ROUNDS', 10);
+        return $options['cost'] ?? Config::driver(ConfigDrivers::ENV)->getInt('BCRYPT_ROUNDS', 10);
     }
 
     /**

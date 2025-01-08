@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Connectors;
 
 use Illuminate\Database\Connectors\MySqlConnector as BaseMySqlConnector;
+use Maginium\Framework\Support\Str;
 use Override;
 use PDO;
 
@@ -93,9 +94,9 @@ class MySqlConnector extends BaseMySqlConnector
         // Check if the port is provided in the configuration.
         return isset($config['port'])
             // If port is provided, include it in the DSN.
-            ? sprintf('mysql:host=%s;port=%d;dbname=%s', $config['host'], $config['port'], $config['dbname'])
+            ? Str::format('mysql:host=%s;port=%d;dbname=%s', $config['host'], $config['port'], $config['dbname'])
             // If port is not provided, exclude it from the DSN.
-            : sprintf('mysql:host=%s;dbname=%s', $config['host'], $config['dbname']);
+            : Str::format('mysql:host=%s;dbname=%s', $config['host'], $config['dbname']);
     }
 
     /**
@@ -114,7 +115,7 @@ class MySqlConnector extends BaseMySqlConnector
     {
         // Set the transaction isolation level if specified in the configuration.
         if (isset($config['isolation_level'])) {
-            $connection->exec(sprintf('SET SESSION TRANSACTION ISOLATION LEVEL %s;', $config['isolation_level']));
+            $connection->exec(Str::format('SET SESSION TRANSACTION ISOLATION LEVEL %s;', $config['isolation_level']));
         }
 
         // Initialize an array to store SQL statements for setting connection attributes.
@@ -146,7 +147,7 @@ class MySqlConnector extends BaseMySqlConnector
 
         // Execute all collected SQL statements as a single `SET` command if any exist.
         if ($statements !== []) {
-            $connection->exec(sprintf('SET %s;', implode(', ', $statements)));
+            $connection->exec(Str::format('SET %s;', implode(', ', $statements)));
         }
     }
 

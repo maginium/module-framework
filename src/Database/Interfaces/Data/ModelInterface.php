@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Interfaces\Data;
 
-use Maginium\Foundation\Exceptions\Exception;
 use Magento\Framework\DataObject\IdentityInterface;
-use Maginium\Foundation\Interfaces\DataObjectInterface;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use Maginium\Framework\Database\Interfaces\SearchableInterface;
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Interfaces\DataObjectInterface;
+use Maginium\Framework\Database\Interfaces\SearchableInterface;
 
 /**
  * Interface ModelInterface.

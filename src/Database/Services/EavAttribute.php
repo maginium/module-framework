@@ -370,10 +370,6 @@ abstract class EavAttribute implements ScopedAttributeInterface
         $attribute = $this->get($code);
         $attributeOptions = $attribute->getSource()->getAllOptions();
 
-        if ($attributeOptions) {
-            // dd($attributeOptions);
-        }
-
         // Step 3: Check if the attribute exists
         if (! $attribute) {
             // If the attribute doesn't exist, throw an exception

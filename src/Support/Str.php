@@ -38,25 +38,24 @@ class Str extends BaseStr
             $phrase = $phrase->render();
         }
 
-        // Named placeholders: {name}, {for}
+        // Replace named placeholders: {name}, {for}, etc.
         $phrase = preg_replace_callback('/\{(\w+)\}/', function($matches) use ($args) {
             $key = $matches[1];
 
             return array_key_exists($key, $args) ? $args[$key] : $matches[0];
         }, $phrase);
 
-        // Numeric placeholders: %1, %2
-        $phrase = preg_replace_callback('/%(\d+)/', function($matches) use ($args) {
+        // Replace numeric placeholders: %1, %2, etc. using sprintf
+        // First, we prepare the arguments for the numeric placeholders
+        $numericArgs = array_slice($args, 0, count($args)); // Ensure we're only passing the correct number of args
+        $phrase = preg_replace_callback('/%(\d+)/', function($matches) use ($numericArgs) {
             $index = (int)$matches[1] - 1; // Convert 1-based index to 0-based
 
-            return array_key_exists($index, $args) ? $args[$index] : $matches[0];
+            return $numericArgs[$index] ?? $matches[0];
         }, $phrase);
 
-        // Sequential placeholders: %s, %d
-        $placeholderIndex = 0;
-        $phrase = preg_replace_callback('/%[sd]/', function() use (&$placeholderIndex, $args) {
-            return array_key_exists($placeholderIndex, $args) ? $args[$placeholderIndex++] : '';
-        }, $phrase);
+        // Sequential placeholders: %s, %d, etc. using sprintf
+        $phrase = sprintf($phrase, ...$args);
 
         return $phrase;
     }

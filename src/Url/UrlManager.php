@@ -20,6 +20,7 @@ use Magento\Framework\Url\RouteParamsResolver;
 use Magento\Framework\Url\RouteParamsResolverFactory;
 use Magento\Framework\Url\ScopeResolverInterface;
 use Magento\Framework\Url\SecurityInfoInterface;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Path;
@@ -234,7 +235,7 @@ class UrlManager extends Url implements UrlInterface
     public function getBackendUrl(?string $route = ''): string
     {
         // Fetch the backend front name from the configuration
-        $backendFrontName = Config::getString(ConfigOptionsList::CONFIG_PATH_BACKEND_FRONTNAME);
+        $backendFrontName = Config::driver(ConfigDrivers::DEPLOYMENT)->getString(ConfigOptionsList::CONFIG_PATH_BACKEND_FRONTNAME);
 
         // Build and return the complete backend URL by joining components
         return Path::join(

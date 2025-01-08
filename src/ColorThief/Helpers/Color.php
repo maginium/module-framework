@@ -42,7 +42,7 @@ class Color
             return ''; // Return empty string for invalid RGB values
         }
 
-        return sprintf('#%02x%02x%02x', $rgb[0], $rgb[1], $rgb[2]);
+        return Str::format('#%02x%02x%02x', $rgb[0], $rgb[1], $rgb[2]);
     }
 
     /**

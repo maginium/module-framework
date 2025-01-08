@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Pusher\Helpers;
 
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 
 /**
@@ -60,7 +61,7 @@ class Data
      */
     public static function getAppId(): string
     {
-        return Config::getString(self::APP_ID);
+        return Config::driver(ConfigDrivers::ENV)->getString(self::APP_ID);
     }
 
     /**
@@ -72,7 +73,7 @@ class Data
      */
     public static function getAppKey(): string
     {
-        return Config::getString(self::APP_KEY);
+        return Config::driver(ConfigDrivers::ENV)->getString(self::APP_KEY);
     }
 
     /**
@@ -84,7 +85,7 @@ class Data
      */
     public static function getAppSecret(): string
     {
-        return Config::getString(self::APP_SECRET);
+        return Config::driver(ConfigDrivers::ENV)->getString(self::APP_SECRET);
     }
 
     /**
@@ -96,7 +97,7 @@ class Data
      */
     public static function getAppCluster(): string
     {
-        return Config::getString(self::APP_CLUSTER);
+        return Config::driver(ConfigDrivers::ENV)->getString(self::APP_CLUSTER);
     }
 
     /**
@@ -109,7 +110,7 @@ class Data
      */
     public static function getUseTLS(): bool
     {
-        return Config::getBool(self::USE_TLS);
+        return Config::driver(ConfigDrivers::ENV)->getBool(self::USE_TLS);
     }
 
     /**
@@ -122,7 +123,7 @@ class Data
      */
     public static function getTimeout(): int
     {
-        return Config::getInt(self::TIMEOUT);
+        return Config::driver(ConfigDrivers::ENV)->getInt(self::TIMEOUT);
     }
 
     /**
@@ -136,7 +137,7 @@ class Data
      */
     public static function getDebug(): bool
     {
-        return Config::getBool(self::DEBUG);
+        return Config::driver(ConfigDrivers::ENV)->getBool(self::DEBUG);
     }
 
     /**

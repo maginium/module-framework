@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Middlewares;
 
-use Maginium\Foundation\Abstracts\AbstractMiddleware;
+use Maginium\Foundation\Abstracts\Middleware\AbstractMiddleware;
 use Maginium\Framework\Response\Interfaces\ResponseInterface;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Validator;

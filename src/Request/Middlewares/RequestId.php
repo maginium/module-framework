@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Request\Middlewares;
 
-use Maginium\Foundation\Abstracts\AbstractHeaderMiddleware;
+use Maginium\Foundation\Abstracts\Middleware\AbstractHeaderMiddleware;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Facades\Uuid;

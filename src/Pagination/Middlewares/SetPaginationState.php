@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Pagination\Middlewares;
 
-use Maginium\Foundation\Abstracts\AbstractMiddleware;
+use Maginium\Foundation\Abstracts\Middleware\AbstractMiddleware;
 use Maginium\Framework\Pagination\PaginationState;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 

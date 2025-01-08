@@ -8,7 +8,6 @@ use Exception;
 use Magento\Framework\MessageQueue\ConsumerConfiguration;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Json;
-use Maginium\Framework\Support\Validator;
 use Override;
 
 /**
@@ -74,7 +73,7 @@ abstract class AbstractConsumer extends ConsumerConfiguration
             $this->rawData = Json::decode($messageBody);
 
             // Prepare the data: convert arrays to DataObject recursively
-            $this->preparedData = $this->prepareData($this->rawData);
+            $this->preparedData = DataObject::make($this->rawData);
 
             // Call the handle method in the child class
             $this->handle();
@@ -150,35 +149,6 @@ abstract class AbstractConsumer extends ConsumerConfiguration
 
         // Try to retrieve the value for the given key
         return $this->preparedData->getData($key) ?? null;
-    }
-
-    /**
-     * Prepare the data by converting nested arrays into DataObject instances.
-     *
-     * @param mixed $data The input data to process.
-     *
-     * @return mixed The prepared data with arrays converted to DataObject instances.
-     */
-    protected function prepareData(mixed $data): mixed
-    {
-        // If the data is already an object, return it as-is.
-        if (Validator::isObject($data)) {
-            return $data;
-        }
-
-        // If the data is an array, iterate over it.
-        if (Validator::isArray($data)) {
-            foreach ($data as $key => $value) {
-                // Recursively process each value in the array.
-                $data[$key] = $this->prepareData($value);
-            }
-
-            // Convert the array into a DataObject.
-            return DataObject::make($data);
-        }
-
-        // If the data is neither an object nor an array, return it as-is.
-        return $data;
     }
 
     /**

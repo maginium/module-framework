@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Redis\Helpers;
 
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 
 /**
@@ -89,7 +90,7 @@ class Data
      */
     public static function getScheme(): ?string
     {
-        return Config::getString(self::REDIS_SCHEME, 'tcp');
+        return Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_SCHEME, 'tcp');
     }
 
     /**
@@ -100,7 +101,7 @@ class Data
      */
     public static function getHost(): ?string
     {
-        return Config::getString(self::REDIS_HOST, '127.0.0.1');
+        return Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_HOST, '127.0.0.1');
     }
 
     /**
@@ -111,7 +112,7 @@ class Data
      */
     public static function getPort(): ?int
     {
-        return Config::getInt(self::REDIS_PORT, 6379);
+        return Config::driver(ConfigDrivers::ENV)->getInt(self::REDIS_PORT, 6379);
     }
 
     /**
@@ -121,7 +122,7 @@ class Data
      */
     public static function getPassword(): ?string
     {
-        return Config::getString(self::REDIS_PASSWORD, null);
+        return Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_PASSWORD, null);
     }
 
     /**
@@ -132,7 +133,7 @@ class Data
      */
     public static function getDatabase(): int
     {
-        return Config::getInt(self::REDIS_DATABASE, 0);
+        return Config::driver(ConfigDrivers::ENV)->getInt(self::REDIS_DATABASE, 0);
     }
 
     /**
@@ -143,7 +144,7 @@ class Data
      */
     public static function getTimeout(): float
     {
-        return Config::getFloat(self::REDIS_TIMEOUT, 5.0);
+        return Config::driver(ConfigDrivers::ENV)->getFloat(self::REDIS_TIMEOUT, 5.0);
     }
 
     /**
@@ -154,7 +155,7 @@ class Data
      */
     public static function getReadWriteTimeout(): float
     {
-        return Config::getFloat(self::REDIS_READ_WRITE_TIMEOUT, 5.0);
+        return Config::driver(ConfigDrivers::ENV)->getFloat(self::REDIS_READ_WRITE_TIMEOUT, 5.0);
     }
 
     /**
@@ -165,7 +166,7 @@ class Data
      */
     public static function isPersistent(): bool
     {
-        return Config::getBool(self::REDIS_PERSISTENT, false);
+        return Config::driver(ConfigDrivers::ENV)->getBool(self::REDIS_PERSISTENT, false);
     }
 
     /**
@@ -177,10 +178,10 @@ class Data
     public static function getPrefix(): string
     {
         // Attempt to get the Redis prefix from the configuration.
-        $prefix = Config::getString(self::REDIS_PREFIX);
+        $prefix = Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_PREFIX);
 
         // If prefix is not found, fallback to a default value using APP_NAME.
-        return $prefix ?: Config::getString('APP_NAME') . '_database_';
+        return $prefix ?: Config::driver(ConfigDrivers::ENV)->getString('APP_NAME') . '_database_';
     }
 
     /**
@@ -191,7 +192,7 @@ class Data
      */
     public static function getCluster(): string
     {
-        return Config::getString(self::REDIS_CLUSTER, env('REDIS_CLUSTER', 'redis'));
+        return Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_CLUSTER, env('REDIS_CLUSTER', 'redis'));
     }
 
     /**
@@ -202,7 +203,7 @@ class Data
      */
     public static function getCompression(): string
     {
-        return Config::getString(self::REDIS_COMPRESSION, 'lz4');
+        return Config::driver(ConfigDrivers::ENV)->getString(self::REDIS_COMPRESSION, 'lz4');
     }
 
     /**

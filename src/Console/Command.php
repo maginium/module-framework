@@ -24,6 +24,7 @@ use Maginium\Framework\Console\Traits\InteractsWithIO;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
 use Override;
 use ReflectionFunctionFactory;
@@ -218,7 +219,7 @@ abstract class Command extends SymfonyCommand
      */
     public static function formatCommandString($string)
     {
-        return sprintf('%s %s %s', static::phpBinary(), static::magentoBinary(), $string);
+        return Str::format('%s %s %s', static::phpBinary(), static::magentoBinary(), $string);
     }
 
     /**
@@ -362,7 +363,7 @@ abstract class Command extends SymfonyCommand
         if ($isInstanceOfIsolated && $isIsolated !== false) {
             // Prevent running multiple instances of the same command concurrently
             if (! $this->commandIsolationMutex()->create($this)) {
-                $this->comment(sprintf('The [%s] command is already running.', $this->getName()));
+                $this->comment(Str::format('The [%s] command is already running.', $this->getName()));
 
                 // Return the exit code for isolated execution (use the option or a default exit code)
                 return (int)(is_numeric($isIsolated)

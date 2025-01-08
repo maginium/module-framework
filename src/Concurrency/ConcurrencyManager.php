@@ -7,6 +7,7 @@ namespace Maginium\Framework\Concurrency;
 use Illuminate\Process\Factory as ProcessFactory;
 use Maginium\Foundation\Exceptions\RuntimeException;
 use Maginium\Framework\Concurrency\Interfaces\DriverInterface;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\MultipleInstanceManager;
 use Maginium\Framework\Support\Php;
@@ -155,7 +156,7 @@ class ConcurrencyManager extends MultipleInstanceManager
     public function getDefaultInstance(): ?string
     {
         // Fetch the default driver name from configuration, fallback to 'process'
-        return Config::getString('concurrency.default', 'process');
+        return Config::driver(ConfigDrivers::ENV)->getString('concurrency.default', 'process');
     }
 
     /**
@@ -171,6 +172,6 @@ class ConcurrencyManager extends MultipleInstanceManager
     public function getInstanceConfig($name): array
     {
         // Fetch the driver configuration from the global configuration
-        return ['driver' => $name ?: Config::getString('concurrency.driver', $this->getDefaultInstance())];
+        return ['driver' => $name ?: Config::driver(ConfigDrivers::ENV)->getString('concurrency.driver', $this->getDefaultInstance())];
     }
 }

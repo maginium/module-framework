@@ -83,7 +83,7 @@ class RedisManager implements RedisInterface
             return $this->client;
         } catch (Exception $e) {
             // Log the exception with detailed information and rethrow it.
-            Log::error(sprintf('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
+            Log::error(Str::format('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
 
             throw $e;
         }

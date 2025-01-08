@@ -6,6 +6,7 @@ namespace Maginium\Framework\Support\Debug;
 
 use Maginium\Foundation\Concerns\ResolvesDumpSource;
 use Maginium\Framework\Support\Facades\Container;
+use Maginium\Framework\Support\Str;
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -161,15 +162,15 @@ class HtmlDumper extends BaseHtmlDumper
         [$file, $relativeFile, $line] = $dumpSource;
 
         // Format the source path and line number as a string.
-        $source = sprintf('%s%s', $relativeFile, $line === null ? '' : ":{$line}");
+        $source = Str::format('%s%s', $relativeFile, $line === null ? '' : ":{$line}");
 
         // Create a clickable HTML link if a source URL can be resolved.
         if ($href = $this->resolveSourceHref($file, $line)) {
             // Wrap source in an anchor tag.
-            $source = sprintf('<a href="%s">%s</a>', $href, $source);
+            $source = Str::format('<a href="%s">%s</a>', $href, $source);
         }
 
         // Return the formatted source string styled in gray color.
-        return sprintf('<span style="color: #A0A0A0;"> // %s</span>', $source);
+        return Str::format('<span style="color: #A0A0A0;"> // %s</span>', $source);
     }
 }

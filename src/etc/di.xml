@@ -39,7 +39,8 @@
     <preference for="Maginium\Framework\Cache\Interfaces\CacheInterface" type="Maginium\Framework\Cache\CacheManager" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
 
-    <!-- Filesystem -->
+    <!-- Media and Filesystem -->
+    <preference for="Maginium\Framework\Media\Interfaces\MediaInterface" type="Maginium\Framework\Media\MediaManager" />
     <preference for="Maginium\Framework\Filesystem\Interfaces\FilesystemInterface" type="Maginium\Framework\Filesystem\Filesystem" />
     <preference for="Maginium\Framework\Filesystem\Interfaces\FactoryInterface" type="Maginium\Framework\Filesystem\FilesystemManager" />
 
@@ -55,6 +56,10 @@
         for="Maginium\Framework\Token\Interfaces\CustomerTokenServiceInterface"
         type="Maginium\Framework\Token\Services\CustomerTokenService"
     />
+
+    <!-- Avatar -->
+    <preference for="Maginium\Framework\Avatar\Interfaces\AvatarInterface" type="Maginium\Framework\Avatar\Avatar" />
+    <preference for="Maginium\Framework\Avatar\Interfaces\GeneratorInterface" type="Maginium\Framework\Avatar\Generator\DefaultGenerator" />
 
     <!-- Cors -->
     <preference for="Maginium\Framework\Cors\Interfaces\CorsCheckInterface" type="Maginium\Framework\Cors\Actions\CorsCheck" />
@@ -226,8 +231,8 @@
         </arguments>
     </type>
 
-    <!-- Configure providers for the ServiceProviderManager -->
-    <type name="Maginium\Framework\Application\ServiceProviderManager">
+    <!-- Configure providers for the ServiceProvider Registry -->
+    <type name="Maginium\Framework\Application\ServiceProvider\Registry">
         <arguments>
             <!-- List of service providers to be registered -->
             <argument xsi:type="array" name="providers">

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Response\Models;
 
 use InvalidArgumentException;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Database\ObjectModel;
 use Maginium\Framework\Response\Helpers\Data as ResponseHelper;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterface;
@@ -15,7 +16,6 @@ use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
 use Override;
-use Throwable;
 
 /**
  * Class Response.
@@ -87,7 +87,7 @@ class Response extends ObjectModel implements ResponseInterface
         $statusCode = $this->getStatusCode();
 
         // Retrieve the application's debugging status (whether debugging is enabled)
-        $isAppDebugging = Config::getBool('APP_DEBUG');
+        $isAppDebugging = Config::driver(ConfigDrivers::ENV)->getBool('APP_DEBUG');
 
         // Initialize the message with a default success message
         $message = $this->getResponseMessage($cause);

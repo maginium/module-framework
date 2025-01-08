@@ -13,6 +13,7 @@ use Magento\Webapi\Model\Config\Converter;
 use Magento\Webapi\Model\Rest\Swagger\Generator as MagentoGenerator;
 use Magento\Webapi\Model\Rest\SwaggerFactory;
 use Magento\Webapi\Model\ServiceMetadata;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Php;
@@ -297,8 +298,8 @@ class Generator extends MagentoGenerator
         $licenseUrl = $this->swaggerHelper->getLicenseUrl();
 
         // Provide default values if not set
-        $url = $licenseUrl ?: Config::getString('SWAGGER_LICENSE_URL');
-        $name = $licenseName ?: Config::getString('SWAGGER_LICENSE_TYPE');
+        $url = $licenseUrl ?: Config::driver(ConfigDrivers::ENV)->getString('SWAGGER_LICENSE_URL');
+        $name = $licenseName ?: Config::driver(ConfigDrivers::ENV)->getString('SWAGGER_LICENSE_TYPE');
 
         // Check if both name and URL are set before returning the result
         if ($name && $url) {
@@ -323,9 +324,9 @@ class Generator extends MagentoGenerator
 
         // Use the retrieved values or provide default values if not set
         // Use the retrieved values or provide default values if not set
-        $url = $contactUrl ?: Config::getString('TECHNICAL_CONTACT_URL');
-        $name = $contactName ?: Config::getString('TECHNICAL_CONTACT_NAME');
-        $email = $contactEmail ?: Config::getString('TECHNICAL_CONTACT_EMAIL');
+        $url = $contactUrl ?: Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_URL');
+        $name = $contactName ?: Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_NAME');
+        $email = $contactEmail ?: Config::driver(ConfigDrivers::ENV)->getString('TECHNICAL_CONTACT_EMAIL');
 
         return [
             'name' => $name,

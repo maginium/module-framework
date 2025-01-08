@@ -12,6 +12,7 @@ use Maginium\Framework\Pusher\Helpers\Data as PusherHelper;
 use Maginium\Framework\Pusher\Interfaces\ClientInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Log;
+use Maginium\Framework\Support\Str;
 use Psr\Log\LoggerInterface;
 use Pusher\Pusher as PusherClient;
 use Pusher\PusherFactory as ClientFactory;
@@ -97,7 +98,7 @@ class Client implements ClientInterface
             return $this->client;
         } catch (Exception $e) {
             // Log the exception with detailed information and rethrow it.
-            Log::error(sprintf('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
+            Log::error(Str::format('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
 
             throw $e;
         }
@@ -138,7 +139,7 @@ class Client implements ClientInterface
             return (bool)$this->client->getSettings();
         } catch (Exception $e) {
             // If health check fails, log the error and return false.
-            Log::error(sprintf('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
+            Log::error(Str::format('Error in %s:%s - %s', __CLASS__, __FUNCTION__, $e->getMessage()));
 
             return false;
         }

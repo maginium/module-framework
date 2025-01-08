@@ -7,6 +7,7 @@ namespace Maginium\Framework\Log\Helpers;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Magento\Framework\Phrase;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Log\Enums\LogEmoji;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Config;
@@ -96,49 +97,49 @@ class Data
         $options['execTime'] ??= null;
 
         // Default to 'production' if not set.
-        $options['env'] ??= Config::getString('APP_ENV', 'production');
+        $options['env'] ??= Config::driver(ConfigDrivers::ENV)->getString('APP_ENV', 'production');
 
         // Get the emoji for the log level.
         $emoji = self::applyLogEmoji($level);
 
         // Construct the log message as a string.
-        $logString = sprintf('%s %s |', $emoji, Str::upper($level));
+        $logString = Str::format('%s %s |', $emoji, Str::upper($level));
 
         // Include className if it's not null or empty.
         if (! Validator::isEmpty($className)) {
-            $logString .= sprintf(' %s |', $className);
+            $logString .= Str::format(' %s |', $className);
         }
 
         // Append optional context fields to the log string.
         if (! Validator::isEmpty($options['reqId'])) {
-            $logString .= sprintf(' [reqId: %s]', $options['reqId']);
+            $logString .= Str::format(' [reqId: %s]', $options['reqId']);
         }
 
         if (! Validator::isEmpty($options['txId'])) {
-            $logString .= sprintf(' [txId: %s]', $options['txId']);
+            $logString .= Str::format(' [txId: %s]', $options['txId']);
         }
 
         if (! Validator::isEmpty($options['userId']) || ! Validator::isEmpty($options['role']) || ! Validator::isEmpty($options['ip'])) {
-            $logString .= sprintf(' [userId: %s, role: %s, ip: %s]', $options['userId'], $options['role'], $options['ip']);
+            $logString .= Str::format(' [userId: %s, role: %s, ip: %s]', $options['userId'], $options['role'], $options['ip']);
         }
 
         // Environment (e.g., production, staging).
         if (! Validator::isEmpty($options['env'])) {
-            $logString .= sprintf(' [env: %s]', $options['env']);
+            $logString .= Str::format(' [env: %s]', $options['env']);
         }
 
         // Specific action or method.
         if (! Validator::isEmpty($options['action'])) {
-            $logString .= sprintf(' [action: %s]', $options['action']);
+            $logString .= Str::format(' [action: %s]', $options['action']);
         }
 
         // Execution time, if applicable.
         if (! Validator::isEmpty($options['execTime'])) {
-            $logString .= sprintf(' [execTime: %s]', $options['execTime']);
+            $logString .= Str::format(' [execTime: %s]', $options['execTime']);
         }
 
         // Append the main log message.
-        $logString .= sprintf(' | %s', $message);
+        $logString .= Str::format(' | %s', $message);
 
         // Return the fully constructed log string.
         return $logString;

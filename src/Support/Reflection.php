@@ -701,7 +701,7 @@ class Reflection extends BaseReflector
      *
      * @return mixed The value of the property.
      */
-    public static function getStaticPropertyValue(string|object $classOrObject, string $name, mixed $def_value = null)
+    public static function getStaticProperty(string|object $classOrObject, string $name, mixed $def_value = null)
     {
         return static::getClass($classOrObject)->getStaticPropertyValue($name, $def_value);
     }

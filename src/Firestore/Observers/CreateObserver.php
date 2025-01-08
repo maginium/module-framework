@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Firestore\Services;
 
-use Maginium\Foundation\Abstracts\AbstractObserver;
+use Maginium\Foundation\Abstracts\Observer\AbstractObserver;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Support\Facades\Firestore;

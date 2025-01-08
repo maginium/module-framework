@@ -8,7 +8,7 @@ use Magento\Backend\Model\Auth\Session as AdminSession;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\User\Api\Data\UserInterface;
-use Maginium\Foundation\Abstracts\AbstractMiddleware;
+use Maginium\Foundation\Abstracts\Middleware\AbstractMiddleware;
 use Maginium\Foundation\Enums\UserType;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Facades\Log;

@@ -6,9 +6,8 @@ namespace Magento\Framework\App;
 
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Application\BaseBootstrap;
-use Maginium\Framework\Application\ServiceProviderManager;
+use Maginium\Framework\Application\ServiceProvider\Registry as ServiceProviderRegistry;
 use Maginium\Framework\Support\Arr;
-use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\ServiceProvider;
 use Override;
@@ -50,50 +49,62 @@ class Bootstrap extends BaseBootstrap
     protected $bootedCallbacks = [];
 
     /**
-     * ServiceProviderManager.
+     * ServiceProviderRegistry.
      *
-     * @var Collection
+     * @var ServiceProviderRegistry
      */
-    protected ServiceProviderManager $serviceProviderManager;
+    protected ServiceProviderRegistry $serviceProviderRegistry;
 
     /**
      * Constructor.
      *
-     * @param ObjectManagerFactory $factory
-     * @param string $rootDir
-     * @param array $initParams
+     * Sets up the application with the object manager factory, root directory,
+     * and initialization parameters. It also resolves the service provider registry,
+     * registers service providers, and boots the application.
+     *
+     * @param ObjectManagerFactory $factory The factory for creating the object manager.
+     * @param string $rootDir The application's root directory.
+     * @param array $initParams Parameters for initialization.
      */
     public function __construct(ObjectManagerFactory $factory, $rootDir, array $initParams)
     {
+        // Initialize the core application components.
         parent::__construct($factory, $rootDir, $initParams);
 
-        $this->serviceProviderManager = Container::resolve(ServiceProviderManager::class);
+        // Resolve and store the service provider registry.
+        $this->serviceProviderRegistry = Container::resolve(ServiceProviderRegistry::class);
 
-        // Register necessary service providers
+        // Register all required service providers.
         $this->registerServiceProviders();
 
-        // Boot the application
+        // Boot the application to prepare it for use.
         $this->boot();
     }
 
     /**
-     * Static method so that client code does not have to create Object Manager Factory every time Bootstrap is called.
+     * Static method to create a new Bootstrap instance.
      *
-     * @param string $rootDir
-     * @param array $initParams
-     * @param ObjectManagerFactory $factory
+     * This method ensures that the client code doesn't need to instantiate the Object Manager Factory every time
+     * Bootstrap is invoked.
      *
-     * @return Bootstrap
+     * @param string $rootDir The root directory of the application.
+     * @param array $initParams Initialization parameters for the application.
+     * @param ObjectManagerFactory|null $factory Optional factory instance for creating the object manager.
+     *
+     * @return Bootstrap Returns an instance of the Bootstrap class.
      */
     #[Override]
     public static function create($rootDir, array $initParams, ?ObjectManagerFactory $factory = null): static
     {
+        // Configure the autoloader using the provided root directory and initialization parameters.
         self::populateAutoloader($rootDir, $initParams);
 
+        // If no factory is provided, create one using the root directory and initialization parameters.
         if ($factory === null) {
             $factory = self::createObjectManagerFactory($rootDir, $initParams);
         }
 
+        // Return a new Bootstrap instance initialized with the factory, root directory, and parameters.
         return new self($factory, $rootDir, $initParams);
     }
 
@@ -104,49 +115,59 @@ class Bootstrap extends BaseBootstrap
      */
     public function boot()
     {
+        // Check if the application has already been booted to prevent redundant operations.
         if ($this->isBooted()) {
             return;
         }
 
-        // Once the application has booted we will also fire some "booted" callbacks
-        // for any listeners that need to do work after this initial booting gets
-        // finished. This is useful when ordering the boot-up processes we run.
+        // Trigger "booting" callbacks to execute preliminary tasks before the application boots.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        $serviceProviders = $this->serviceProviderManager->all();
+        // Retrieve all service providers registered in the application.
+        $serviceProviders = $this->serviceProviderRegistry->all();
 
-        array_walk($serviceProviders, function($p) {
+        // Boot each service provider by calling their respective boot methods.
+        Arr::walk($serviceProviders, function($p) {
             $this->bootProvider($p);
         });
 
+        // Mark the application as booted.
         $this->booted = true;
 
+        // Trigger "booted" callbacks for any logic that depends on the application being fully booted.
         $this->fireAppCallbacks($this->bootedCallbacks);
     }
 
     /**
      * Register a new boot listener.
      *
-     * @param  callable  $callback
+     * Allows client code to add callbacks to execute during the boot process.
+     *
+     * @param callable $callback The callback function to register.
      *
      * @return void
      */
     public function booting($callback)
     {
+        // Append the provided callback to the list of "booting" callbacks.
         $this->bootingCallbacks[] = $callback;
     }
 
     /**
      * Register a new "booted" listener.
      *
-     * @param  callable  $callback
+     * Allows client code to add callbacks to execute after the application has booted.
+     *
+     * @param callable $callback The callback function to register.
      *
      * @return void
      */
     public function booted($callback)
     {
+        // Append the provided callback to the list of "booted" callbacks.
         $this->bootedCallbacks[] = $callback;
 
+        // If the application has already booted, invoke the callback immediately.
         if ($this->isBooted()) {
             $callback($this);
         }
@@ -155,31 +176,30 @@ class Bootstrap extends BaseBootstrap
     /**
      * Register a service provider with the application.
      *
-     * @param  ServiceProvider|string  $provider
-     * @param  bool  $force
+     * @param ServiceProvider|string $provider The service provider instance or class name to register.
+     * @param bool $force Whether to force re-registration even if the provider is already registered.
      *
-     * @return ServiceProvider
+     * @return ServiceProvider The registered service provider instance.
      */
     public function register(ServiceProvider|string $provider, bool $force = false)
     {
+        // Check if the provider is already registered and return it unless forced to re-register.
         if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
         }
 
-        // If the given "provider" is a string, we will resolve it, passing in the
-        // application instance automatically for the developer. This is simply
-        // a more convenient way of specifying your service provider classes.
+        // Resolve the provider instance if a class name is given.
         if (is_string($provider)) {
             $provider = $this->resolveProvider($provider);
         }
 
+        // Call the provider's register method to initialize its services.
         $provider->register();
 
+        // Mark the provider as registered in the registry.
         $this->markAsRegistered($provider);
 
-        // If the application has already booted, we will call this boot method on
-        // the provider class so it has an opportunity to do its boot logic and
-        // will be ready for any usage by this developer's application logic.
+        // If the application is already booted, boot the provider immediately.
         if ($this->isBooted()) {
             $this->bootProvider($provider);
         }
@@ -190,52 +210,59 @@ class Bootstrap extends BaseBootstrap
     /**
      * Get the registered service provider instance if it exists.
      *
-     * @param  ServiceProvider|string  $provider
+     * @param  ServiceProvider|string  $provider The service provider or its class name.
      *
-     * @return ServiceProvider|null
+     * @return ServiceProvider|null The service provider instance or null if not found.
      */
     public function getProvider($provider)
     {
+        // Determine the provider name (class name if a provider object is passed).
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        $serviceProviders = $this->serviceProviderManager->all();
+        // Get all registered service providers.
+        $serviceProviders = $this->serviceProviderRegistry->all();
 
+        // Return the provider if registered, otherwise null.
         return $serviceProviders[$name] ?? null;
     }
 
     /**
      * Get the registered service provider instances if any exist.
      *
-     * @param  ServiceProvider|string  $provider
+     * @param  ServiceProvider|string  $provider The service provider or its class name.
      *
-     * @return array
+     * @return array List of service provider instances.
      */
     public function getProviders($provider)
     {
+        // Determine the provider name (class name if a provider object is passed).
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::where($this->serviceProviderManager->all(), fn($value) => $value instanceof $name);
+        // Filter and return all providers that match the given name.
+        return Arr::where($this->serviceProviderRegistry->all(), fn($value) => $value instanceof $name);
     }
 
     /**
      * Resolve a service provider instance from the class name.
      *
-     * @param  string  $provider
+     * @param  string  $provider The service provider class name.
      *
-     * @return ServiceProvider
+     * @return ServiceProvider The resolved service provider instance.
      */
     public function resolveProvider($provider)
     {
+        // Instantiate and return the provider class.
         return new $provider($this);
     }
 
     /**
      * Determine if the application has booted.
      *
-     * @return bool
+     * @return bool True if the application has booted, false otherwise.
      */
     public function isBooted()
     {
+        // Return the booted status.
         return $this->booted;
     }
 
@@ -246,11 +273,11 @@ class Bootstrap extends BaseBootstrap
      */
     public function callBootingCallbacks()
     {
+        // Loop through and call each booting callback.
         $index = 0;
 
         while ($index < count($this->bootingCallbacks)) {
             $this->call($this->bootingCallbacks[$index]);
-
             $index++;
         }
     }
@@ -258,21 +285,20 @@ class Bootstrap extends BaseBootstrap
     /**
      * Call a method or callback dynamically.
      *
-     * This method allows the execution of any callable provided to it, which could be
-     * a simple function, method in a class, or even a closure.
+     * @param callable $callback The callback to execute.
+     * @param array $parameters Parameters for the callback.
      *
-     * @param callable $callback
-     * @param array $parameters Parameters to be passed to the callable
-     *
-     * @return mixed The result of the callable execution
+     * @return mixed The result of the callback execution.
      */
     public function call($callback, array $parameters = [])
     {
+        // Ensure the callback is callable before executing.
         if (is_callable($callback)) {
-            // Call the callback with the provided parameters
+            // Execute the callback with provided parameters.
             return call_user_func_array($callback, $parameters);
         }
 
+        // Throw an error if the callback is not callable.
         throw InvalidArgumentException::make('Provided callback is not callable');
     }
 
@@ -281,11 +307,11 @@ class Bootstrap extends BaseBootstrap
      */
     protected function registerServiceProviders()
     {
-        // Optionally, call specific providers to register after boot if needed
-        $serviceProviders = $this->serviceProviderManager->all();
+        // Get all registered service providers.
+        $serviceProviders = $this->serviceProviderRegistry->getServiceProviders();
 
-        array_walk($serviceProviders, function($provider) {
-            // Register the provider if it's not already registered
+        // Register each service provider if not already registered.
+        Arr::walk($serviceProviders, function(ServiceProvider $provider) {
             $this->register($provider);
         });
     }
@@ -293,35 +319,38 @@ class Bootstrap extends BaseBootstrap
     /**
      * Boot the given service provider.
      *
-     * @param ServiceProvider  $provider
+     * @param ServiceProvider  $provider The service provider to boot.
      *
      * @return void
      */
     protected function bootProvider(ServiceProvider $provider)
     {
+        // Call the booting callbacks for the provider.
         $provider->callBootingCallbacks();
 
+        // Call the 'boot' method if it exists.
         if (method_exists($provider, 'boot')) {
             $this->call([$provider, 'boot']);
         }
 
+        // Call the booted callbacks for the provider.
         $provider->callBootedCallbacks();
     }
 
     /**
      * Call the booting callbacks for the application.
      *
-     * @param  callable[]  $callbacks
+     * @param  callable[]  $callbacks List of booting callbacks.
      *
      * @return void
      */
     protected function fireAppCallbacks(array &$callbacks)
     {
+        // Loop through and call each callback.
         $index = 0;
 
         while ($index < count($callbacks)) {
             $callbacks[$index]($this);
-
             $index++;
         }
     }
@@ -329,18 +358,20 @@ class Bootstrap extends BaseBootstrap
     /**
      * Mark the given provider as registered.
      *
-     * @param  ServiceProvider  $provider
+     * @param  ServiceProvider  $provider The service provider to mark.
      *
      * @return void
      */
     protected function markAsRegistered($provider)
     {
+        // Get the class name of the provider.
         $class = get_class($provider);
 
-        $serviceProviders = $this->serviceProviderManager->all();
+        // Get all registered service providers.
+        $serviceProviders = $this->serviceProviderRegistry->all();
 
+        // Mark the provider as registered.
         $serviceProviders[$class] = $provider;
-
         $this->loadedProviders[$class] = true;
     }
 }

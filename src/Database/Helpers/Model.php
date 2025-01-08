@@ -9,6 +9,7 @@ use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Support\Facades\MageDB;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Str;
 
 /**
  * Class Model.
@@ -60,7 +61,7 @@ class Model
             $className = Reflection::getClassBasename($class);
 
             // Build the resource model class name by replacing 'Models' with 'ResourceModel' and appending the class name
-            $resourceModelClassName = sprintf('%s\\Models\\ResourceModel\\%s', $namespace, $className);
+            $resourceModelClassName = Str::format('%s\\Models\\ResourceModel\\%s', $namespace, $className);
 
             // Check if the resource model class exists
             if (Php::isClassExists($resourceModelClassName)) {
@@ -68,7 +69,7 @@ class Model
             }
 
             // Fallback: Check for 'Models\ResourceModel\Index' if the class does not exist
-            $defaultResourceModelClassName = sprintf('%s\\Models\\ResourceModel\\Index', $namespace);
+            $defaultResourceModelClassName = Str::format('%s\\Models\\ResourceModel\\Index', $namespace);
 
             // Check if the fallback class exists
             if (Php::isClassExists($defaultResourceModelClassName)) {
