@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Pagination;
 
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Pagination\Cursor;
 use Maginium\Framework\Pagination\CursorPaginator;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
 
@@ -154,7 +156,7 @@ class SearchAfterPaginator extends CursorPaginator
         $previousCursor['page']--;
 
         // Set the next sort parameter based on the sort history.
-        $previousCursor['next_sort'] = array_pop($previousCursor['sort_history']);
+        $previousCursor['next_sort'] = Arr::pop($previousCursor['sort_history']);
 
         // Return the previous cursor.
         return Container::make(Cursor::class, ['parameters' => $previousCursor, 'pointsToNextItems' => false]);

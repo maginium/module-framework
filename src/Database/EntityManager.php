@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database;
 
-use Exception;
-use LogicException;
 use Magento\Framework\EntityManager\EntityManager as BaseEntityManager;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\LogicException;
 
 /**
  * Custom Entity Manager for managing model operations.
@@ -30,14 +30,14 @@ class EntityManager extends BaseEntityManager
      */
     public function save($model, $arguments = [])
     {
-        // Check if the model is an instance of EloquentModel (Laravel Eloquent model)
-        if ($model instanceof EloquentModel) {
+        // Check if the model is an instance of Model (Laravel Eloquent model)
+        if ($model instanceof Model) {
             try {
                 // Attempt to save the Eloquent model. Use save() instead of create() since create() is for instantiating models
                 return $model->save();
             } catch (Exception $e) {
-                // Catch any exception during the Eloquent save operation and throw a new Exception with the error message
-                throw new Exception('Error saving Eloquent model: ' . $e->getMessage());
+                // Catch any exception during the Eloquent save operation and throw a Exception::make with the error message
+                throw Exception::make('Error saving Eloquent model: ' . $e->getMessage());
             }
         }
 
@@ -58,14 +58,14 @@ class EntityManager extends BaseEntityManager
      */
     public function delete($model, $arguments = [])
     {
-        // Check if the model is an instance of EloquentModel (Laravel Eloquent model)
-        if ($model instanceof EloquentModel) {
+        // Check if the model is an instance of Model (Laravel Eloquent model)
+        if ($model instanceof Model) {
             try {
                 // Attempt to delete the Eloquent model
                 return $model->delete();
             } catch (Exception $e) {
-                // Catch any exception during the Eloquent delete operation and throw a new Exception with the error message
-                throw new Exception('Error deleting Eloquent model: ' . $e->getMessage());
+                // Catch any exception during the Eloquent delete operation and throw a Exception::make with the error message
+                throw Exception::make('Error deleting Eloquent model: ' . $e->getMessage());
             }
         }
 
@@ -87,14 +87,14 @@ class EntityManager extends BaseEntityManager
      */
     public function load($model, $identifier, $arguments = [])
     {
-        // Check if the model is an instance of EloquentModel (Laravel Eloquent model)
-        if ($model instanceof EloquentModel) {
+        // Check if the model is an instance of Model (Laravel Eloquent model)
+        if ($model instanceof Model) {
             try {
                 // Attempt to find the model by its identifier using Eloquent's find() method
                 return $model->find($identifier);
             } catch (Exception $e) {
-                // Catch any exception during the Eloquent load operation and throw a new Exception with the error message
-                throw new Exception('Error loading Eloquent model: ' . $e->getMessage());
+                // Catch any exception during the Eloquent load operation and throw a Exception::make with the error message
+                throw Exception::make('Error loading Eloquent model: ' . $e->getMessage());
             }
         }
 
@@ -114,14 +114,14 @@ class EntityManager extends BaseEntityManager
      */
     public function has($model)
     {
-        // Check if the model is an instance of EloquentModel (Laravel Eloquent model)
-        if ($model instanceof EloquentModel) {
+        // Check if the model is an instance of Model (Laravel Eloquent model)
+        if ($model instanceof Model) {
             try {
                 // Attempt to check if the Eloquent model exists by checking the 'exists' property
                 return $model->exists;
             } catch (Exception $e) {
-                // Catch any exception during the Eloquent existence check and throw a new Exception with the error message
-                throw new Exception('Error checking existence of Eloquent model: ' . $e->getMessage());
+                // Catch any exception during the Eloquent existence check and throw a Exception::make with the error message
+                throw Exception::make('Error checking existence of Eloquent model: ' . $e->getMessage());
             }
         }
 

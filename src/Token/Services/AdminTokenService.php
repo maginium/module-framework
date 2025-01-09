@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Token\Services;
 
-use Exception;
 use Magento\Integration\Api\Exception\UserTokenException;
 use Magento\Integration\Model\CustomUserContext;
 use Maginium\Foundation\Exceptions\AuthenticationException;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Token\Interfaces\AdminTokenServiceInterface;
 

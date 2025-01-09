@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Relations;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\MorphTo as BaseMorphTo;
+use Maginium\Framework\Database\Eloquent\Collection;
 
 /**
  * Class MorphTo.

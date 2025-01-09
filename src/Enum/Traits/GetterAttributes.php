@@ -87,22 +87,18 @@ trait GetterAttributes
         $constants = static::getConstants();
 
         // Normalize the constants: keys to lowercase, values to lowercase
-        $lowercaseConstants = array_map(
-            fn($val, $key) => [mb_strtolower($key) => Str::lower($val)],
+        $lowercaseConstants = Arr::map(
             $constants,
-            array_keys($constants),
+            fn($val, $key) => Str::lower($val),
         );
 
-        // Flatten the array since array_map creates an array of arrays
-        $lowercaseConstants = Arr::merge(...$lowercaseConstants);
-
-        // Normalize the value for case-insensitive comparison
+        // Normalize the input value for case-insensitive comparison
         $value = Str::lower($value);
 
         // Search for the key associated with the provided value
         $foundKey = Arr::search($value, $lowercaseConstants, true);
 
-        // Return null if the value is not found among enum members
+        // Return the found key or null if no match is found
         return $foundKey ?: null;
     }
 
@@ -121,17 +117,13 @@ trait GetterAttributes
         // Get all constants for the current enum class
         $constants = static::getConstants();
 
-        // Normalize the constants: keys to lowercase while preserving values
-        $lowercaseConstants = array_map(
-            fn($val, $constKey) => [$constKey => $val],
+        // Normalize the constants: values to lowercase, key to lowercase
+        $lowercaseConstants = Arr::map(
             $constants,
-            array_keys(array_change_key_case($constants, CASE_LOWER)),
+            fn($val, $key): string => Str::lower($key),
         );
 
-        // Convert to a single associative array
-        $lowercaseConstants = Arr::merge(...$lowercaseConstants);
-
-        // Convert the provided key to lowercase for case-insensitive comparison
+        // Normalize the input value for case-insensitive comparison
         $key = Str::lower($key);
 
         // Retrieve the associated enum value or null if the key doesn't exist

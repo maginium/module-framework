@@ -7,14 +7,15 @@ namespace Maginium\Framework\Filesystem\Drivers;
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 use DateTimeInterface;
-use Exception;
 use Illuminate\Support\Traits\Conditionable;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Http\File;
 use Maginium\Framework\Http\UploadedFile;
+use Maginium\Framework\Support\Arr;
 use Override;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
@@ -104,7 +105,7 @@ class AwsS3V3 extends DriverFilesystem
     public function temporaryUrl(string $path, DateTimeInterface $expiration, array $options = []): string
     {
         // Create a command to fetch the object from S3.
-        $command = $this->client->getCommand('GetObject', array_merge([
+        $command = $this->client->getCommand('GetObject', Arr::merge([
             'Bucket' => $this->config['bucket'],
             'Key' => $this->prefixer->prefixPath($path),
         ], $options));
@@ -132,7 +133,7 @@ class AwsS3V3 extends DriverFilesystem
     public function temporaryUploadUrl(string $path, DateTimeInterface $expiration, array $options = []): array
     {
         // Create a command to put the object in S3.
-        $command = $this->client->getCommand('PutObject', array_merge([
+        $command = $this->client->getCommand('PutObject', Arr::merge([
             'Bucket' => $this->config['bucket'],
             'Key' => $this->prefixer->prefixPath($path),
         ], $options));

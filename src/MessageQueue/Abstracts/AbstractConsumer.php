@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\MessageQueue\Abstracts;
 
-use Exception;
 use Magento\Framework\MessageQueue\ConsumerConfiguration;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Json;
 use Override;

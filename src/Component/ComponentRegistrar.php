@@ -7,8 +7,8 @@ namespace Maginium\Framework\Component;
 use const VENDOR_AUTOLOAD;
 
 use Composer\Autoload\ClassLoader;
-use Exception;
 use Magento\Framework\Component\ComponentRegistrar as BaseComponentRegistrar;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LogicException;
 use Maginium\Framework\Component\Interfaces\ComponentRegistrarInterface;
 use Maginium\Framework\Support\Arr;

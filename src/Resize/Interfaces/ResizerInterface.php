@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Resize\Interfaces;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**

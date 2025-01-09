@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\Helpers;
 
 use Closure;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Maginium\Framework\Elasticsearch\Eloquent\Models;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
 
 /**
@@ -182,12 +183,12 @@ trait QueriesRelationships
     protected function getConstrainedRelatedIds($relations, $operator, $count): array
     {
         // Count the occurrences of each related ID
-        $relationCount = array_count_values(array_map(function($id) {
+        $relationCount = Arr::count_values(Arr::map(is_array($relations) ? $relations : $relations->flatten()->toArray(), function($id) {
             return (string)$id; // Convert object IDs to strings
-        }, is_array($relations) ? $relations : $relations->flatten()->toArray()));
+        }));
 
         // Filter out relations based on the operator and count
-        $relationCount = array_filter($relationCount, function($counted) use ($count, $operator) {
+        $relationCount = Arr::filter($relationCount, function($counted) use ($count, $operator) {
             if ($count === 0) {
                 return true; // If the count is 0, include all results
             }
@@ -209,7 +210,7 @@ trait QueriesRelationships
         });
 
         // Return the keys (related IDs) after filtering
-        return array_keys($relationCount);
+        return Arr::keys($relationCount);
     }
 
     /**
@@ -240,6 +241,6 @@ trait QueriesRelationships
         }
 
         // Throw an exception if the relation type is not supported
-        throw new Exception(class_basename($relation) . ' is not supported for hybrid query constraints.');
+        throw Exception::make(class_basename($relation) . ' is not supported for hybrid query constraints.');
     }
 }

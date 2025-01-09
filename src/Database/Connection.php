@@ -52,7 +52,7 @@ class Connection extends BaseConnection implements ConnectionInterface
      * @return QueryBuilder
      */
     #[Override]
-    public function table($table, $as = null): QueryBuilder
+    public function table($table, $as = null): mixed
     {
         return $this->query()->from($table, $as);
     }
@@ -63,7 +63,7 @@ class Connection extends BaseConnection implements ConnectionInterface
      * This method returns a `SchemaBuilder` instance customized for the current
      * database connection. If no schema grammar is set, it uses the default grammar.
      *
-     * @return BuilderInterface The schema builder instance for managing database schemas.
+     * @return SchemaBuilder The schema builder instance for managing database schemas.
      */
     #[Override]
     public function getSchemaBuilder(): BuilderInterface

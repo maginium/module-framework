@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\DSL;
 
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Carbon;
 use Maginium\Framework\Support\Str;
 
@@ -143,7 +144,7 @@ trait IndexInterpreter
     public function cleanData(array $data): array
     {
         if (! empty($data)) {
-            array_walk_recursive($data, function(&$item) {
+            Arr::walk_recursive($data, function(&$item) {
                 if ($item instanceof Carbon) {
                     // Convert Carbon instances to ISO 8601 format.
                     $item = $item->toIso8601String();

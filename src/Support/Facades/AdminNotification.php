@@ -6,6 +6,7 @@ namespace Maginium\Framework\Support\Facades;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Framework\Dto\DataTransferObject;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facade;
@@ -79,7 +80,7 @@ class AdminNotification extends Facade
         $placeholders = [];
 
         foreach ($placeholdersList as $placeholder) {
-            if (array_key_exists($placeholder, $data)) {
+            if (Arr::exists($data, $placeholder)) {
                 $placeholders["{$placeholder}"] = $data[$placeholder];
             }
         }

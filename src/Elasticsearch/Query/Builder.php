@@ -7,9 +7,9 @@ namespace Maginium\Framework\Elasticsearch\Query;
 use AllowDynamicProperties;
 use Carbon\Carbon;
 use Closure;
-use Exception;
 use Illuminate\Database\Query\Builder as BaseBuilder;
 use LogicException;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Elasticsearch\Collection\ElasticCollection;
 use Maginium\Framework\Elasticsearch\Collection\ElasticCollectionFactory;
 use Maginium\Framework\Elasticsearch\Collection\ElasticResult;
@@ -23,6 +23,7 @@ use Maginium\Framework\Elasticsearch\Meta\QueryMetaDataFactory;
 use Maginium\Framework\Elasticsearch\Schema\Schema;
 use Maginium\Framework\Pagination\Facades\Paginator;
 use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
@@ -461,9 +462,9 @@ class Builder extends BaseBuilder
      * @param  string  $pageName
      * @param  int|null  $page
      *
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @return PaginatorInterface
      */
-    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null): Paginator
+    public function simplePaginate($perPage = 15, $columns = ['*'], $pageName = 'page', $page = null): PaginatorInterface
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -1801,7 +1802,7 @@ class Builder extends BaseBuilder
 
         if ($currentColumns) {
             // Merge new columns with the existing ones
-            return $this->select(array_merge($currentColumns, $column));
+            return $this->select(Arr::merge($currentColumns, $column));
         }
 
         // Select the new columns
@@ -2446,7 +2447,7 @@ class Builder extends BaseBuilder
     protected function _processUpdate($values, array $options = [], $method = 'updateMany'): int
     {
         // Default to updating multiple documents unless otherwise specified.
-        if (! array_key_exists('multiple', $options)) {
+        if (! Arr::exists($options, 'multiple')) {
             $options['multiple'] = true;
         }
 
@@ -2612,9 +2613,9 @@ class Builder extends BaseBuilder
             return ['*'];
         }
 
-        $final = array_values(array_unique($final));
+        $final = Arr::values(Arr::unique($final));
 
-        if (($key = array_search('*', $final)) !== false) {
+        if (($key = Arr::search('*', $final)) !== false) {
             unset($final[$key]);
         }
 
@@ -2652,7 +2653,7 @@ class Builder extends BaseBuilder
 
         if (! isset($operator) || $operator === '=') {
             $query = [$column => $value];
-        } elseif (array_key_exists($operator, $this->conversion)) {
+        } elseif (Arr::exists($this->conversion, $operator)) {
             $query = [$column => [$this->conversion[$operator] => $value]];
         } else {
             if (is_callable($column)) {
@@ -2766,7 +2767,7 @@ class Builder extends BaseBuilder
         $column = $where['column'];
         $values = $where['values'];
 
-        return [$column => ['in' => array_values($values)]];
+        return [$column => ['in' => Arr::values($values)]];
     }
 
     /**
@@ -2784,7 +2785,7 @@ class Builder extends BaseBuilder
         $column = $where['column'];
         $values = $where['values'];
 
-        return [$column => ['nin' => array_values($values)]];
+        return [$column => ['nin' => Arr::values($values)]];
     }
 
     /**
@@ -2975,9 +2976,9 @@ class Builder extends BaseBuilder
             $response['failed'] += $result['failed'];
             $response['created'] += $result['created'];
             $response['modified'] += $result['modified'];
-            $response['data'] = array_merge($response['data'], $result['data']);
+            $response['data'] = Arr::merge($response['data'], $result['data']);
 
-            $response['error_bag'] = array_merge($response['error_bag'], $result['error_bag']);
+            $response['error_bag'] = Arr::merge($response['error_bag'], $result['error_bag']);
         });
 
         return $this->_parseBulkInsertResult($response, $returnData);
@@ -3044,7 +3045,7 @@ class Builder extends BaseBuilder
             $currentCloneCols = $clone->columns;
 
             if ($columns && $columns !== ['*']) {
-                $currentCloneCols = array_merge($currentCloneCols, $columns);
+                $currentCloneCols = Arr::merge($currentCloneCols, $columns);
             }
 
             return $clone->setAggregate('count', $currentCloneCols)->get()->all();
@@ -3140,7 +3141,7 @@ class Builder extends BaseBuilder
     private function _attachOption($key, $value): void
     {
         $wheres = $this->wheres;
-        $where = array_pop($wheres);
+        $where = Arr::pop($wheres);
 
         if (! isset($where['options'])) {
             $where['options'] = [];
@@ -3202,7 +3203,7 @@ class Builder extends BaseBuilder
             return true;
         }
 
-        return array_keys($arr) !== range(0, count($arr) - 1);
+        return Arr::keys($arr) !== range(0, count($arr) - 1);
     }
 
     /**

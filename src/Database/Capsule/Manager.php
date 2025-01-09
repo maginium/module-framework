@@ -11,7 +11,7 @@ use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Database\Connection;
 use Maginium\Framework\Database\DatabaseManager;
 use Maginium\Framework\Database\DatabaseManagerFactory;
-use Maginium\Framework\Database\EloquentModel;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Database\Facades\AdminConfig;
 use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Database\Interfaces\ConnectionInterface;
@@ -162,10 +162,10 @@ class Manager
     public function bootEloquent(): void
     {
         // Set the connection resolver for Eloquent.
-        EloquentModel::setConnectionResolver($this->manager);
+        Model::setConnectionResolver($this->manager);
 
         // Optionally, set the event dispatcher for Eloquent models.
-        // EloquentModel::setEventDispatcher($this->eventManager);
+        // Model::setEventDispatcher($this->eventManager);
     }
 
     /**

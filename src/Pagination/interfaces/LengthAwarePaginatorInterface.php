@@ -28,6 +28,16 @@ interface LengthAwarePaginatorInterface extends ArrayAccess, Countable, Iterator
     public function all(): array;
 
     /**
+     * Get pagination metadata as an associative array.
+     *
+     * This method returns the core pagination information such as the pagination path,
+     * total number of items, items per page, current page, last page, and other essential metadata.
+     *
+     * @return array Pagination metadata array.
+     */
+    public function meta(): array;
+
+    /**
      * Convert paginator data into an associative array.
      *
      * This method prepares and returns the complete paginator data, including pagination metadata and

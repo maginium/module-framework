@@ -115,7 +115,7 @@ abstract class FlaggedEnum extends Enum
      */
     public function setFlags(array $flags): static
     {
-        // Combine the provided flags into the value property using array_reduce.
+        // Combine the provided flags into the value property using Arr::reduce.
         $this->value = Arr::reduce(
             $flags,
             static fn(int $carry, int|self $flag): int => $carry

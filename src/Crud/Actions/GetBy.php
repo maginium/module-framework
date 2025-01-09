@@ -14,6 +14,7 @@ use Maginium\Framework\Crud\Constants\Criteria;
 use Maginium\Framework\Crud\Interfaces\GetByInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Validator;
 
@@ -47,6 +48,13 @@ class GetBy implements GetByInterface
     protected string $modelName;
 
     /**
+     *  The class name of the Elastic model.
+     *
+     * @var class-string<Model>
+     */
+    protected string $elasticModel;
+
+    /**
      * GetBy constructor.
      * Initializes the service and sets the logger and model name.
      *
@@ -63,6 +71,9 @@ class GetBy implements GetByInterface
 
         // Set model name (can be dynamically set in subclasses)
         $this->modelName = $service->getRepository()->getEntityName();
+
+        // Fetch the Elasticsearch model associated with the entity.
+        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
     }
 
     /**
@@ -80,7 +91,7 @@ class GetBy implements GetByInterface
     {
         try {
             // Use the service to get the model by attribute
-            $model = $this->service->getBy($value, $attribute);
+            $model = $this->elasticModel::where($attribute, $value);
 
             if (Validator::isEmpty($model)) {
                 // No results found, set custom status code and message, then throw exception
@@ -92,7 +103,7 @@ class GetBy implements GetByInterface
             }
 
             // Filter the columns from the deleted model's data
-            $filteredEntityData = $this->applyColumnFilter($model->toDataArray());
+            $filteredEntityData = $model->only($this->getColumns());
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()

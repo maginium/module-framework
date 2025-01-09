@@ -105,7 +105,7 @@ trait HasAuthorization
                     return match ($userTypeId) {
                         UserContextInterface::USER_TYPE_CUSTOMER => Customer::loadById($userId),
                         UserContextInterface::USER_TYPE_ADMIN => User::loadById($userId),
-                        default => throw new Exception('Invalid user type in token.'),
+                        default => throw Exception::make('Invalid user type in token.'),
                     };
                 }
             } catch (Exception $e) {

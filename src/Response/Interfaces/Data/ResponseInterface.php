@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Interfaces\Data;
 
-use Exception;
 use Magento\Framework\Webapi\Exception as WebapiException;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Interfaces\DataObjectInterface;
 use Throwable;
 

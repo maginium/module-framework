@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Config\Drivers;
 
-use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Config\Config;
 use Maginium\Framework\Config\Helpers\Cache as CacheManager;

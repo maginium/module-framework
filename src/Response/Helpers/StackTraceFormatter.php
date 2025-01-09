@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Helpers;
 
+use Maginium\Framework\Support\Arr;
+
 /**
  * Class responsible for formatting and parsing stack traces.
  *
@@ -26,8 +28,8 @@ class StackTraceFormatter
     {
         // Check if the trace is valid; return an empty array if null
         if ($trace) {
-            // Use array_map to process each frame with the parseStackTraceFrame method
-            return array_map([static::class, 'parseStackTraceFrame'], $trace);
+            // Use Arr::map to process each frame with the parseStackTraceFrame method
+            return Arr::map($trace, [static::class, 'parseStackTraceFrame']);
         }
 
         // Return an empty array if no trace is provided
@@ -87,9 +89,9 @@ class StackTraceFormatter
         // Match all occurrences of the pattern in the arguments string
         if (preg_match_all($pattern, $argsString, $matches)) {
             // Map each matched object into a structured array with type and class details
-            $args = array_map(
-                fn($arg) => ['type' => 'Object', 'class' => $arg],
+            $args = Arr::map(
                 $matches[1],
+                fn($arg) => ['type' => 'Object', 'class' => $arg],
             );
         }
 

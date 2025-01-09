@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Console\Commands\Cache;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Console\Command;
 use Maginium\Framework\Console\Enums\Commands;
 use Maginium\Framework\Console\Enums\MagentoCommands;

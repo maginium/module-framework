@@ -7,6 +7,7 @@ namespace Maginium\Framework\Support\Traits;
 use Magento\Framework\Exception\LocalizedException;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Php;
+use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
 
 /**
@@ -19,7 +20,7 @@ trait DataObject
      *
      * @var array
      */
-    protected static $_underscoreCache = [];
+    protected static $underscoreCache = [];
 
     /**
      * Stores the current key being worked with.
@@ -27,26 +28,6 @@ trait DataObject
      * @var string
      */
     protected $currentKey = null;
-
-    /**
-     * Object attributes.
-     *
-     * @var array
-     */
-    protected $_data = [];
-
-    /**
-     * Constructor.
-     *
-     * By default is looking for first argument as array and assigns it as object attributes
-     * This behavior may change in child classes
-     *
-     * @param array $data
-     */
-    public function __construct(array $data = [])
-    {
-        $this->_data = $data;
-    }
 
     /**
      * Build and return the key dynamically by joining parts with a dot.
@@ -120,11 +101,11 @@ trait DataObject
 
         // Check if the key is empty or not a string, then check if the object has any data
         if (empty($key) || ! is_string($key)) {
-            return ! empty($this->_data);
+            return ! empty($this->attributes);
         }
 
         // Otherwise, check if the simple key exists in the data
-        return Arr::keyExists($key, $this->_data);
+        return Arr::keyExists($key, $this->attributes);
     }
 
     /**
@@ -154,7 +135,7 @@ trait DataObject
 
         // If no key is provided, return the entire data object
         if ($key === '') {
-            return $this->_data;
+            return $this->attributes;
         }
 
         // If the key is an array, recursively retrieve data for each key in the array
@@ -170,8 +151,8 @@ trait DataObject
             return $result;
         }
 
-        // Try to retrieve data directly from the _data property using the key
-        $data = $this->_data[$key] ?? null;
+        // Try to retrieve data directly from the attributes property using the key
+        $data = $this->attributes[$key] ?? null;
 
         // If no data is found for the key and the key contains a '/' (which implies nested keys)
         if ($data === null && str_contains($key, SP)) {
@@ -233,7 +214,7 @@ trait DataObject
 
         // If $key is an array, completely overwrite the existing data
         if (is_array($key)) {
-            $this->_data = $key;
+            $this->attributes = $key;
         } else {
             // Handle dot notation in the key for nested data
             if (str_contains($key, '.')) {
@@ -245,20 +226,20 @@ trait DataObject
                 $remainingKey = implode('.', $keys);
 
                 // Initialize the firstKey as an empty array if it doesn't exist
-                if (! isset($this->_data[$firstKey])) {
-                    $this->_data[$firstKey] = [];
+                if (! isset($this->attributes[$firstKey])) {
+                    $this->attributes[$firstKey] = [];
                 }
 
                 // Recursively assign the nested data
-                $this->_data[$firstKey] = $this->_setNestedData($this->_data[$firstKey], $remainingKey, $value);
+                $this->attributes[$firstKey] = $this->_setNestedData($this->attributes[$firstKey], $remainingKey, $value);
             } else {
                 // Handle non-nested keys: merge or directly assign the value
-                if (isset($this->_data[$key]) && is_array($this->_data[$key]) && is_array($value)) {
+                if (isset($this->attributes[$key]) && is_array($this->attributes[$key]) && is_array($value)) {
                     // Merge existing data and new value if both are arrays
-                    $this->_data[$key] = Php::mergeArrays($this->_data[$key], $value);
+                    $this->attributes[$key] = Php::mergeArrays($this->attributes[$key], $value);
                 } else {
                     // Overwrite the existing value or set a new one
-                    $this->_data[$key] = $value;
+                    $this->attributes[$key] = $value;
                 }
             }
         }
@@ -278,7 +259,7 @@ trait DataObject
      */
     public function addData(array $arr)
     {
-        if ($this->_data === []) {
+        if ($this->attributes === []) {
             $this->setData($arr);
 
             return $this;
@@ -303,8 +284,8 @@ trait DataObject
         if ($key === null) {
             $this->setData([]);
         } elseif (is_string($key)) {
-            if (isset($this->_data[$key]) || array_key_exists($key, $this->_data)) {
-                unset($this->_data[$key]);
+            if (isset($this->attributes[$key]) || Arr::exists($this->attributes, $key)) {
+                unset($this->attributes[$key]);
             }
         } elseif ($key === (array)$key) {
             foreach ($key as $element) {
@@ -328,7 +309,7 @@ trait DataObject
     {
         $keys = explode('/', (string)$path);
 
-        $data = $this->_data;
+        $data = $this->attributes;
 
         foreach ($keys as $key) {
             if ((array)$data === $data && isset($data[$key])) {
@@ -419,7 +400,7 @@ trait DataObject
      */
     public function isEmpty()
     {
-        return (bool)(empty($this->_data));
+        return (bool)(empty($this->attributes));
     }
 
     /**
@@ -439,10 +420,10 @@ trait DataObject
         $data = [];
 
         if (empty($keys)) {
-            $keys = array_keys($this->_data);
+            $keys = Arr::keys($this->attributes);
         }
 
-        foreach ($this->_data as $key => $value) {
+        foreach ($this->attributes as $key => $value) {
             if (in_array($key, $keys)) {
                 $data[] = $key . $valueSeparator . $quote . $value . $quote;
             }
@@ -487,7 +468,29 @@ trait DataObject
     }
 
     /**
-     * Get value from _data array without parse key.
+     * Check if the given method is supported dynamically.
+     *
+     * @param string $method The method name to check.
+     *
+     * @return bool True if the method matches a supported prefix, false otherwise.
+     */
+    public function hasMethod(string $method): bool
+    {
+        // Define supported method prefixes.
+        $supportedPrefixes = ['get', 'set', 'uns', 'has'];
+
+        // Check if the method starts with any of the supported prefixes.
+        foreach ($supportedPrefixes as $prefix) {
+            if (Str::startsWith($method, $prefix)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get value from attributes array without parse key.
      *
      * @param   string $key
      *
@@ -495,8 +498,8 @@ trait DataObject
      */
     protected function _getData($key)
     {
-        if (isset($this->_data[$key])) {
-            return $this->_data[$key];
+        if (isset($this->attributes[$key])) {
+            return $this->attributes[$key];
         }
     }
 
@@ -512,8 +515,8 @@ trait DataObject
      */
     protected function _underscore($name)
     {
-        if (isset(self::$_underscoreCache[$name])) {
-            return self::$_underscoreCache[$name];
+        if (isset(self::$underscoreCache[$name])) {
+            return self::$underscoreCache[$name];
         }
 
         $result = mb_strtolower(
@@ -532,7 +535,7 @@ trait DataObject
             ),
         );
 
-        self::$_underscoreCache[$name] = $result;
+        self::$underscoreCache[$name] = $result;
 
         return $result;
     }
@@ -553,7 +556,7 @@ trait DataObject
         $keys = explode('.', $key);
 
         // Start with the root data
-        $currentData = $this->_data;
+        $currentData = $this->attributes;
 
         // Traverse each part of the key to reach the nested data
         foreach ($keys as $part) {
@@ -620,52 +623,31 @@ trait DataObject
     }
 
     /**
-     * Set/Get attribute wrapper.
+     * Handle dynamic method calls for getter, setter, unsetter, and checker methods.
      *
-     * @param string $method
-     * @param array $args
+     * @param string $method The called method name.
+     * @param array $arguments The arguments passed to the method.
      *
-     * @throws LocalizedException
+     * @throws LocalizedException If the method is not supported.
      *
-     * @return mixed
+     * @return mixed The result of the dynamic method call.
      */
-    public function __call($method, $args)
+    public function __call($method, $arguments): mixed
     {
-        // Compare 3 first letters of the method name
-        switch ($method[0] . ($method[1] ?? '') . ($method[2] ?? '')) {
-            case 'get':
-                if (isset($args[0]) && $args[0] !== null) {
-                    return $this->getData(
-                        self::$_underscoreCache[$method] ?? $this->_underscore($method),
-                        $args[0],
-                    );
-                }
+        // Determine the method's prefix (e.g., "get", "set", "uns", "has").
+        $prefix = Str::substr($method, 0, 3);
 
-                return $this->getData(
-                    self::$_underscoreCache[$method] ?? $this->_underscore($method),
-                    $args[0] ?? null,
-                );
+        // Transform the method name into an underscore key (e.g., "setSomeKey" becomes "some_key").
+        $key = self::$underscoreCache[$method] ??= $this->_underscore($method);
 
-            case 'set':
-                return $this->setData(
-                    self::$_underscoreCache[$method] ?? $this->_underscore($method),
-                    $args[0] ?? null,
-                );
-
-            case 'uns':
-                return $this->unsetData(
-                    self::$_underscoreCache[$method] ?? $this->_underscore($method),
-                );
-
-            case 'has':
-                return isset(
-                    $this->_data[
-                        self::$_underscoreCache[$method] ?? $this->_underscore($method)
-                    ],
-                );
-        }
-
-        parent::__call($method, $args);
+        // Handle the method based on its prefix.
+        return match ($prefix) {
+            'get' => $this->getData($key),
+            'set' => $this->setData($key, $arguments[0] ?? null),
+            'uns' => $this->unsetData($key),
+            'has' => $this->hasData($key),
+            default => parent::__call($method, $arguments),
+        };
     }
 
     /**
@@ -675,8 +657,8 @@ trait DataObject
      */
     public function __debugInfo()
     {
-        return array_filter(
-            $this->_data,
+        return Arr::filter(
+            $this->attributes,
             fn($v) => is_scalar($v) || is_array($v),
         );
     }

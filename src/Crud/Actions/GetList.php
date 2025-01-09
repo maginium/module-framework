@@ -13,6 +13,7 @@ use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\GetListInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
@@ -47,6 +48,13 @@ class GetList implements GetListInterface
     protected string $modelName;
 
     /**
+     *  The class name of the Elastic model.
+     *
+     * @var class-string<Model>
+     */
+    protected string $elasticModel;
+
+    /**
      * GetList constructor.
      * Initializes the service and sets the logger and model name.
      *
@@ -63,6 +71,9 @@ class GetList implements GetListInterface
 
         // Set model name (can be dynamically set in subclasses)
         $this->modelName = $service->getRepository()->getEntityName();
+
+        // Fetch the Elasticsearch model associated with the entity.
+        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
     }
 
     /**
@@ -86,7 +97,7 @@ class GetList implements GetListInterface
             $this->assertValidPagination($page, $perPage);
 
             // Fetch paginated list of models from the service
-            $models = $this->service->getList($page, $perPage, $this->getColumns());
+            $models = $this->elasticModel::paginate(perPage: $perPage, columns: $this->getColumns(), page: $page);
 
             // Throw exception if no models were found
             if ($models->isEmpty()) {

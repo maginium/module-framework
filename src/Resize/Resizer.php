@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Resize;
 
-use Exception;
 use GdImage;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Resize\Interfaces\ResizerInterface;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\File as FileObj;
@@ -81,7 +82,7 @@ class Resizer implements ResizerInterface
 
         // Check if file is provided
         if (! $file) {
-            throw new Exception('Opened resizer on an empty file');
+            throw Exception::make('Opened resizer on an empty file');
         }
 
         // If the file is a string (path), convert it to a FileObj instance
@@ -201,7 +202,7 @@ class Resizer implements ResizerInterface
 
             default:
                 // If the extension is invalid, throw an exception
-                throw new Exception(sprintf(
+                throw Exception::make(sprintf(
                     'Invalid image type: %s. Accepted types: jpg, gif, png, webp.',
                     $extension,
                 ));
@@ -239,7 +240,7 @@ class Resizer implements ResizerInterface
     public function setOptions(array $options): self
     {
         // Merge user-provided options with the default values
-        $this->options = array_merge([
+        $this->options = Arr::merge([
             'mode' => 'auto', // Default mode is 'auto' (preserves aspect ratio and fits within given dimensions)
             'offset' => [0, 0], // Default crop offset is [0, 0]
             'sharpen' => 0, // Default sharpen value is 0 (no sharpening)
@@ -361,7 +362,7 @@ class Resizer implements ResizerInterface
         ];
 
         // Calculate the divisor for normalization (the sum of all matrix elements)
-        $divisor = array_sum(array_map('array_sum', $matrix));
+        $divisor = Arr::sum(Arr::map($matrix, 'Arr::sum'));
 
         // Apply convolution to sharpen the image
         imageconvolution($image, $matrix, $divisor, 0);
@@ -485,7 +486,7 @@ class Resizer implements ResizerInterface
      */
     protected function getOption($option)
     {
-        return array_get($this->options, $option);
+        return Arr::get($this->options, $option);
     }
 
     /**
@@ -656,7 +657,7 @@ class Resizer implements ResizerInterface
 
             default:
                 // Throw an exception for unsupported MIME types
-                throw new Exception(
+                throw Exception::make(
                     "Invalid mime type: {$this->mime}. Accepted types: image/jpeg, image/gif, image/png, image/webp.",
                 );
         }
@@ -664,7 +665,7 @@ class Resizer implements ResizerInterface
         // Check if the image resource creation failed
         if ($img === false) {
             // Throw an exception indicating failure to open the image file
-            throw new Exception(
+            throw Exception::make(
                 "Resizer failed opening the file for reading ({$this->mime}).",
             );
         }
@@ -720,7 +721,7 @@ class Resizer implements ResizerInterface
 
             default:
                 // Throw an exception for an unsupported or invalid mode
-                throw new Exception(
+                throw Exception::make(
                     'Invalid dimension type. Accepted types: exact, portrait, landscape, auto, crop, fit.',
                 );
         }

@@ -204,6 +204,6 @@ trait Emitter
         krsort($combined);
 
         // Return a flattened array of all callbacks sorted by priority.
-        return call_user_func_array('array_merge', $combined);
+        return call_user_func_array('Arr::merge', $combined);
     }
 }

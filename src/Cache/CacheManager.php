@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Cache;
 
+use ArrayAccess;
 use Closure;
 use DateInterval;
 use DateTimeInterface;
+use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use Magento\Framework\App\CacheInterface as BaseCacheInterface;
@@ -31,23 +33,13 @@ use Maginium\Framework\Support\Facades\Date;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Validator;
+use Predis\Client;
 use Predis\ClientInterface as RedisClientInterface;
 
 /**
- * Class CacheManager.
- *
- * This class manages caching operations, providing a flexible interface for
- * interacting with different cache stores such as Redis. It supports time-based
- * cache operations, event dispatching, and the ability to extend functionality
- * through custom macros.
- *
- * @property RedisClientInterface $store The cache store implementation (e.g., Redis).
- * @property EventInterface $events The event dispatcher implementation for cache events.
- * @property BaseCacheInterface $cache The base cache manager for handling cache operations.
- * @property int|null $default The default time-to-live (TTL) in seconds for cached items.
- * @property array $config Configuration options for the cache store.
+ * @mixin Store
  */
-class CacheManager implements CacheInterface
+class CacheManager implements ArrayAccess, CacheInterface
 {
     // Trait for time-related operations such as converting seconds to minutes or checking expiration.
     use InteractsWithTime;
@@ -136,7 +128,7 @@ class CacheManager implements CacheInterface
      *
      * This is the primary storage mechanism used for caching data.
      *
-     * @var RedisInterface
+     * @var Client
      */
     protected RedisClientInterface $store;
 
@@ -312,7 +304,7 @@ class CacheManager implements CacheInterface
     public function increment($key, $value = 1)
     {
         // Delegate the increment operation to the store and return the result.
-        return $this->store->increment($key, $value);
+        return $this->store->incrby($key, $value);
     }
 
     /**
@@ -326,7 +318,17 @@ class CacheManager implements CacheInterface
     public function decrement($key, $value = 1)
     {
         // Delegate the decrement operation to the store and return the result.
-        return $this->store->decrement($key, $value);
+        return $this->store->decrby($key, $value);
+    }
+
+    /**
+     * Get the cache store implementation.
+     *
+     * @return Client
+     */
+    public function getStore(): Client
+    {
+        return $this->store;
     }
 
     /**
@@ -724,10 +726,11 @@ class CacheManager implements CacheInterface
      * @param  string  $key  The key of the cached item.
      * @param  Closure|DateTimeInterface|DateInterval|int|null  $ttl  The expiration time for the cache item.
      * @param  Closure(): TCacheValue  $callback  The callback to execute if the item is not found in the cache.
+     * @param  array  $tags  An array of tags to associate with the cached items.
      *
      * @return TCacheValue The cached value.
      */
-    public function remember($key, $ttl, Closure $callback)
+    public function remember($key, $ttl, Closure $callback, array $tags = [])
     {
         $value = $this->get($key);
 
@@ -740,7 +743,7 @@ class CacheManager implements CacheInterface
 
         $value = $callback();
 
-        $this->put($key, $value, value($ttl, $value));
+        $this->put($key, $value, $tags, value($ttl, $value));
 
         return $value;
     }
@@ -775,10 +778,11 @@ class CacheManager implements CacheInterface
      *
      * @param  string  $key  The key of the cached item.
      * @param  Closure(): TCacheValue  $callback  The function to run if the item is not cached.
+     * @param  array  $tags  An array of tags to associate with the cached items.
      *
      * @return TCacheValue The cached value or the newly generated value.
      */
-    public function rememberForever($key, Closure $callback)
+    public function rememberForever($key, Closure $callback, array $tags = [])
     {
         // Try to get the value from the cache using the key.
         $value = $this->get($key);
@@ -790,7 +794,7 @@ class CacheManager implements CacheInterface
 
         // If not found, execute the callback to create the value.
         // Store the result in the cache forever.
-        $this->forever($key, $value = $callback());
+        $this->forever($key, $value = $callback(), $tags);
 
         // Return the newly generated value.
         return $value;

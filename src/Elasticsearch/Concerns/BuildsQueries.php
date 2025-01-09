@@ -7,11 +7,12 @@ namespace Maginium\Framework\Elasticsearch\Concerns;
 use Illuminate\Database\Query\Expression;
 use Maginium\Framework\Pagination\Cursor;
 use Maginium\Framework\Pagination\CursorPaginator;
-use Maginium\Framework\Pagination\Facades\LengthAwarePaginator;
-use Maginium\Framework\Pagination\Facades\Paginator;
+use Maginium\Framework\Pagination\Interfaces\CursorPaginatorInterface;
 use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
+use Maginium\Framework\Pagination\LengthAwarePaginator;
+use Maginium\Framework\Pagination\Paginator;
 use Maginium\Framework\Support\Collection;
-use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Str;
 
 /**
@@ -35,9 +36,9 @@ trait BuildsQueries
      * @param  string  $cursorName The name of the cursor. Defaults to 'cursor'.
      * @param  Cursor|string|null  $cursor The cursor to paginate with. If not provided, it will resolve the current cursor.
      *
-     * @return CursorPaginator Returns the cursor paginator instance.
+     * @return CursorPaginatorInterface Returns the cursor paginator instance.
      */
-    protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null)
+    protected function paginateUsingCursor($perPage, $columns = ['*'], $cursorName = 'cursor', $cursor = null): CursorPaginatorInterface
     {
         // Check and resolve the cursor if it's not already an instance of Cursor
         if (! $cursor instanceof Cursor) {
@@ -180,9 +181,9 @@ trait BuildsQueries
      * @param  int  $currentPage The current page number.
      * @param  array  $options Additional options for the paginator.
      *
-     * @return Paginator Returns the simple Paginator instance.
+     * @return PaginatorInterface Returns the simple Paginator instance.
      */
-    protected function simplePaginator($items, $perPage, $currentPage, $options)
+    protected function simplePaginator($items, $perPage, $currentPage, $options): PaginatorInterface
     {
         return Paginator::make(compact(
             'items',
@@ -203,11 +204,11 @@ trait BuildsQueries
      * @param  Cursor  $cursor The cursor to paginate with.
      * @param  array  $options Additional options for the paginator.
      *
-     * @return CursorPaginator Returns the CursorPaginator instance.
+     * @return CursorPaginatorInterface Returns the CursorPaginator instance.
      */
-    protected function cursorPaginator($items, $perPage, $cursor, $options)
+    protected function cursorPaginator($items, $perPage, $cursor, $options): CursorPaginatorInterface
     {
-        return Container::make(CursorPaginator::class, compact(
+        return CursorPaginator::make(compact(
             'items',
             'perPage',
             'cursor',

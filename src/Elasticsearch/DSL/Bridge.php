@@ -8,10 +8,11 @@ use Elasticsearch\Client;
 use Elasticsearch\Exception\ClientResponseException;
 use Elasticsearch\Exception\MissingParameterException;
 use Elasticsearch\Exception\ServerResponseException;
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\DSL\exceptions\ParameterException;
 use Maginium\Framework\Elasticsearch\DSL\exceptions\QueryException;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Reflection;
 
@@ -144,7 +145,7 @@ class Bridge
 
             // Check if the PIT ID is returned, else throw an error
             if (empty($res['id'])) {
-                throw new Exception('Error on PIT creation. No ID returned.');
+                throw Exception::make('Error on PIT creation. No ID returned.');
             }
         } catch (Exception $e) {
             // Handle any exceptions by throwing a custom error with the details
@@ -519,7 +520,7 @@ class Bridge
 
             // Apply limit and skip to the distinct results if necessary
             if ($skip || $limit) {
-                $data = array_slice($data, $skip, $limit);
+                $data = Arr::slice($data, $skip, $limit);
             }
         } catch (Exception $e) {
             // Handle errors during the search operation
@@ -1677,7 +1678,7 @@ class Bridge
         // If there is exactly one aggregation, return its value. Otherwise, map over multiple aggregations.
         $data = (count($aggs) === 1)
             ? reset($aggs)['value'] ?? 0
-            : array_map(fn($value) => $value['value'] ?? 0, $aggs);
+            : Arr::map($aggs, fn($value) => $value['value'] ?? 0);
 
         // Return the sanitized data along with the metadata, query parameters, and query tag
         return $this->_return($data, $meta, $params, $queryTag);
@@ -1885,7 +1886,7 @@ class Bridge
      */
     private function _matrixDistinctAggregate($wheres, $options, $columns)
     {
-        $this->_throwError(new Exception('Matrix distinct aggregate not supported', 500), [], $this->_queryTag(__FUNCTION__));
+        $this->_throwError(Exception::make(message: 'Matrix distinct aggregate not supported', code: 500), [], $this->_queryTag(__FUNCTION__));
     }
 
     /**
@@ -2105,7 +2106,7 @@ class Bridge
                     $nestedData = $this->_processBuckets($columns, $keys, $res, $index + 1, $includeDocCount, $datum);
 
                     if (! empty($nestedData)) {
-                        $data = array_merge($data, $nestedData);
+                        $data = Arr::merge($data, $nestedData);
                     } else {
                         $data[] = $datum;
                     }
@@ -2374,7 +2375,7 @@ class Bridge
     {
         // If there is any stashed metadata, merge it with the current metadata
         if (! empty($this->stashedMeta)) {
-            $meta = array_merge($meta, $this->stashedMeta);
+            $meta = Arr::merge($meta, $this->stashedMeta);
         }
 
         // Return the merged metadata
@@ -2395,7 +2396,7 @@ class Bridge
 
         // Loop through the sort array and apply sorting parameters
         foreach ($sort as $key => $value) {
-            $sortValues[array_key_first($sortParams[$key])] = $value;
+            $sortValues[Arr::key_first($sortParams[$key])] = $value;
         }
 
         // Return the sorted values

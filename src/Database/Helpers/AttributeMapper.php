@@ -8,6 +8,7 @@ use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Database\Facades\CustomerAttribute;
 use Maginium\Framework\Database\Interfaces\Data\AttributeBlueprintInterface;
 use Maginium\Framework\Database\Schema\AttributeDefinition;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Validator;
 
@@ -119,12 +120,12 @@ class AttributeMapper
         // Check if the $validationRule is an array.
         if (Validator::isArray($validationRule)) {
             // Check if the array is associative (i.e., has keys) or indexed (i.e., numeric keys).
-            $isAssociative = array_keys($validationRule) !== range(0, count($validationRule) - 1);
+            $isAssociative = Arr::keys($validationRule) !== range(0, count($validationRule) - 1);
 
             // If the array is associative, leave it as is; otherwise, process it as an array of strings.
             $validationRule = $isAssociative
                 ? $validationRule // If associative, leave it as it is.
-                : array_reduce($validationRule, function($carry, $item) {
+                : Arr::reduce($validationRule, function($carry, $item) {
                     // Split each string rule by ':' (e.g., 'min:10' becomes ['min', '10']).
                     [$key, $value] = explode(':', $item);
                     // Assign the value as an integer to the associative array ($carry).

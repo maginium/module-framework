@@ -392,7 +392,7 @@ class DriverFilesystem implements CloudInterface
         $headers['Content-Length'] ??= $this->size($path);
 
         // If the Content-Disposition header is not present, create it.
-        if (! array_key_exists('Content-Disposition', $headers)) {
+        if (! Arr::exists($headers, 'Content-Disposition')) {
             // Determine the filename (either from the provided name or the base name of the path).
             $filename = $name ?? basename($path);
 

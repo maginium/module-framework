@@ -60,33 +60,6 @@ class QueryException extends LocalizedException
     }
 
     /**
-     * Static factory method to create a new instance of CouldNotDeleteException.
-     *
-     * @param Phrase $message The error message encapsulated in a Phrase object.
-     * @param Throwable|null $cause The original exception that caused this exception (optional).
-     * @param int|null $statusCode The status code for the error (optional).
-     * @param string|int|null $code The error code associated with the exception (optional).
-     * @param string[]|null $context Additional context or data related to the exception (optional).
-     *
-     * @return self A new instance of the CouldNotDeleteException.
-     */
-    public static function make(
-        Phrase $message,
-        ?Throwable $cause = null,
-        ?int $statusCode = null,
-        string|int|null $code = null,
-        ?array $context = null,
-    ): self {
-        return new self(
-            $message,
-            $cause,
-            $statusCode ?? HttpStatusCode::INTERNAL_SERVER_ERROR, // Default to 500 if no statusCode provided
-            $code,
-            $context,
-        );
-    }
-
-    /**
      * Creates a new array representing a solution.
      *
      * @return array An associative array containing the solution details.

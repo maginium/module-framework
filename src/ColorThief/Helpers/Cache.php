@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\ColorThief\Helpers;
 
-use Exception;
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\Store;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Serializer;
 use Maginium\Framework\Support\Str;

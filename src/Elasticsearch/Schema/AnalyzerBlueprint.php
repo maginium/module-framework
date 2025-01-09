@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\Schema;
 
 use Maginium\Framework\Elasticsearch\Connection;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Fluent;
 
@@ -135,7 +136,7 @@ class AnalyzerBlueprint
     {
         return $this->addPropertyDefinition(Container::make(
             Definitions\AnalyzerPropertyDefinition::class,
-            ['attributes' => array_merge(compact('config', 'name'), $parameters)],
+            ['attributes' => Arr::merge(compact('config', 'name'), $parameters)],
         ));
     }
 

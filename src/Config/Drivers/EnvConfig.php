@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Config\Drivers;
 
-use Exception;
 use Illuminate\Support\Env as BaseEnv;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Config\Config;
 use Maginium\Framework\Config\Interfaces\DriverInterface;
 use Maginium\Framework\Log\Interfaces\LoggerInterface;

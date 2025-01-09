@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\ColorThief\Helpers;
 
 use InvalidArgumentException;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Str;
 
@@ -92,13 +93,13 @@ class Color
         }
 
         // Adjust lightness
-        $adjustedRgb = array_map(
+        $adjustedRgb = Arr::map(
+            $rgbColor,
             static function($channel) use ($adjustment) {
                 $adjustedChannel = max(0, min(255, $channel + $adjustment)); // Ensure the channel stays in the 0-255 range
 
                 return $adjustedChannel;
             },
-            $rgbColor,
         );
 
         // Convert adjusted RGB back to hex

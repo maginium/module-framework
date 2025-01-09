@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Interceptors\Framework\Setup\Patch;
 
-use Exception;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Module\ModuleList;
 use Magento\Framework\ObjectManagerInterface;
@@ -20,6 +19,7 @@ use Magento\Framework\Setup\Patch\PatchRegistry;
 use Magento\Framework\Setup\Patch\PatchRegistryFactory;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\SetupInterface;
+use Maginium\Foundation\Exceptions\Exception;
 
 /**
  * Apply patches per specific module.

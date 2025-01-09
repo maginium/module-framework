@@ -7,6 +7,7 @@ namespace Maginium\Framework\Filesystem\Facades;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Config\Interfaces\ConfigInterface;
 use Maginium\Framework\Filesystem\Interfaces\FactoryInterface;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facade;
 
 /**
@@ -127,7 +128,7 @@ class Storage extends Facade
         $originalConfig = static::resolve(ConfigInterface::class)::driver(ConfigDrivers::DEPLOYMENT)->get("filesystems.{$disk}", []);
 
         // Merge the original configuration with the provided custom configuration and the root path.
-        return array_merge(
+        return Arr::merge(
             [
                 // Add 'throw' setting from the original configuration or default to false if not set.
                 'throw' => $originalConfig['throw'] ?? false,

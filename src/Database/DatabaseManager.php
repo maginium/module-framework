@@ -292,7 +292,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function availableDrivers()
     {
-        return array_intersect(
+        return Arr::intersect(
             $this->supportedDrivers(),
             str_replace('dblib', 'sqlsrv', PDO::getAvailableDrivers()),
         );

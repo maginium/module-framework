@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Eloquent;
 
-use Maginium\Framework\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Maginium\Framework\Database\Query\Builder as QueryBuilder;
 use Maginium\Framework\Elasticsearch\Eloquent\Model as EloquentModel;
 use Maginium\Framework\Elasticsearch\Relations\BelongsTo;

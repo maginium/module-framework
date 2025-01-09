@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Console;
 
-use Exception;
 use Illuminate\Console\OutputStyleFactory;
 use Magento\Framework\App\State;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Support\DataObject;
 use ReflectionFunctionFactory;
 use Symfony\Component\Console\Input\InputOptionFactory;

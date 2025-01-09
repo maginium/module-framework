@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch;
 
 use Elasticsearch\Client;
-use Illuminate\Database\Connection as BaseConnection;
+use Maginium\Framework\Database\Connection as BaseConnection;
+use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Elasticsearch\DSL\Bridge;
 use Maginium\Framework\Elasticsearch\DSL\Results;
 use Maginium\Framework\Elasticsearch\Exceptions\LogicException;
@@ -236,9 +237,9 @@ class Connection extends BaseConnection
      * @param string $table The table name.
      * @param string|null $as An optional alias for the table.
      *
-     * @return Builder The query builder instance.
+     * @return QueryBuilder The query builder instance.
      */
-    public function table($table, $as = null)
+    public function table($table, $as = null): mixed
     {
         $query = Container::resolve(QueryBuilder::class);
 
@@ -362,8 +363,10 @@ class Connection extends BaseConnection
 
     /**
      * Override the default schema builder.
+     *
+     * @return Schema\Builder
      */
-    public function getSchemaBuilder(): Schema\Builder
+    public function getSchemaBuilder(): BuilderInterface
     {
         // Returns a new Schema Builder instance
         return Container::make(Schema\Builder::class);

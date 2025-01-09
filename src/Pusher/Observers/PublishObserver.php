@@ -67,12 +67,12 @@ class PublishObserver extends AbstractObserver
     {
         // Ensure the `topic` property exists and is not empty.
         if (! $this->data->has('topic') || empty($this->data->getTopic())) {
-            throw new Exception('The data object is missing a valid "topic" property.');
+            throw Exception::make('The data object is missing a valid "topic" property.');
         }
 
         // Ensure the `payload` property exists and is not empty.
         if (! $this->data->has('payload') || empty($this->data->getPayload())) {
-            throw new Exception('The data object is missing a valid "payload" property.');
+            throw Exception::make('The data object is missing a valid "payload" property.');
         }
     }
 

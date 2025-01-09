@@ -57,6 +57,10 @@
         type="Maginium\Framework\Token\Services\CustomerTokenService"
     />
 
+    <!-- Elasticsearch -->
+    <preference for="Maginium\Framework\Elasticsearch\Interfaces\ClientInterface" type="Maginium\Framework\Elasticsearch\Client" />
+    <preference for="Maginium\Framework\Elasticsearch\Interfaces\IndexInterface" type="Maginium\Framework\Elasticsearch\Entities\Index" />
+
     <!-- Avatar -->
     <preference for="Maginium\Framework\Avatar\Interfaces\AvatarInterface" type="Maginium\Framework\Avatar\Avatar" />
     <preference for="Maginium\Framework\Avatar\Interfaces\GeneratorInterface" type="Maginium\Framework\Avatar\Generator\DefaultGenerator" />

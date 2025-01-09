@@ -42,12 +42,12 @@ class Str extends BaseStr
         $phrase = preg_replace_callback('/\{(\w+)\}/', function($matches) use ($args) {
             $key = $matches[1];
 
-            return array_key_exists($key, $args) ? $args[$key] : $matches[0];
+            return Arr::exists($args, $key) ? $args[$key] : $matches[0];
         }, $phrase);
 
         // Replace numeric placeholders: %1, %2, etc. using sprintf
         // First, we prepare the arguments for the numeric placeholders
-        $numericArgs = array_slice($args, 0, count($args)); // Ensure we're only passing the correct number of args
+        $numericArgs = Arr::slice($args, 0, count($args)); // Ensure we're only passing the correct number of args
         $phrase = preg_replace_callback('/%(\d+)/', function($matches) use ($numericArgs) {
             $index = (int)$matches[1] - 1; // Convert 1-based index to 0-based
 

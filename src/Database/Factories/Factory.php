@@ -8,12 +8,11 @@ use Faker\Generator;
 use Illuminate\Database\Eloquent\Factories\Factory as BaseFactory;
 use Maginium\Foundation\Enums\FileExtension;
 use Maginium\Framework\Component\Module;
-use Maginium\Framework\Database\EloquentModel;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Database\Helpers\Faker;
 use Maginium\Framework\Database\Interfaces\HasMetadataInterface;
 use Maginium\Framework\Database\Interfaces\HasSoftDeletesInterface;
 use Maginium\Framework\Database\Interfaces\HasUserStampsInterface;
-use Maginium\Framework\Database\Model;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Container;
@@ -45,7 +44,7 @@ abstract class Factory extends BaseFactory
      * Create a collection of models and persist them to the database.
      *
      * @param  (callable(array<string, mixed>): array<string, mixed>)|array<string, mixed>  $attributes
-     * @param  EloquentModel|null  $parent
+     * @param  Model|null  $parent
      *
      * @return DataObject
      */
@@ -135,10 +134,10 @@ abstract class Factory extends BaseFactory
             // Return an array containing the current timestamp values
             return [
                 // Set the `created_at` column to the current timestamp in the format "Y-m-d H:i:s"
-                $this->model::getCreatedAtColumn() => $currentDate->format('Y-m-d H:i:s'),
+                $this->newModel()->getCreatedAtColumn() => $currentDate->format('Y-m-d H:i:s'),
 
                 // Set the `updated_at` column to the current timestamp in the format "Y-m-d H:i:s"
-                $this->model::getUpdatedAtColumn() => $currentDate->format('Y-m-d H:i:s'),
+                $this->newModel()->getUpdatedAtColumn() => $currentDate->format('Y-m-d H:i:s'),
             ];
         });
     }

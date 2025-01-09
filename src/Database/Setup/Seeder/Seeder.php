@@ -7,7 +7,7 @@ namespace Maginium\Framework\Database\Setup\Seeder;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Maginium\Foundation\Exceptions\Exception;
-use Maginium\Framework\Database\Model;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Debug\ConsoleOutput;

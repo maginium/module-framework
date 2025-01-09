@@ -7,6 +7,7 @@ namespace Maginium\Framework\Elasticsearch\Eloquent\Docs;
 use Closure;
 use Illuminate\Contracts\Database\Query\Expression;
 use Maginium\Framework\Elasticsearch\Collection\ElasticCollection;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Elasticsearch\Pagination\SearchAfterPaginator;
 use Maginium\Framework\Elasticsearch\Query\Builder;
 use Maginium\Framework\Pagination\Cursor;

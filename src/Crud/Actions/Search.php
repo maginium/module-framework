@@ -16,6 +16,7 @@ use Maginium\Framework\Crud\Interfaces\SearchInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Enums\ComparisonOperator;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
@@ -50,6 +51,13 @@ class Search implements SearchInterface
     protected string $modelName;
 
     /**
+     *  The class name of the Elastic model.
+     *
+     * @var class-string<Model>
+     */
+    protected string $elasticModel;
+
+    /**
      * Search constructor.
      * Initializes the service and sets the logger and model name.
      *
@@ -66,6 +74,9 @@ class Search implements SearchInterface
 
         // Set model name (can be dynamically set in subclasses)
         $this->modelName = $service->getRepository()->getEntityName();
+
+        // Fetch the Elasticsearch model associated with the entity.
+        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
     }
 
     /**
@@ -97,7 +108,7 @@ class Search implements SearchInterface
             $criteria = $this->prepareCriteria($searchTerm, $filters, $sorts, $page, $perPage);
 
             // Fetch search results from the service based on the prepared criteria
-            $searchResults = $this->service->search($searchTerm, $criteria);
+            $searchResults = $this->elasticModel::search($searchTerm)->filter($filters)->sortBy($sorts);
 
             // Using Collection to map each search result models to an array representation
             $models = collect($searchResults->all())->map(function($model) {

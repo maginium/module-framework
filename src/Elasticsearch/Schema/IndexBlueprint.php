@@ -6,6 +6,7 @@ namespace Maginium\Framework\Elasticsearch\Schema;
 
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\Schema\Definitions\FieldDefinition;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Fluent;
 
@@ -376,7 +377,7 @@ class IndexBlueprint
     {
         // Use Container::make to create the FieldDefinition instance
         $fieldDefinition = Container::make(FieldDefinition::class, [
-            'attributes' => array_merge(compact('type', 'field'), $parameters),
+            'attributes' => Arr::merge(compact('type', 'field'), $parameters),
         ]);
 
         return $this->addFieldDefinition($fieldDefinition);

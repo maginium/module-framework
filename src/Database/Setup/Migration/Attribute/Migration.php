@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Setup\Migration\Attribute;
 
 use Magento\Framework\Setup\Patch\DataPatchInterface;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Database\Interfaces\RevertablePatchInterface;
-use Maginium\Framework\Database\Model;
 use Maginium\Framework\Database\Setup\BaseMigration;
 use Maginium\Framework\Support\Debug\ConsoleOutput;
 use Maginium\Framework\Support\Facades\Log;

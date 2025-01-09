@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\Collection;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\Collection;
+use Maginium\Framework\Database\Eloquent\Collection;
 use Maginium\Framework\Elasticsearch\Eloquent\Models;
 
 /**

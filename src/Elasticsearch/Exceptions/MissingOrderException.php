@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Exceptions;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 
 /**
  * Class MissingOrderException.

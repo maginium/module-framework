@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\Schema;
 
 use Maginium\Framework\Database\DatabaseManager;
-use Maginium\Framework\Database\Enums\Searcher;
+use Maginium\Framework\Database\Enums\SearcherEngines;
 use Maginium\Framework\Support\Facade;
 
 /**
@@ -84,7 +84,7 @@ class Schema extends Facade
      */
     protected static function getAccessor(): string
     {
-        return static::resolve(DatabaseManager::class)->connection(Searcher::ELASTIC_SEARCH)->getSchemaBuilder();
+        return static::resolve(DatabaseManager::class)->connection(SearcherEngines::ELASTIC_SEARCH)->getSchemaBuilder();
     }
 
     /**

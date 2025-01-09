@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Eloquent;
 
-use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Magento\Elasticsearch\Model\Adapter\Index\IndexNameResolver;
+use Maginium\Framework\Database\Eloquent\Model as BaseModel;
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\Eloquent\Docs\ModelDocs;
 use Maginium\Framework\Elasticsearch\Meta\ModelMetaData;
@@ -193,7 +193,7 @@ abstract class Model extends BaseModel
     public function getIdAttribute($value = null)
     {
         // If no ID value is provided, return the Elasticsearch `_id` if available.
-        if (! $value && array_key_exists('_id', $this->attributes)) {
+        if (! $value && Arr::exists($this->attributes, '_id')) {
             $value = $this->attributes['_id'];
         }
 
@@ -294,7 +294,7 @@ abstract class Model extends BaseModel
     {
         // Collect all model data and exclude attributes that are part of search highlights.
         $data = $this->attributes;
-        $mutators = array_values(array_diff($this->getMutatedAttributes(), [
+        $mutators = Arr::values(Arr::diff($this->getMutatedAttributes(), [
             'id',
             'search_highlights',
             'search_highlights_as_array',
@@ -485,7 +485,7 @@ abstract class Model extends BaseModel
     public function originalIsEquivalent($key): bool
     {
         // If the key does not exist in the original attributes, return false.
-        if (! array_key_exists($key, $this->original)) {
+        if (! Arr::exists($this->original, $key)) {
             return false;
         }
 
@@ -624,23 +624,6 @@ abstract class Model extends BaseModel
     }
 
     /**
-     * Get the instance as an array.
-     *
-     * This method delegates to `toArray` to convert the group instance into an array,
-     * optionally including only specific keys.
-     *
-     * @param array $keys Optional array of keys to include in the resulting array.
-     *                    Defaults to all keys ('*') if not specified.
-     *
-     * @return array The model's data as an associative array.
-     */
-    public function toDataArray(array $keys = ['*']): array
-    {
-        // Delegate to the `toArray` method for conversion and key filtering
-        return $this->toArray();
-    }
-
-    /**
      * Resolve the connection instance.
      *
      * This method checks if the connection resolver is set and returns the resolved connection.
@@ -649,13 +632,13 @@ abstract class Model extends BaseModel
      */
     protected function resolveConnectionInstance(): Connection
     {
-        if (static::$resolver) {
-            // Clone the resolved connection.
-            /** @var Connection $connection */
-            $connection = clone static::resolveConnection($this->getConnectionName());
+        // if (static::$resolver) {
+        //     // Clone the resolved connection.
+        //     /** @var Connection $connection */
+        //     $connection = clone static::resolveConnection($this->getConnectionName());
 
-            return $connection;
-        }
+        //     return $connection;
+        // }
 
         // Otherwise, fetch the connection from the container.
         return Container::resolve(Connection::class);
@@ -767,7 +750,7 @@ abstract class Model extends BaseModel
         if (is_array($current)) {
             // Remove the specified values from the current array.
             foreach ($values as $value) {
-                $keys = array_keys($current, $value);
+                $keys = Arr::keys($current, $value);
 
                 foreach ($keys as $key) {
                     unset($current[$key]);
@@ -775,7 +758,7 @@ abstract class Model extends BaseModel
             }
         }
 
-        $this->attributes[$column] = array_values($current);
+        $this->attributes[$column] = Arr::values($current);
 
         $this->syncOriginalAttribute($column);
     }

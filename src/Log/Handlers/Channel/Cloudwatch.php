@@ -9,6 +9,7 @@ use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Log\Enums\LogLevel;
 use Maginium\Framework\Log\Enums\LogLevelString;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\AppState;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Request;
@@ -136,7 +137,7 @@ class Cloudwatch extends CloudWatchHandler
      */
     protected function getContext(): array
     {
-        return array_filter([
+        return Arr::filter([
             'uri' => Request::getRequestUri(), // Request URI
             'host' => Request::getHttpHost(), // Host of the request
             'client_ip' => Request::getClientIp(), // Client's IP address
@@ -145,8 +146,8 @@ class Cloudwatch extends CloudWatchHandler
                 : (AppState::getMode() === AppState::MODE_DEFAULT
                     ? 'Default Mode'
                     : 'Production Mode'), // Client's IP address
-            'command' => array_key_exists('argv', $_SERVER) ? $_SERVER['argv'] : null, // Command-line arguments as array
-            'method' => array_key_exists('REQUEST_METHOD', $_SERVER) ? $_SERVER['REQUEST_METHOD'] : null, // HTTP request method (GET, POST, etc.)
+            'command' => Arr::exists($_SERVER, 'argv') ? $_SERVER['argv'] : null, // Command-line arguments as array
+            'method' => Arr::exists($_SERVER, 'REQUEST_METHOD') ? $_SERVER['REQUEST_METHOD'] : null, // HTTP request method (GET, POST, etc.)
         ]);
     }
 

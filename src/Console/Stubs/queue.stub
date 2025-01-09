@@ -2,7 +2,7 @@
 
 namespace :NAMESPACE:\:MODULE:\Models;
 
-use Maginium\Framework\Database\Model;
+use Maginium\Framework\Database\Eloquent\Model;
 
 class :MODEL: extends Model
 {

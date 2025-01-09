@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Schema;
 
 use Maginium\Framework\Database\Interfaces\BuilderInterface;
+use Maginium\Framework\Support\Arr;
 
 /**
  * MySqlBuilder class.
@@ -160,7 +161,7 @@ class MySqlBuilder extends Builder implements BuilderInterface
      */
     public function dropAllTables()
     {
-        $tables = array_column($this->getTables(), 'name');
+        $tables = Arr::column($this->getTables(), 'name');
 
         if (empty($tables)) {
             return;
@@ -182,7 +183,7 @@ class MySqlBuilder extends Builder implements BuilderInterface
      */
     public function dropAllViews()
     {
-        $views = array_column($this->getViews(), 'name');
+        $views = Arr::column($this->getViews(), 'name');
 
         if (empty($views)) {
             return;

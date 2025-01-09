@@ -9,6 +9,7 @@ use Maginium\Framework\ColorThief\Helpers\Cache as CacheManager;
 use Maginium\Framework\ColorThief\Helpers\Color as ColorHelper;
 use Maginium\Framework\ColorThief\Interfaces\ColorThiefInterface;
 use Maginium\Framework\Media\Facades\Media;
+use Maginium\Framework\Support\Arr;
 
 /**
  * Class ColorThief.
@@ -100,7 +101,7 @@ class ColorThief implements ColorThiefInterface
         $palette = CoreColorThief::getPalette($sourceImage, $colorCount, $quality, $area);
 
         // Convert RGB colors to Hex format
-        $hexPalette = array_map(fn($rgbColor) => $this->colorHelper->rgbToHex($rgbColor), $palette);
+        $hexPalette = Arr::map($palette, fn($rgbColor) => $this->colorHelper->rgbToHex($rgbColor));
 
         // Cache the result for future use
         $this->cache->save($cacheKey, $hexPalette);

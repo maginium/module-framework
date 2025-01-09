@@ -8,9 +8,9 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Eloquent\Builder as BaseEloquentBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Eloquent\Models;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HigherOrderTapProxy;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Elasticsearch\Collection\ElasticCollection;
 use Maginium\Framework\Elasticsearch\Concerns\BuildsQueries;
 use Maginium\Framework\Elasticsearch\Exceptions\MissingOrderException;
@@ -18,6 +18,7 @@ use Maginium\Framework\Elasticsearch\Helpers\QueriesRelationships;
 use Maginium\Framework\Elasticsearch\Pagination\SearchAfterPaginator;
 use Maginium\Framework\Elasticsearch\Query\Builder as QueryBuilder;
 use Maginium\Framework\Pagination\Facades\Paginator;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Reflection;
 use RuntimeException;
@@ -287,7 +288,7 @@ class Builder extends BaseEloquentBuilder
         }
 
         // If not found, create a new model and merge the attributes with values
-        return $this->create(array_merge($attributes, $values));
+        return $this->create(Arr::merge($attributes, $values));
     }
 
     /**
@@ -327,7 +328,7 @@ class Builder extends BaseEloquentBuilder
         }
 
         // If not found, create a new model without refreshing the index
-        return $this->createWithoutRefresh(array_merge($attributes, $values));
+        return $this->createWithoutRefresh(Arr::merge($attributes, $values));
     }
 
     /**
@@ -384,7 +385,7 @@ class Builder extends BaseEloquentBuilder
         $instance = $this->newModelInstance();
 
         // Hydrate each item and return the collection
-        return $instance->newCollection(array_map(function($item) use ($items, $instance) {
+        return $instance->newCollection(Arr::map($items, function($item) use ($items, $instance) {
             $recordIndex = null;
 
             // If the item contains an index, extract it
@@ -430,7 +431,7 @@ class Builder extends BaseEloquentBuilder
             }
 
             return $model;
-        }, $items));
+        }));
     }
 
     /**
@@ -728,7 +729,7 @@ class Builder extends BaseEloquentBuilder
         $column = $this->model->getUpdatedAtColumn();
 
         // Add the 'updated_at' column with the current timestamp to the values.
-        return array_merge([$column => $this->model->freshTimestampString()], $values);
+        return Arr::merge([$column => $this->model->freshTimestampString()], $values);
     }
 
     /**

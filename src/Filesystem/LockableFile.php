@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Filesystem;
 
-use Exception;
 use Illuminate\Contracts\Filesystem\LockTimeoutException;
+use Maginium\Foundation\Exceptions\Exception;
 
 /**
  * Class LockableFile.
@@ -217,7 +217,7 @@ class LockableFile
         $this->handle = fopen($path, $mode);
 
         if (! $this->handle) {
-            throw new Exception("Unable to open file at path [{$path}].");
+            throw Exception::make("Unable to open file at path [{$path}].");
         }
     }
 }

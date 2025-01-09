@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Maginium\Framework\Application;
 
 use DomainException;
-use Exception;
 use InvalidArgumentException;
 use Magento\Framework\App\Bootstrap;
 use Magento\Framework\App\DeploymentConfig;
@@ -23,6 +22,8 @@ use Magento\Framework\HTTP\PhpEnvironment\RemoteAddress;
 use Magento\Framework\HTTP\PhpEnvironment\Response;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Profiler;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Support\Arr;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -378,13 +379,13 @@ class BaseBootstrap
         if ($isOn && ! $isExpected) {
             $this->errorCode = self::ERR_MAINTENANCE;
 
-            throw new Exception('Unable to proceed: the maintenance mode is enabled. ');
+            throw Exception::make('Unable to proceed: the maintenance mode is enabled. ');
         }
 
         if (! $isOn && $isExpected) {
             $this->errorCode = self::ERR_MAINTENANCE;
 
-            throw new Exception('Unable to proceed: the maintenance mode must be enabled first. ');
+            throw Exception::make('Unable to proceed: the maintenance mode must be enabled first. ');
         }
     } // phpcs:enable
 
@@ -408,14 +409,14 @@ class BaseBootstrap
             $this->errorCode = self::ERR_IS_INSTALLED;
 
             // phpcs:ignore Magento2.Exceptions.DirectThrow
-            throw new Exception('Error: Application is not installed yet. ');
+            throw Exception::make('Error: Application is not installed yet. ');
         }
 
         if ($isInstalled && ! $isExpected) {
             $this->errorCode = self::ERR_IS_INSTALLED;
 
             // phpcs:ignore Magento2.Exceptions.DirectThrow
-            throw new Exception('Error: Application is already installed. ');
+            throw Exception::make('Error: Application is already installed. ');
         }
     }
 
@@ -468,7 +469,7 @@ class BaseBootstrap
      */
     private function getIsExpected($key, $default)
     {
-        if (array_key_exists($key, $this->server)) {
+        if (Arr::exists($this->server, $key)) {
             if (isset($this->server[$key])) {
                 return (bool)(int)$this->server[$key];
             }

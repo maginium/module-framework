@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Console\Commands\Make;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Console\Enums\MakeCommands;
 use Maginium\Framework\Console\GeneratorCommand;
 use Maginium\Framework\Support\DataObject;

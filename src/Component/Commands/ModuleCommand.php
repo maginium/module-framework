@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Component\Commands;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Component\ComponentRegistrar;
 use Maginium\Framework\Component\Module;
 use Maginium\Framework\Console\Command;

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Interceptors\Framework\Webapi;
 
-use Exception;
 use Magento\Framework\App\State;
 use Magento\Framework\Webapi\ErrorProcessor;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Framework\Webapi\Rest\Response as BaseResponse;
 use Magento\Framework\Webapi\Rest\Response\RendererFactory;
 use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterface;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterfaceFactory;
 use Override;

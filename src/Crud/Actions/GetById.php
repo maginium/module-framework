@@ -13,6 +13,7 @@ use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\GetByIdInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Validator;
 
@@ -46,6 +47,13 @@ class GetById implements GetByIdInterface
     protected string $modelName;
 
     /**
+     *  The class name of the Elastic model.
+     *
+     * @var class-string<Model>
+     */
+    protected string $elasticModel;
+
+    /**
      * GetById constructor.
      * Initializes the service and sets the logger and model name.
      *
@@ -62,6 +70,9 @@ class GetById implements GetByIdInterface
 
         // Set model name (can be dynamically set in subclasses)
         $this->modelName = $service->getRepository()->getEntityName();
+
+        // Fetch the Elasticsearch model associated with the entity.
+        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
     }
 
     /**
@@ -78,7 +89,7 @@ class GetById implements GetByIdInterface
     {
         try {
             // Use the service to get the model by its unique ID
-            $model = $this->service->getById($id);
+            $model = $this->elasticModel::find($id);
 
             // Check if the model does not exist (empty result)
             if (Validator::isEmpty($model)) {
@@ -90,9 +101,12 @@ class GetById implements GetByIdInterface
                 );
             }
 
+            // Filter the columns from the deleted model's data
+            $filteredEntityData = $model->only($this->getColumns());
+
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
-                ->setPayload($model) // Set the payload
+                ->setPayload($filteredEntityData) // Set the payload
                 ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('%1 model retrieved successfully.', $this->modelName)); // Set a success message with the model name
 

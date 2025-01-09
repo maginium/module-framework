@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\Schema;
 
 use Closure;
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\DSL\Results;
+use Maginium\Framework\Support\Arr;
 
 /**
  * Class Builder.
@@ -240,6 +241,7 @@ class Builder
     public function modify(string $index, Closure $callback): array
     {
         // Use the factory to create the analyzer blueprint
+        /** @var IndexBlueprint $blueprint */
         $blueprint = $this->analyzerBlueprintFactory->create(['index' => $index]);
 
         // Apply the callback to the blueprint
@@ -509,7 +511,7 @@ class Builder
                 $field = $parts[0];
 
                 // Walk through the parts and adjust the field names if needed
-                array_walk($parts, function($v, $k) use (&$field, $parts) {
+                Arr::walk($parts, function($v, $k) use (&$field, $parts) {
                     // If we encounter the 'properties' part, we append the next part to the field name
                     if ($v === 'properties') {
                         $field .= '.' . $parts[$k + 1];

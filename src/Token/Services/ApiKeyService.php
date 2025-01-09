@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Token\Services;
 
-use Exception;
 use Magento\Integration\Api\IntegrationServiceInterface as BaseApiKeyServiceInterface;
 use Magento\Integration\Api\OauthServiceInterface;
 use Magento\Integration\Model\Integration as ApiKey;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Support\Facades\Config;

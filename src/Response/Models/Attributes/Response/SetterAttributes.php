@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Models\Attributes\Response;
 
-use Exception;
 use Magento\Framework\Exception\AbstractAggregateException;
 use Magento\Framework\Webapi\Exception as WebapiException;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Response as ResponseFacade;

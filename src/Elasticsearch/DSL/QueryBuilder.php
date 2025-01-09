@@ -7,6 +7,7 @@ namespace Maginium\Framework\Elasticsearch\DSL;
 use Maginium\Framework\Elasticsearch\DSL\exceptions\ParameterException;
 use Maginium\Framework\Elasticsearch\DSL\exceptions\QueryException;
 use Maginium\Framework\Elasticsearch\Helpers\Utilities;
+use Maginium\Framework\Support\Arr;
 
 trait QueryBuilder
 {
@@ -72,7 +73,7 @@ trait QueryBuilder
             if ($opts) {
                 foreach ($opts as $key => $value) {
                     if (isset($params[$key])) {
-                        $params[$key] = array_merge($params[$key], $value);
+                        $params[$key] = Arr::merge($params[$key], $value);
                     } else {
                         $params[$key] = $value;
                     }
@@ -121,7 +122,7 @@ trait QueryBuilder
         if ($opts) {
             foreach ($opts as $key => $value) {
                 if (isset($params[$key])) {
-                    $params[$key] = array_merge($params[$key], $opts[$key]);
+                    $params[$key] = Arr::merge($params[$key], $opts[$key]);
                 } else {
                     $params[$key] = $value;
                 }
@@ -171,7 +172,7 @@ trait QueryBuilder
         $aggs['by_' . $columns[0]] = $terms;
 
         if (count($columns) > 1) {
-            $aggs['by_' . $columns[0]]['aggs'] = $this->createNestedAggs(array_slice($columns, 1), $sort);
+            $aggs['by_' . $columns[0]]['aggs'] = $this->createNestedAggs(Arr::slice($columns, 1), $sort);
         }
 
         return $aggs;
@@ -580,7 +581,7 @@ trait QueryBuilder
         ];
 
         if (! empty($payload['options'])) {
-            $query['multi_match'] = array_merge($query['multi_match'], $payload['options']);
+            $query['multi_match'] = Arr::merge($query['multi_match'], $payload['options']);
         }
 
         return $query;
@@ -682,7 +683,7 @@ trait QueryBuilder
         if (! empty($options['body'])) {
             $body = $options['body'];
             unset($options['body']);
-            $options = array_merge($options, $body);
+            $options = Arr::merge($options, $body);
         }
 
         if (! empty($options['sort'])) {

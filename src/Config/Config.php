@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Config;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Config\Interfaces\ConfigInterface;
 use Maginium\Framework\Support\Collection;

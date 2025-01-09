@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Support;
 
-use Exception;
 use Illuminate\Support\Reflector as BaseReflector;
+use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
