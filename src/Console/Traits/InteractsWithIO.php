@@ -10,6 +10,7 @@ use Illuminate\Console\View\Components\Factory;
 use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableStyle;
@@ -623,7 +624,7 @@ trait InteractsWithIO
             $level = $this->verbosityMap[$level];
         }
         // If the level is not an integer, fall back to the current verbosity level.
-        elseif (! is_int($level)) {
+        elseif (! Validator::isInt($level)) {
             $level = $this->verbosity;
         }
 

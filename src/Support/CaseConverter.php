@@ -44,7 +44,7 @@ class CaseConverter
         }
 
         // If the data is not an array or collection, return it as is
-        if (! is_array($data) && ! $data instanceof Collection) {
+        if (! Validator::isArray($data) && ! $data instanceof Collection) {
             return $data;
         }
 
@@ -54,7 +54,7 @@ class CaseConverter
         // Iterate over each key-value pair in the collection
         $data = $collection->mapWithKeys(function($value, $key) use ($case) {
             // Handle array with numeric indexes (indexed arrays)
-            if (is_array($value) && ! $this->isMetadata($key)) {
+            if (Validator::isArray($value) && ! $this->isMetadata($key)) {
                 // If it's a subarray (with indexed keys), recursively convert its keys
                 // Also handle arrays of objects like 'departure', 'destination'
                 if (Arr::values($value) === $value) {

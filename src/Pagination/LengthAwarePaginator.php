@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Pagination;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Pagination\LengthAwarePaginator as BaseLengthAwarePaginator;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
 use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
+use Maginium\Framework\Support\Validator;
 use Override;
 
 /**
@@ -107,5 +110,54 @@ class LengthAwarePaginator extends BaseLengthAwarePaginator implements LengthAwa
 
         // Return the final result
         return $data;
+    }
+
+    /**
+     * Get the paginator links as a collection (for JSON responses).
+     *
+     * @return Collection
+     */
+    #[Override]
+    public function linkCollection()
+    {
+        // Collect the pagination elements (pages) and process them.
+        return collect($this->elements())->flatMap(function($item) {
+            // If the item is not an array (i.e., it is a placeholder like '...'), return it as such.
+            if (! Validator::isArray($item)) {
+                return [[PaginatorConstants::URL => null, PaginatorConstants::LABEL => PaginatorConstants::ELLIPSIS, PaginatorConstants::ACTIVE => false]]; // Ellipsis link.
+            }
+
+            // Otherwise, map each page in the item to a structured array with URL, label, and active status.
+            return collect($item)->map(fn($url, $page) => [
+                PaginatorConstants::URL => $url,  // URL for the page.
+                PaginatorConstants::LABEL => (string)$page,  // Label for the page (converted to string).
+                PaginatorConstants::ACTIVE => $this->currentPage() === $page,  // Check if this page is the current one.
+            ]);
+        })
+            // Prepend the "Previous" page link.
+            ->prepend([
+                PaginatorConstants::URL => $this->previousPageUrl(),  // URL for the previous page.
+                PaginatorConstants::LABEL => __(PaginatorConstants::PREVIOUS_LABEL),  // Label for the previous page.
+                PaginatorConstants::ACTIVE => false,  // Not active, as it's always a link.
+            ])
+            // Append the "Next" page link.
+            ->push([
+                PaginatorConstants::URL => $this->nextPageUrl(),  // URL for the next page.
+                PaginatorConstants::LABEL => __(PaginatorConstants::NEXT_LABEL),  // Label for the next page.
+                PaginatorConstants::ACTIVE => false,  // Not active, as it's always a link.
+            ]);
+    }
+
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     *
+     * @return Htmlable
+     */
+    #[Override]
+    public function render($view = null, $data = []): void
+    {
     }
 }

@@ -10,6 +10,7 @@ use Maginium\Framework\Application\ServiceProvider\Registry as ServiceProviderRe
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\ServiceProvider;
+use Maginium\Framework\Support\Validator;
 use Override;
 
 /**
@@ -26,6 +27,13 @@ class Bootstrap extends BaseBootstrap
      * @var bool
      */
     protected $booted = false;
+
+    /**
+     * The names of the loaded service providers.
+     *
+     * @var array
+     */
+    protected $serviceProviders = [];
 
     /**
      * The names of the loaded service providers.
@@ -74,6 +82,9 @@ class Bootstrap extends BaseBootstrap
         // Resolve and store the service provider registry.
         $this->serviceProviderRegistry = Container::resolve(ServiceProviderRegistry::class);
 
+        // Get all service providers from registry
+        $this->serviceProviders = $this->getServiceProviders();
+
         // Register all required service providers.
         $this->registerServiceProviders();
 
@@ -109,6 +120,29 @@ class Bootstrap extends BaseBootstrap
     }
 
     /**
+     * Retrieve the service providers from the registry.
+     *
+     * This method retrieves all registered service providers from the service provider registry,
+     * processes them to extract their class names, and returns an array of these class names.
+     *
+     * @return array An array containing the class names of all registered service providers.
+     */
+    public function getServiceProviders(): array
+    {
+        // Retrieve all service providers registered in the application.
+        $serviceProviders = $this->serviceProviderRegistry->all();
+
+        // Map through each service provider and extract the `class` property.
+        $serviceProviders = Arr::map($serviceProviders, function($provider) {
+            // Ensure $provider is an instance of DataObject and return its `class`.
+            return $provider->getClass();
+        });
+
+        // Return the array of service provider classes.
+        return $serviceProviders;
+    }
+
+    /**
      * Boot the application's service providers.
      *
      * @return void
@@ -123,11 +157,8 @@ class Bootstrap extends BaseBootstrap
         // Trigger "booting" callbacks to execute preliminary tasks before the application boots.
         $this->fireAppCallbacks($this->bootingCallbacks);
 
-        // Retrieve all service providers registered in the application.
-        $serviceProviders = $this->serviceProviderRegistry->all();
-
         // Boot each service provider by calling their respective boot methods.
-        Arr::walk($serviceProviders, function($p) {
+        Arr::walk($this->serviceProviders, function($p) {
             $this->bootProvider($p);
         });
 
@@ -189,7 +220,7 @@ class Bootstrap extends BaseBootstrap
         }
 
         // Resolve the provider instance if a class name is given.
-        if (is_string($provider)) {
+        if (Validator::isString($provider)) {
             $provider = $this->resolveProvider($provider);
         }
 
@@ -197,7 +228,7 @@ class Bootstrap extends BaseBootstrap
         $provider->register();
 
         // Mark the provider as registered in the registry.
-        $this->markAsRegistered($provider);
+        $this->markAsRegistered(provider: $provider);
 
         // If the application is already booted, boot the provider immediately.
         if ($this->isBooted()) {
@@ -217,13 +248,10 @@ class Bootstrap extends BaseBootstrap
     public function getProvider($provider)
     {
         // Determine the provider name (class name if a provider object is passed).
-        $name = is_string($provider) ? $provider : get_class($provider);
-
-        // Get all registered service providers.
-        $serviceProviders = $this->serviceProviderRegistry->all();
+        $name = Validator::isString($provider) ? $provider : get_class($provider);
 
         // Return the provider if registered, otherwise null.
-        return $serviceProviders[$name] ?? null;
+        return $this->serviceProviders[$name] ?? null;
     }
 
     /**
@@ -236,7 +264,7 @@ class Bootstrap extends BaseBootstrap
     public function getProviders($provider)
     {
         // Determine the provider name (class name if a provider object is passed).
-        $name = is_string($provider) ? $provider : get_class($provider);
+        $name = Validator::isString($provider) ? $provider : get_class($provider);
 
         // Filter and return all providers that match the given name.
         return Arr::where($this->serviceProviderRegistry->all(), fn($value) => $value instanceof $name);
@@ -307,11 +335,8 @@ class Bootstrap extends BaseBootstrap
      */
     protected function registerServiceProviders()
     {
-        // Get all registered service providers.
-        $serviceProviders = $this->serviceProviderRegistry->getServiceProviders();
-
         // Register each service provider if not already registered.
-        Arr::walk($serviceProviders, function(ServiceProvider $provider) {
+        Arr::walk($this->serviceProviders, function(ServiceProvider $provider) {
             $this->register($provider);
         });
     }
@@ -367,11 +392,10 @@ class Bootstrap extends BaseBootstrap
         // Get the class name of the provider.
         $class = get_class($provider);
 
-        // Get all registered service providers.
-        $serviceProviders = $this->serviceProviderRegistry->all();
+        // Set the service class.
+        $this->serviceProviders[$class] = $provider;
 
         // Mark the provider as registered.
-        $serviceProviders[$class] = $provider;
         $this->loadedProviders[$class] = true;
     }
 }

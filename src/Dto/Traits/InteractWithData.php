@@ -9,6 +9,7 @@ use Magento\Framework\Model\AbstractModel;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait WithData.
@@ -42,7 +43,7 @@ trait InteractWithData
             return $this->processCollection($data);
         }
 
-        if (is_array($data) && ! empty($data)) {
+        if (Validator::isArray($data) && ! empty($data)) {
             return $this->processArray($data);
         }
 
@@ -87,7 +88,7 @@ trait InteractWithData
      */
     private function areAllItemsObjects(array $data): bool
     {
-        return Arr::reduce($data, fn($carry, $item) => $carry && is_object($item), true);
+        return Arr::reduce($data, fn($carry, $item) => $carry && Validator::isObject($item), true);
     }
 
     /**

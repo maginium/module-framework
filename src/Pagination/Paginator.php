@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Pagination;
 
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Pagination\Paginator as BasePaginator;
 use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
 use Maginium\Framework\Support\Facades\Container;
+use Override;
 
 /**
  * Enhanced Paginator class for managing pagination.
@@ -32,5 +34,18 @@ class Paginator extends BasePaginator implements PaginatorInterface
     {
         // Resolve and return a new paginator instance using the container with the provided arguments
         return Container::make(PaginatorInterface::class, ...$arguments);
+    }
+
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     *
+     * @return Htmlable
+     */
+    #[Override]
+    public function render($view = null, $data = []): void
+    {
     }
 }

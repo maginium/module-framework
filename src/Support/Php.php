@@ -118,7 +118,7 @@ class Php
      */
     public static function htmlEntityDecode(string $string): string
     {
-        return html_model_decode($string);
+        return html_entity_decode($string);
     }
 
     /**
@@ -524,7 +524,7 @@ class Php
         foreach ($array2 as $key => $value) {
             // If the value is an array and the same key exists in the first array and is also an array,
             // recursively merge the arrays to preserve nested structures.
-            if (is_array($value) && isset($array1[$key]) && is_array($array1[$key])) {
+            if (Validator::isArray($value) && isset($array1[$key]) && Validator::isArray($array1[$key])) {
                 $array1[$key] = static::deepMerge($array1[$key], $value);
             } else {
                 // If the value is not an array, or the key doesn't exist in the first array, overwrite the value in the first array.

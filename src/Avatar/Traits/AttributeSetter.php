@@ -6,6 +6,7 @@ namespace Maginium\Framework\Avatar\Traits;
 
 use Maginium\Framework\Avatar\Interfaces\AvatarInterface;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait AttributeSetter.
@@ -28,8 +29,8 @@ trait AttributeSetter
     public function setTheme($theme): static
     {
         // Validate and set theme using the `setData` method
-        if (is_string($theme) || is_array($theme)) {
-            if (is_string($theme) && ! Arr::keyExists($theme, $this->themes)) {
+        if (Validator::isString($theme) || Validator::isArray($theme)) {
+            if (Validator::isString($theme) && ! Arr::keyExists($theme, $this->themes)) {
                 // Return the current instance if the theme is invalid
                 return $this;
             }

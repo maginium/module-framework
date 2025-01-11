@@ -15,7 +15,6 @@ use Maginium\Framework\Support\Facade;
  * @method static ?string encode(mixed $data) Encode the given data into a JSON string format.
  * @method static mixed decode(string $string) Decode the given JSON string back into its original data format.
  * @method static bool isValid(string $json) Check if the given string is a valid JSON formatted string.
- * @method static bool isJson(string $string) Check if the string is a JSON formatted string.
  *
  * @see JsonInterface
  */

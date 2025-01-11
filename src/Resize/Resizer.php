@@ -9,6 +9,7 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Resize\Interfaces\ResizerInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
+use Maginium\Framework\Support\Validator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\File as FileObj;
 
@@ -86,7 +87,7 @@ class Resizer implements ResizerInterface
         }
 
         // If the file is a string (path), convert it to a FileObj instance
-        if (is_string($file)) {
+        if (Validator::isString($file)) {
             $file = new FileObj($file);
         }
 

@@ -16,6 +16,13 @@ use Maginium\Framework\Support\ServiceProvider;
 class ConfigServiceProvider extends ServiceProvider
 {
     /**
+     * Sort order for customer data.
+     *
+     * @var int
+     */
+    public int $sortOrder = 0;
+
+    /**
      * Register any application services.
      *
      * This method is invoked during the service provider registration phase.

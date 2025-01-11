@@ -58,6 +58,25 @@ class HtmlDumper extends BaseHtmlDumper
     protected $dumping = false;
 
     /**
+     * @var array styles definition for output
+     */
+    protected array $styles = [
+        'cchr' => 'color:#222',
+        'num' => 'color:#a71d5d',
+        'ref' => 'color:#a0a0a0',
+        'key' => 'color:#df5000',
+        'str' => 'color:#df5000',
+        'meta' => 'color:#b729d9',
+        'note' => 'color:#a71d5d',
+        'const' => 'color:#795da3',
+        'index' => 'color:#a71d5d',
+        'public' => 'color:#795da3',
+        'private' => 'color:#795da3',
+        'protected' => 'color:#795da3',
+        'default' => 'background-color:#fff; color:#222; line-height:1.2em; font-weight:normal; font:12px Monaco, Consolas, monospace; word-wrap: break-word; white-space: pre-wrap; position:relative; z-index:100000',
+    ];
+
+    /**
      * HtmlDumper constructor.
      *
      * Initializes the dumper with the base path and cloner instance.

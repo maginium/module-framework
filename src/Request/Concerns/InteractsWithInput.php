@@ -12,7 +12,6 @@ use Maginium\Framework\Support\Carbon;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Date;
 use Maginium\Framework\Support\Facades\Json;
-use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Stringable;
 use Maginium\Framework\Support\Traits\Dumpable;
 use Maginium\Framework\Support\Validator;
@@ -106,7 +105,7 @@ trait InteractsWithInput
 
         // Loop through the keys to retrieve the corresponding values from the combined input and file data.
         // If $keys is not an array, convert it into an array using func_get_args().
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+        foreach (Validator::isArray($keys) ? $keys : func_get_args() as $key) {
             // Retrieve the value associated with the key and set it in the results array.
             Arr::set($results, $key, Arr::get($input, $key));
         }
@@ -269,7 +268,7 @@ trait InteractsWithInput
     public function has($key): bool
     {
         // If multiple keys are passed, treat them as an array
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = Validator::isArray($key) ? $key : func_get_args();
 
         // Retrieve all request input data
         $input = $this->all();
@@ -299,7 +298,7 @@ trait InteractsWithInput
     public function hasAny($keys): bool
     {
         // If $keys is a single value, convert it into an array of keys.
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = Validator::isArray($keys) ? $keys : func_get_args();
 
         // Retrieve all the request input.
         $input = $this->all();
@@ -350,7 +349,7 @@ trait InteractsWithInput
     public function filled($key): bool
     {
         // If the argument is an array, check each key; otherwise, use the arguments passed.
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = Validator::isArray($key) ? $key : func_get_args();
 
         // Iterate over each key and check if it's non-empty.
         foreach ($keys as $value) {
@@ -375,7 +374,7 @@ trait InteractsWithInput
     public function isNotFilled($key): bool
     {
         // If the argument is an array, check each key; otherwise, use the arguments passed.
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = Validator::isArray($key) ? $key : func_get_args();
 
         // Iterate over each key and check if it's not empty.
         foreach ($keys as $value) {
@@ -400,7 +399,7 @@ trait InteractsWithInput
     public function anyFilled($keys): bool
     {
         // If the argument is a single value, convert it into an array of keys.
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = Validator::isArray($keys) ? $keys : func_get_args();
 
         // Iterate over each key and check if any one of them has a non-empty value.
         foreach ($keys as $key) {
@@ -454,7 +453,7 @@ trait InteractsWithInput
     public function missing($key): bool
     {
         // If the argument is an array, check each key; otherwise, use the arguments passed.
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = Validator::isArray($key) ? $key : func_get_args();
 
         // Check if the key(s) are missing in the request.
         return ! $this->has($keys);
@@ -668,7 +667,7 @@ trait InteractsWithInput
     public function collect($key = null): Collection
     {
         // If a key is provided, retrieve the input for that key or all input if no key is given
-        return collect(is_array($key) ? $this->only($key) : $this->input($key));
+        return collect(Validator::isArray($key) ? $this->only($key) : $this->input($key));
     }
 
     /**
@@ -694,7 +693,7 @@ trait InteractsWithInput
         $placeholder = new stdClass;
 
         // Loop through the provided keys and filter the input
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+        foreach (Validator::isArray($keys) ? $keys : func_get_args() as $key) {
             // Get the value for the key, or use the placeholder if the key is not present
             $value = data_get($input, $key, $placeholder);
 
@@ -722,7 +721,7 @@ trait InteractsWithInput
     public function except($keys): array
     {
         // If $keys is not an array, convert it into an array.
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = Validator::isArray($keys) ? $keys : func_get_args();
 
         // Retrieve all input data.
         $results = $this->all();
@@ -798,7 +797,7 @@ trait InteractsWithInput
     public function hasFile($key): bool
     {
         // Retrieve files for the given key. If it's not an array, make it an array.
-        if (! is_array($files = $this->file($key))) {
+        if (! Validator::isArray($files = $this->file($key))) {
             $files = [$files];
         }
 
@@ -844,7 +843,7 @@ trait InteractsWithInput
     public function dump($keys = []): static
     {
         // If $keys is not an array, convert it into an array.
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = Validator::isArray($keys) ? $keys : func_get_args();
 
         // Dump the input data for the specified keys (or all data if no keys provided).
         dump(Validator::isEmpty($keys) ? $this->only($keys) : $this->all());
@@ -869,7 +868,7 @@ trait InteractsWithInput
         $value = $this->input($key);
 
         // Check if the value is not a boolean or an array and if it is an empty string.
-        return ! is_bool($value) && ! is_array($value) && trim((string)$value) === '';
+        return ! is_bool($value) && ! Validator::isArray($value) && trim((string)$value) === '';
     }
 
     /**

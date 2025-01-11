@@ -45,7 +45,7 @@ class Data
     public static function buildLogMessage($message): string
     {
         // If the message is an array, convert it to a string representation.
-        if (is_array($message)) {
+        if (Validator::isArray($message)) {
             return var_export($message, true);
         }
 

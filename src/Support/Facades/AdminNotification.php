@@ -11,6 +11,7 @@ use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facade;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class AdminNotification.
@@ -110,7 +111,7 @@ class AdminNotification extends Facade
         }
 
         // If it's already an array, return as is
-        return is_array($dto) ? $dto : [];
+        return Validator::isArray($dto) ? $dto : [];
     }
 
     /**

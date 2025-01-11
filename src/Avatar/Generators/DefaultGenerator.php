@@ -8,6 +8,7 @@ use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Avatar\Interfaces\GeneratorInterface;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Default generator for creating avatar initials.
@@ -77,14 +78,14 @@ class DefaultGenerator implements GeneratorInterface
     protected function setName(?string $name, bool $ascii): void
     {
         // Validate that name is not an array
-        if (is_array($name)) {
+        if (Validator::isArray($name)) {
             throw InvalidArgumentException::make(
                 'Passed value cannot be an array',
             );
         }
 
         // Validate that name is a string or object with a __toString method
-        if (is_object($name) && ! method_exists($name, '__toString')) {
+        if (Validator::isObject($name) && ! method_exists($name, '__toString')) {
             throw InvalidArgumentException::make(
                 'Passed object must have a __toString method',
             );

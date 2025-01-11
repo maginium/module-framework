@@ -75,7 +75,7 @@ class Config implements ConfigInterface
             $value = $this->get($path, $default);
 
             // Convert the retrieved value to a string
-            return ! empty($value) ? (string)$value : null;
+            return ! empty($value) ? (string)$value : $default;
         } catch (Exception) {
             // Handle the exception by throwing a localized error
             throw LocalizedException::make(__('Error retrieving configuration variable as string.'));

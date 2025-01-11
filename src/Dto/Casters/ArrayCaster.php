@@ -7,6 +7,7 @@ namespace Maginium\Framework\Dto\Casters;
 use ArrayAccess;
 use Maginium\Foundation\Exceptions\LogicException;
 use Maginium\Framework\Dto\Interfaces\CasterInterface;
+use Maginium\Framework\Support\Validator;
 use Traversable;
 
 /**
@@ -118,7 +119,7 @@ class ArrayCaster implements CasterInterface
         }
 
         // If the item is an array, create a new instance of the expected item type using the array values.
-        if (is_array($data)) {
+        if (Validator::isArray($data)) {
             return new $this->itemType(...$data);
         }
 

@@ -136,7 +136,7 @@ class Arr extends BaseArr
     public static function flip(array $array): array
     {
         // Filter the array to include only string or integer values.
-        $filteredArray = array_filter($array, fn($value) => is_string($value) || is_int($value));
+        $filteredArray = array_filter($array, fn($value) => Validator::isString($value) || Validator::isInt($value));
 
         // Perform the flip operation on the filtered array.
         return array_flip($filteredArray);

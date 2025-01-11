@@ -759,7 +759,7 @@ class Reflection extends BaseReflector
     public static function hasTrait(string|object $classOrObject, string $trait): bool
     {
         // Ensure we are dealing with a valid class or object
-        $className = is_object($classOrObject) ? get_class($classOrObject) : (string)$classOrObject;
+        $className = Validator::isObject($classOrObject) ? get_class($classOrObject) : (string)$classOrObject;
 
         // Get traits of the current class
         $traits = static::getTraitNames($className);
@@ -1003,7 +1003,7 @@ class Reflection extends BaseReflector
     private static function getReflectionClass(string|object $classOrObject): ReflectionClass
     {
         // Normalize class name
-        $className = is_object($classOrObject) ? get_class($classOrObject) : $classOrObject;
+        $className = Validator::isObject($classOrObject) ? get_class($classOrObject) : $classOrObject;
 
         // Check if ReflectionClass is cached
         if (isset(self::$cache[$className])) {

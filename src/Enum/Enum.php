@@ -77,7 +77,7 @@ abstract class Enum implements Arrayable, JsonSerializable, Stringable
         // Check if the provided enum value is valid
         if (! static::hasValue($enumValue)) {
             // Throw an exception if the enum value is not valid
-            throw new InvalidEnumMemberException($enumValue, static::class);
+            throw InvalidEnumMemberException::make($enumValue, static::class);
         }
 
         // Initialize instance properties
@@ -144,7 +144,7 @@ abstract class Enum implements Arrayable, JsonSerializable, Stringable
         }
 
         // Throw an exception if the key is not valid
-        throw new InvalidEnumKeyException($key, static::class);
+        throw InvalidEnumKeyException::make($key, static::class);
     }
 
     /**

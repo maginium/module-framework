@@ -287,7 +287,7 @@ class Str extends BaseStr
     public static function normalizeClassName($name)
     {
         // If the input is an object, get its class name.
-        if (is_object($name)) {
+        if (Validator::isObject($name)) {
             $name = get_class($name);
         }
 
@@ -308,7 +308,7 @@ class Str extends BaseStr
     public static function getClassId($name)
     {
         // If the input is an object, get its class name.
-        if (is_object($name)) {
+        if (Validator::isObject($name)) {
             $name = get_class($name);
         }
 

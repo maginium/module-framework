@@ -112,7 +112,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         }
 
         // Check if the key is empty or not a string, then check if the object has any data
-        if (empty($key) || ! is_string($key)) {
+        if (empty($key) || ! Validator::isString($key)) {
             return ! empty($this->_data);
         }
 
@@ -176,7 +176,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         }
 
         // If the key is an array, recursively retrieve data for each key in the array
-        if (is_array($key)) {
+        if (Validator::isArray($key)) {
             $result = [];
 
             // Loop through each key in the array and get the corresponding data
@@ -206,11 +206,11 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         // If an index is specified, process the data accordingly
         if ($index !== null) {
             // If the data is an array, return the element at the specified index
-            if (is_array($data)) {
+            if (Validator::isArray($data)) {
                 $data = $data[$index] ?? null;
             }
             // If the data is a string, split it by new lines and return the element at the specified index
-            elseif (is_string($data)) {
+            elseif (Validator::isString($data)) {
                 $data = explode(PHP_EOL, $data);
                 $data = $data[$index] ?? null;
             }
@@ -250,7 +250,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         }
 
         // If $key is an array, completely overwrite the existing data
-        if (is_array($key)) {
+        if (Validator::isArray($key)) {
             $this->_data = $key;
         } else {
             // Handle dot notation in the key for nested data
@@ -271,7 +271,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
                 $this->_data[$firstKey] = $this->_setNestedData($this->_data[$firstKey], $remainingKey, $value);
             } else {
                 // Handle non-nested keys: merge or directly assign the value
-                if (isset($this->_data[$key]) && is_array($this->_data[$key]) && is_array($value)) {
+                if (isset($this->_data[$key]) && Validator::isArray($this->_data[$key]) && Validator::isArray($value)) {
                     // Merge existing data and new value if both are arrays
                     $this->_data[$key] = Php::mergeArrays($this->_data[$key], $value);
                 } else {
@@ -305,11 +305,12 @@ class DataObject extends BaseDataObject implements DataObjectInterface
 
         // Traverse each part of the key to reach the nested data
         foreach ($keys as $part) {
-            if (is_array($currentData) && isset($currentData[$part])) {
+            if (Validator::isArray($currentData) && isset($currentData[$part])) {
                 // If current data is an array, move to the next nested level
                 $currentData = $currentData[$part];
-            } elseif (is_object($currentData) && isset($currentData->{$part})) {
+            } elseif (Validator::isObject($currentData) && isset($currentData->{$part})) {
                 // If current data is an object, access its property
+                /** @var object $currentData */
                 $currentData = $currentData->{$part};
             } else {
                 // If the key doesn't exist in the data, return null
@@ -354,7 +355,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
             $data[$firstKey] = $this->_setNestedData($data[$firstKey], $remainingKey, $value);
         } else {
             // Merge or overwrite the value based on its type
-            if (is_array($data[$firstKey]) && is_array($value)) {
+            if (Validator::isArray($data[$firstKey]) && Validator::isArray($value)) {
                 // Merge arrays if both the current data and value are arrays
                 $data[$firstKey] = Php::mergeArrays($data[$firstKey], $value);
             } else {

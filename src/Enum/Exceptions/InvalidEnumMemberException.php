@@ -4,30 +4,25 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Enum\Exceptions;
 
-use Maginium\Foundation\Exceptions\LocalizedException;
+use InvalidArgumentException;
+use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Framework\Enum\Enum;
 use Maginium\Framework\Support\Php;
-use Throwable;
 
 /**
  * Exception thrown when an invalid value is used to construct an Enum instance.
  */
-class InvalidEnumMemberException extends LocalizedException
+class InvalidEnumMemberException extends InvalidArgumentException
 {
     /**
      * InvalidEnumMemberException constructor.
      *
      * @param  mixed  $invalidValue  The invalid value used for construction.
      * @param  class-string<Enum<mixed>>  $enum  The class name of the Enum.
-     * @param  Throwable|null  $cause  The original exception that caused this exception (optional).
-     * @param  string|int|null  $code  The error code associated with the exception (optional).
-     * @param  string[]|null  $context  Additional context or data related to the exception (optional).
      */
-    public function __construct(
+    public static function make(
         mixed $invalidValue,
         string $enum,
-        ?Throwable $cause = null,
-        string|int|null $code = null,
     ) {
         // Determine the type of the invalid key
         $invalidValueType = gettype($invalidValue);
@@ -47,11 +42,7 @@ class InvalidEnumMemberException extends LocalizedException
             $enumKeys,          // List of valid keys
         );
 
-        // Call the parent constructor to initialize the exception with the constructed message and other parameters
-        parent::__construct(
-            $message, // The error message
-            $cause,     // The original exception that caused this exception (if any)
-            $code,       // The error code
-        );
+        // Create and return a new instance of the exception with the appropriate message
+        return new self($message->render(), HttpStatusCode::BAD_REQUEST);
     }
 }

@@ -13,8 +13,8 @@ use Maginium\Framework\Console\Command;
 use Maginium\Framework\Defer\DeferredCallback;
 use Maginium\Framework\Defer\Interfaces\DeferInterface;
 use Maginium\Framework\Support\Arr;
-use Maginium\Framework\Support\Facades\ClosureSerializer;
 use Maginium\Framework\Support\Facades\Json;
+use Maginium\Framework\Support\Facades\SerializableClosure;
 use Maginium\Framework\Support\Facades\Serializer;
 
 /**
@@ -68,7 +68,7 @@ class ProcessDriver implements DriverInterface
             foreach (Arr::wrap($tasks) as $task) {
                 // Add each task to the process pool, passing environment variables for closure serialization.
                 $pool->path(BP)->env([
-                    'MAGENTO_INVOKABLE_CLOSURE' => ClosureSerializer::serialize($task), // Serialize each closure.
+                    'MAGENTO_INVOKABLE_CLOSURE' => SerializableClosure::serialize($task), // Serialize each closure.
                 ])->command($command); // Specify the command to execute.
             }
         })->start()->wait(); // Start and wait for all processes to complete.
@@ -76,7 +76,7 @@ class ProcessDriver implements DriverInterface
         // Process the results collected from the pool execution.
         return $results->collect()->map(function($result) {
             // Decode the output from each process.
-            $result = Json::decode($result->output(), true);
+            $result = Json::decode($result->output());
 
             // If the task was not successful, throw the reported exception.
             if (! $result['successful']) {
@@ -109,7 +109,7 @@ class ProcessDriver implements DriverInterface
             foreach (Arr::wrap($tasks) as $task) {
                 // Serialize the closure and run the command in the background.
                 $this->processFactory->path(BP)->env([
-                    'MAGENTO_INVOKABLE_CLOSURE' => ClosureSerializer::serialize($task), // Serialize each closure.
+                    'MAGENTO_INVOKABLE_CLOSURE' => SerializableClosure::serialize($task), // Serialize each closure.
                 ])->run($command . ' 2>&1 &'); // Run the command in the background with output redirection.
             }
         });

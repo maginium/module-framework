@@ -243,7 +243,7 @@ class Validator
      */
     public static function isJson($value): bool
     {
-        return Json::isJson($value);
+        return Json::isValid($value);
     }
 
     /**

@@ -784,7 +784,7 @@ class Request extends BaseHttp implements RequestInterface
         }
 
         foreach ($files as $key => $file) { // Loop through the files array.
-            if (is_array($file)) { // If the file is an array (e.g., multiple uploads), process it recursively.
+            if (Validator::isArray($file)) { // If the file is an array (e.g., multiple uploads), process it recursively.
                 $files[$key] = $this->filterFiles($files[$key]);
             }
 

@@ -35,6 +35,7 @@ use League\Flysystem\Visibility;
 use Maginium\Framework\Http\File;
 use Maginium\Framework\Http\UploadedFile;
 use Maginium\Framework\Support\Facades\Request;
+use Maginium\Framework\Support\Validator;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -158,7 +159,7 @@ class DriverFilesystem implements CloudInterface
     public function delete($paths): bool
     {
         // Normalize input to an array.
-        $paths = is_array($paths) ? $paths : func_get_args();
+        $paths = Validator::isArray($paths) ? $paths : func_get_args();
 
         $success = true;
 
@@ -472,7 +473,7 @@ class DriverFilesystem implements CloudInterface
     public function put($path, $contents, $options = []): bool
     {
         // Convert options to an array if it's a string.
-        $options = is_string($options) ? ['visibility' => $options] : (array)$options;
+        $options = Validator::isString($options) ? ['visibility' => $options] : (array)$options;
 
         // Handle file or uploaded file instances.
         if ($contents instanceof File || $contents instanceof UploadedFile) {
@@ -514,12 +515,12 @@ class DriverFilesystem implements CloudInterface
     public function putFile($path, $file = null, $options = []): bool|string
     {
         // Handle cases where the file is null or options are provided as an array
-        if ($file === null || is_array($file)) {
+        if ($file === null || Validator::isArray($file)) {
             [$path, $file, $options] = ['', $path, $file ?? []];
         }
 
         // If the file is a string path, convert it to a File instance
-        $file = is_string($file) ? new File($file) : $file;
+        $file = Validator::isString($file) ? new File($file) : $file;
 
         // Store the file using a hashed name
         return $this->putFileAs($path, $file, $file->hashName(), $options);
@@ -540,12 +541,12 @@ class DriverFilesystem implements CloudInterface
     public function putFileAs($path, $file, $name = null, $options = [])
     {
         // Handle cases where the name is null or options are provided as an array
-        if ($name === null || is_array($name)) {
+        if ($name === null || Validator::isArray($name)) {
             [$path, $file, $name, $options] = ['', $path, $file, $name ?? []];
         }
 
         // Open the file stream for reading
-        $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
+        $stream = fopen(Validator::isString($file) ? $file : $file->getRealPath(), 'r');
 
         // Format the file path and store the file using a stream
         $result = $this->put(

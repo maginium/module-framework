@@ -10,6 +10,7 @@ use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\RuntimeException;
 use Maginium\Framework\Cache\RedisLockFactory;
 use Maginium\Framework\Redis\Helpers\Data as RedisHelper;
+use Maginium\Framework\Redis\Interfaces\ClientInterface;
 use Maginium\Framework\Redis\Interfaces\RedisInterface;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
@@ -27,9 +28,9 @@ use Predis\Response\Status as ClientStatus;
 class RedisManager implements RedisInterface
 {
     /**
-     * @var Client|null The Redis client instance.
+     * @var ClientInterface|null The Redis client instance.
      */
-    protected ?Client $client = null;
+    protected $client = null;
 
     /**
      * @var RedisLockFactory The factory for creating Redis locks.
@@ -67,9 +68,9 @@ class RedisManager implements RedisInterface
      *
      * @throws Exception If the Redis client cannot be initialized or is unhealthy.
      *
-     * @return Client The initialized Redis client instance.
+     * @return ClientInterface The initialized Redis client instance.
      */
-    public function init(): Client
+    public function init()
     {
         try {
             // Step 1: Initialize the Redis client using the Guzzle client.
@@ -96,9 +97,9 @@ class RedisManager implements RedisInterface
      *
      * @throws Exception If an error occurs during client or initialization.
      *
-     * @return Client|null The Redis client instance.
+     * @return ClientInterface|null The Redis client instance.
      */
-    public function getClient(): ?Client
+    public function getClient()
     {
         try {
             // Initialize the client if not already connected
@@ -188,9 +189,9 @@ class RedisManager implements RedisInterface
      *
      * @throws Exception If an error occurs while initializing the Redis client.
      *
-     * @return Client The initialized Redis client.
+     * @return ClientInterface The initialized Redis client.
      */
-    private function build(): Client
+    private function build()
     {
         // Fetch configuration values required to initialize the Redis client.
         $config = RedisHelper::getConfig();

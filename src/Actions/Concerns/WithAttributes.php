@@ -6,6 +6,7 @@ namespace Maginium\Framework\Actions\Concerns;
 
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait for managing attributes, providing various methods to get, set, and manipulate attributes.
@@ -124,7 +125,7 @@ trait WithAttributes
     public function only($keys): array
     {
         // Use Arr::only to return only the specified keys from the attributes array
-        return Arr::only($this->attributes, is_array($keys) ? $keys : func_get_args());
+        return Arr::only($this->attributes, Validator::isArray($keys) ? $keys : func_get_args());
     }
 
     /**
@@ -140,7 +141,7 @@ trait WithAttributes
     public function except($keys): array
     {
         // Use Arr::except to return all attributes except the specified keys
-        return Arr::except($this->attributes, is_array($keys) ? $keys : func_get_args());
+        return Arr::except($this->attributes, Validator::isArray($keys) ? $keys : func_get_args());
     }
 
     /**

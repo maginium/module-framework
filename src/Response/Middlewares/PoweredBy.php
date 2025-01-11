@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Response\Middlewares;
 
 use Maginium\Foundation\Abstracts\Middleware\AbstractHeaderMiddleware;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Str;
 
@@ -33,17 +34,20 @@ class PoweredBy extends AbstractHeaderMiddleware
     }
 
     /**
-     * Retrieves the value of the header to be added.
+     * Gets the value of the "Powered-By" header to be added.
      *
-     * @return string|null The header value.
+     * @return string|null The formatted header value or null if not set.
      */
     protected function getValue(): ?string
     {
-        // Retrieve the "AUTHOR" configuration value from the application config
-        // This could be used to identify the source or author of the application
-        $poweredBy = Str::headline(Config::getString('AUTHOR'));
+        // Get the "AUTHOR" value from the environment configuration.
+        // This value may represent the application author or source.
+        $author = Config::driver(ConfigDrivers::ENV)->getString(path: 'AUTHOR');
 
-        // Return the value retrieved from the config as the header value
+        // Format the author value into a headline-style string.
+        $poweredBy = Str::headline($author);
+
+        // Return the formatted value as the header value.
         return $poweredBy;
     }
 }

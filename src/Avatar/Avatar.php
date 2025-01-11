@@ -18,13 +18,14 @@ use Maginium\Framework\Avatar\Generators\DefaultGenerator;
 use Maginium\Framework\Avatar\Interfaces\AvatarInterface;
 use Maginium\Framework\Avatar\Interfaces\GeneratorInterface;
 use Maginium\Framework\Avatar\Traits\AttributeSetter;
-use Maginium\Framework\Cache\Interfaces\CacheInterface;
 use Maginium\Framework\Database\ObjectModel;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Facades\Cache;
 use Maginium\Framework\Support\Facades\Filesystem;
 use Maginium\Framework\Support\Facades\Media;
 use Maginium\Framework\Support\Path;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 use Random\RandomException;
 
 /**
@@ -144,11 +145,6 @@ class Avatar extends ObjectModel implements AvatarInterface
     protected string $initials = '';
 
     /**
-     * @var CacheInterface Cache interface for caching avatars.
-     */
-    protected CacheInterface $cache;
-
-    /**
      * @var mixed Image driver to use for image processing (GD or Imagick).
      */
     protected mixed $driver;
@@ -191,14 +187,10 @@ class Avatar extends ObjectModel implements AvatarInterface
      * This constructor initializes the avatar with provided configuration settings.
      * It applies themes, selects an image driver, and sets up default configurations.
      *
-     * @param CacheInterface|null $cache Cache interface to store generated avatars.
      * @param array $config Configuration settings for avatar customization.
      */
-    public function __construct(CacheInterface $cache, array $config = [])
+    public function __construct(array $config = [])
     {
-        // Set the cache interface for caching avatars
-        $this->cache = $cache;
-
         // Determine the image processing driver (GD or Imagick)
         $this->driver = $config['driver'] ?? 'gd';
 
@@ -381,8 +373,8 @@ class Avatar extends ObjectModel implements AvatarInterface
         $key = $this->cacheKey();
 
         // Check if the SVG is cached
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
+        if (Cache::has($key)) {
+            return Cache::get($key);
         }
 
         // Build the avatar if not cached
@@ -392,7 +384,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         $base64 = $this->image->toPng()->toDataUri();
 
         // Cache the Base64 string for future use
-        $this->cache->forever($key, $base64);
+        Cache::forever($key, $base64);
 
         return $base64;
     }
@@ -506,8 +498,8 @@ class Avatar extends ObjectModel implements AvatarInterface
         $key = $this->cacheKey('svg');
 
         // Check if the SVG is cached
-        if ($this->cache->has($key)) {
-            return $this->cache->get($key);
+        if (Cache::has($key)) {
+            return Cache::get($key);
         }
 
         // Build the initial avatar settings before generating SVG
@@ -557,7 +549,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         $svg .= '</svg>';
 
         // Cache the generated SVG for future use
-        $this->cache->forever($key, $svg);
+        Cache::forever($key, $svg);
 
         return $svg;
     }
@@ -708,7 +700,7 @@ class Avatar extends ObjectModel implements AvatarInterface
 
         // Loop through the theme names and resolve them to their corresponding configurations
         foreach ((array)$theme as $themeName) {
-            if (! is_string($themeName)) {
+            if (! Validator::isString($themeName)) {
                 continue;
             }
 

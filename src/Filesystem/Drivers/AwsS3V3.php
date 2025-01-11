@@ -12,10 +12,10 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
 use League\Flysystem\UnableToSetVisibility;
 use League\Flysystem\UnableToWriteFile;
-use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Http\File;
 use Maginium\Framework\Http\UploadedFile;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 use Override;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
@@ -179,7 +179,7 @@ class AwsS3V3 extends DriverFilesystem
     public function put($path, $contents, $options = []): bool
     {
         // Convert options to an array if it's a string.
-        $options = is_string($options) ? ['visibility' => $options] : (array)$options;
+        $options = Validator::isString($options) ? ['visibility' => $options] : (array)$options;
 
         // Extract bucket name from the path (adjust depending on your driver implementation).
         $bucketName = $this->config['bucket'];

@@ -56,7 +56,7 @@ class Accepted implements ValidatorInterface
     public function __construct(string|array $values)
     {
         // Ensure that the values are always stored as an array.
-        $this->acceptedValues = is_array($values) ? $values : [$values];
+        $this->acceptedValues = Validator::isArray($values) ? $values : [$values];
     }
 
     /**

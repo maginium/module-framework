@@ -5,40 +5,16 @@ declare(strict_types=1);
 namespace Maginium\Framework\Redis\Interfaces;
 
 use Illuminate\Contracts\Cache\Lock;
-use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
-use Predis\Client;
+use Predis\ClientInterface as BaseClientInterface;
 
 /**
  * Interface RedisInterface.
  *
  * Defines the contract for a Redis client.
  */
-interface RedisInterface
+interface ClientInterface extends BaseClientInterface
 {
-    /**
-     * Initializes the Redis client.
-     *
-     * @throws Exception If an error occurs during initialization.
-     *
-     * @return ClientInterface The initialized Redis client instance.
-     */
-    public function init();
-
-    /**
-     * Retrieves the Redis client instance.
-     *
-     * @return ClientInterface|null The Redis client instance.
-     */
-    public function getClient();
-
-    /**
-     * Checks if the Redis service is healthy.
-     *
-     * @return bool True if the Redis service is healthy, false otherwise.
-     */
-    public function isHealthy(): bool;
-
     /**
      * Creates and returns a lock instance to manage concurrency.
      *

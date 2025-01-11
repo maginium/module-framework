@@ -12,6 +12,16 @@ namespace Maginium\Framework\ColorThief\Interfaces;
 interface ColorThiefInterface
 {
     /**
+     * Cache type identifier.
+     */
+    public const TYPE_IDENTIFIER = 'scope_color_thief';
+
+    /**
+     * Cache tag.
+     */
+    public const CACHE_TAG = 'COLOR_THEIF';
+
+    /**
      * Get the dominant color of an image.
      *
      * @param mixed $sourceImage Path/URL to the image, GD resource, Imagick instance, or image as binary string

@@ -36,8 +36,8 @@
     <preference for="Maginium\Framework\Locale\Interfaces\TranslationInterface" type="Maginium\Framework\Locale\TranslatorManager" />
 
     <!-- Cache and Redis -->
-    <preference for="Maginium\Framework\Cache\Interfaces\CacheInterface" type="Maginium\Framework\Cache\CacheManager" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
+    <preference for="Maginium\Framework\Cache\Interfaces\FactoryInterface" type="Maginium\Framework\Cache\CacheManager" />
 
     <!-- Media and Filesystem -->
     <preference for="Maginium\Framework\Media\Interfaces\MediaInterface" type="Maginium\Framework\Media\MediaManager" />
@@ -47,7 +47,10 @@
     <!-- Serialization -->
     <preference for="Maginium\Framework\Serializer\Interfaces\JsonInterface" type="Maginium\Framework\Serializer\Json" />
     <preference for="Maginium\Framework\Serializer\Interfaces\SerializerInterface" type="Maginium\Framework\Serializer\Serializer" />
-    <preference for="Maginium\Framework\Serializer\Interfaces\ClosureSerializerInterface" type="Maginium\Framework\Serializer\ClosureSerializer" />
+    <preference
+        for="Maginium\Framework\Serializer\Interfaces\SerializableClosureInterface"
+        type="Maginium\Framework\Serializer\SerializableClosure"
+    />
 
     <!-- Token & Api Key -->
     <preference for="Maginium\Framework\Token\Interfaces\ApiKeyServiceInterface" type="Maginium\Framework\Token\Services\ApiKeyService" />
@@ -79,7 +82,7 @@
 
     <!-- Database and CRUD -->
     <preference for="Magento\Framework\EntityManager\EntityManager" type="Maginium\Framework\Database\EntityManager" />
-    <preference for="Maginium\Framework\Database\Interfaces\ConnectionInterface" type="Maginium\Framework\Database\Connection" />
+    <preference for="Maginium\Framework\Database\Interfaces\ConnectionInterface" type="Maginium\Framework\Database\Connections\Connection" />
     <preference for="Magento\Framework\Setup\Patch\PatchApplier" type="Maginium\Framework\Database\Interceptors\Framework\Setup\Patch\PatchApplier" />
 
     <!-- Log Module -->
@@ -245,6 +248,50 @@
 
                 <!-- Eloquent service provider -->
                 <item xsi:type="object" name="eloquent_service_provider">Maginium\Framework\Database\Providers\DatabaseServiceProvider</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Configure providers for the ServiceProvider Registry -->
+    <type name="Maginium\Framework\Crud\Filters\FilterList">
+        <arguments>
+            <!-- List of service providers to be registered -->
+            <argument xsi:type="array" name="filters">
+                <item xsi:type="object" name="in_filter">Maginium\Framework\Crud\Filters\Strategies\InFilter</item>
+                <item xsi:type="object" name="or_filter">Maginium\Framework\Crud\Filters\Strategies\OrFilter</item>
+                <item xsi:type="object" name="and_filter">Maginium\Framework\Crud\Filters\Strategies\AndFilter</item>
+                <item xsi:type="object" name="null_filter">Maginium\Framework\Crud\Filters\Strategies\NullFilter</item>
+                <item xsi:type="object" name="equal_filter">Maginium\Framework\Crud\Filters\Strategies\EqualFilter</item>
+                <item xsi:type="object" name="not_in_filter">Maginium\Framework\Crud\Filters\Strategies\NotInFilter</item>
+                <item xsi:type="object" name="between_filter">Maginium\Framework\Crud\Filters\Strategies\BetweenFilter</item>
+                <item xsi:type="object" name="not_null_filter">Maginium\Framework\Crud\Filters\Strategies\NotNullFilter</item>
+                <item xsi:type="object" name="contains_filter">Maginium\Framework\Crud\Filters\Strategies\ContainsFilter</item>
+                <item xsi:type="object" name="ends_with_filter">Maginium\Framework\Crud\Filters\Strategies\EndsWithFilter</item>
+                <item xsi:type="object" name="not_equal_filter">Maginium\Framework\Crud\Filters\Strategies\NotEqualFilter</item>
+                <item xsi:type="object" name="less_than_filter">Maginium\Framework\Crud\Filters\Strategies\LessThanFilter</item>
+                <item xsi:type="object" name="not_between_filter">Maginium\Framework\Crud\Filters\Strategies\NotBetweenFilter</item>
+                <item xsi:type="object" name="starts_with_filter">Maginium\Framework\Crud\Filters\Strategies\StartsWithFilter</item>
+                <item xsi:type="object" name="not_contains_filter">Maginium\Framework\Crud\Filters\Strategies\NotContainsFilter</item>
+                <item xsi:type="object" name="greater_than_filter">Maginium\Framework\Crud\Filters\Strategies\GreaterThanFilter</item>
+                <item xsi:type="object" name="less_or_equal_filter">Maginium\Framework\Crud\Filters\Strategies\LessOrEqualFilter</item>
+                <item xsi:type="object" name="greater_or_equal_filter">Maginium\Framework\Crud\Filters\Strategies\GreaterOrEqualFilter</item>
+                <item xsi:type="object" name="equal_case_sensitive_filter">Maginium\Framework\Crud\Filters\Strategies\EqualCaseSensitiveFilter</item>
+                <item
+                    xsi:type="object"
+                    name="not_contains_sensitive_filter"
+                >Maginium\Framework\Crud\Filters\Strategies\NotContainsSensitiveFilter</item>
+                <item
+                    xsi:type="object"
+                    name="contains_case_sensitive_filter"
+                >Maginium\Framework\Crud\Filters\Strategies\ContainsCaseSensitiveFilter</item>
+                <item
+                    xsi:type="object"
+                    name="ends_with_case_sensitive_filter"
+                >Maginium\Framework\Crud\Filters\Strategies\EndsWithCaseSensitiveFilter</item>
+                <item
+                    xsi:type="object"
+                    name="starts_with_case_sensitive_filter"
+                >Maginium\Framework\Crud\Filters\Strategies\StartsWithCaseSensitiveFilter</item>
             </argument>
         </arguments>
     </type>

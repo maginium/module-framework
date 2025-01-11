@@ -42,7 +42,7 @@ if (! function_exists('trace_log')) {
             if ($message instanceof \Exception) {
                 // Set the logging level to 'error' for exceptions.
                 $level = 'error';
-            } elseif (Validator::isArray($message) || is_object($message)) {
+            } elseif (Validator::isArray($message) || Validator::isObject($message)) {
                 // Convert arrays and objects to a string for logging.
                 $message = print_r($message, true);
             }
@@ -1341,7 +1341,7 @@ if (! function_exists('request')) {
         }
 
         // If an array of keys is provided, return only those keys from the request
-        if (is_array($key)) {
+        if (Validator::isArray($key)) {
             return $instance->only($key);
         }
 

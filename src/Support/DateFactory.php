@@ -130,7 +130,7 @@ class DateFactory
     public static function use($handler)
     {
         // If the handler is an object and callable, use the callable handler.
-        if (is_callable($handler) && is_object($handler)) {
+        if (is_callable($handler) && Validator::isObject($handler)) {
             return static::useCallable($handler);
         }
 

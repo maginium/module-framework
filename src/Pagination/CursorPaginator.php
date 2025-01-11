@@ -7,6 +7,7 @@ namespace Maginium\Framework\Pagination;
 use Illuminate\Pagination\CursorPaginator as BaseCursorPaginator;
 use Maginium\Framework\Pagination\Interfaces\CursorPaginatorInterface;
 use Maginium\Framework\Support\Facades\Container;
+use Override;
 
 /**
  * Enhanced CursorPaginator class for managing pagination.
@@ -32,5 +33,18 @@ class CursorPaginator extends BaseCursorPaginator implements CursorPaginatorInte
     {
         // Resolve and return a new cursor paginator instance using the container with the provided arguments
         return Container::make(CursorPaginatorInterface::class, ...$arguments);
+    }
+
+    /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     *
+     * @return Htmlable
+     */
+    #[Override]
+    public function render($view = null, $data = []): void
+    {
     }
 }

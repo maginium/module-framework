@@ -100,7 +100,7 @@ trait DataObject
         }
 
         // Check if the key is empty or not a string, then check if the object has any data
-        if (empty($key) || ! is_string($key)) {
+        if (empty($key) || ! Validator::isString($key)) {
             return ! empty($this->attributes);
         }
 
@@ -139,7 +139,7 @@ trait DataObject
         }
 
         // If the key is an array, recursively retrieve data for each key in the array
-        if (is_array($key)) {
+        if (Validator::isArray($key)) {
             $result = [];
 
             // Loop through each key in the array and get the corresponding data
@@ -169,11 +169,11 @@ trait DataObject
         // If an index is specified, process the data accordingly
         if ($index !== null) {
             // If the data is an array, return the element at the specified index
-            if (is_array($data)) {
+            if (Validator::isArray($data)) {
                 $data = $data[$index] ?? null;
             }
             // If the data is a string, split it by new lines and return the element at the specified index
-            elseif (is_string($data)) {
+            elseif (Validator::isString($data)) {
                 $data = explode(PHP_EOL, $data);
                 $data = $data[$index] ?? null;
             }
@@ -213,7 +213,7 @@ trait DataObject
         }
 
         // If $key is an array, completely overwrite the existing data
-        if (is_array($key)) {
+        if (Validator::isArray($key)) {
             $this->attributes = $key;
         } else {
             // Handle dot notation in the key for nested data
@@ -234,7 +234,7 @@ trait DataObject
                 $this->attributes[$firstKey] = $this->_setNestedData($this->attributes[$firstKey], $remainingKey, $value);
             } else {
                 // Handle non-nested keys: merge or directly assign the value
-                if (isset($this->attributes[$key]) && is_array($this->attributes[$key]) && is_array($value)) {
+                if (isset($this->attributes[$key]) && Validator::isArray($this->attributes[$key]) && Validator::isArray($value)) {
                     // Merge existing data and new value if both are arrays
                     $this->attributes[$key] = Php::mergeArrays($this->attributes[$key], $value);
                 } else {
@@ -283,7 +283,7 @@ trait DataObject
     {
         if ($key === null) {
             $this->setData([]);
-        } elseif (is_string($key)) {
+        } elseif (Validator::isString($key)) {
             if (isset($this->attributes[$key]) || Arr::exists($this->attributes, $key)) {
                 unset($this->attributes[$key]);
             }
@@ -457,7 +457,7 @@ trait DataObject
         foreach ($data as $key => $value) {
             if (is_scalar($value)) {
                 $debug[$key] = $value;
-            } elseif (is_array($value)) {
+            } elseif (Validator::isArray($value)) {
                 $debug[$key] = $this->debug($value, $objects);
             } elseif ($value instanceof \Magento\Framework\DataObject) {
                 $debug[$key . ' (' . get_class($value) . ')'] = $value->debug(null, $objects);
@@ -560,10 +560,10 @@ trait DataObject
 
         // Traverse each part of the key to reach the nested data
         foreach ($keys as $part) {
-            if (is_array($currentData) && isset($currentData[$part])) {
+            if (Validator::isArray($currentData) && isset($currentData[$part])) {
                 // If current data is an array, move to the next nested level
                 $currentData = $currentData[$part];
-            } elseif (is_object($currentData) && isset($currentData->{$part})) {
+            } elseif (Validator::isObject($currentData) && isset($currentData->{$part})) {
                 // If current data is an object, access its property
                 $currentData = $currentData->{$part};
             } else {
@@ -609,7 +609,7 @@ trait DataObject
             $data[$firstKey] = $this->_setNestedData($data[$firstKey], $remainingKey, $value);
         } else {
             // Merge or overwrite the value based on its type
-            if (is_array($data[$firstKey]) && is_array($value)) {
+            if (Validator::isArray($data[$firstKey]) && Validator::isArray($value)) {
                 // Merge arrays if both the current data and value are arrays
                 $data[$firstKey] = Php::mergeArrays($data[$firstKey], $value);
             } else {
@@ -659,7 +659,7 @@ trait DataObject
     {
         return Arr::filter(
             $this->attributes,
-            fn($v) => is_scalar($v) || is_array($v),
+            fn($v) => is_scalar($v) || Validator::isArray($v),
         );
     }
 }

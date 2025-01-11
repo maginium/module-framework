@@ -40,7 +40,7 @@ class Data
      */
     public static function getOriginUrl(): string
     {
-        return Config::getString(self::XML_PATH_ORIGIN_URL);
+        return Config::getString(self::XML_PATH_ORIGIN_URL, '');
     }
 
     /**
