@@ -9,11 +9,14 @@ use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Exceptions\CouldNotSaveException;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\CreateInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
@@ -36,7 +39,7 @@ class Save implements CreateInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -63,7 +66,7 @@ class Save implements CreateInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -86,10 +89,14 @@ class Save implements CreateInterface
             $data = $this->input();
 
             // Create a data transfer object (DTO) with the provided data
-            $dto = $this->service->getRepository()->withData($data);
+            $dto = $this->service->getRepository()->getModel()->getDtoClass();
+
+            // Fill and validate the given data
+            $dto::make($data);
 
             // Create the model from the provided data
-            $model = $this->service->save($dto->toArray());
+            /** @var Model $model */
+            $model = $this->service->create($dto->toArray());
 
             // Verify if the model was successfully saved by checking if the model data is empty
             if (Validator::isEmpty($model)) {
@@ -101,8 +108,8 @@ class Save implements CreateInterface
                 );
             }
 
-            // Filter the columns from the deleted model's data
-            $filteredEntityData = $this->applyColumnFilter($model->toDataArray());
+            // Filter the columns from the model's data
+            $filteredEntityData = $model->only($this->getColumns());
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
@@ -112,7 +119,7 @@ class Save implements CreateInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|CouldNotSaveException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {

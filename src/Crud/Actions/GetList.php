@@ -8,12 +8,13 @@ use AllowDynamicProperties;
 use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\GetListInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
-use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
@@ -36,7 +37,7 @@ class GetList implements GetListInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -46,13 +47,6 @@ class GetList implements GetListInterface
      * @var string
      */
     protected string $modelName;
-
-    /**
-     *  The class name of the Elastic model.
-     *
-     * @var class-string<Model>
-     */
-    protected string $elasticModel;
 
     /**
      * GetList constructor.
@@ -70,10 +64,7 @@ class GetList implements GetListInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
-
-        // Fetch the Elasticsearch model associated with the entity.
-        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -91,13 +82,14 @@ class GetList implements GetListInterface
             $page = (int)$this->query(PaginatorConstants::PAGE, PaginatorConstants::DEFAULT_PAGE);
 
             // Retrieve the 'update' array, which contains the fields to update if a matching record is found.
-            $perPage = (int)$this->query(PaginatorConstants::PER_PAGE, PaginatorConstants::DEFAULT_PER_PAGE);
+            $defaultPerPage = $this->service->getRepository()->getModel()->getPerPage() ?? PaginatorConstants::DEFAULT_PER_PAGE;
+            $perPage = (int)$this->query(PaginatorConstants::PER_PAGE, $defaultPerPage);
 
             // Validate pagination parameters
             $this->assertValidPagination($page, $perPage);
 
             // Fetch paginated list of models from the service
-            $models = $this->elasticModel::paginate(perPage: $perPage, columns: $this->getColumns(), page: $page);
+            $models = $this->service->paginate($perPage, $this->getColumns(), $page);
 
             // Throw exception if no models were found
             if ($models->isEmpty()) {
@@ -117,7 +109,7 @@ class GetList implements GetListInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {

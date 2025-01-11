@@ -9,13 +9,16 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Crud\Interfaces\Repositories\CacheableInterface;
 use Maginium\Framework\Crud\Interfaces\Repositories\RepositoryInterface;
 use Maginium\Framework\Crud\Traits\Cacheable;
+use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model as ElasticModel;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class AbstractRepository
@@ -164,7 +167,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance of the repository to allow for method chaining.
      */
-    public function scope($name, array $parameters = []): static
+    public function scope(string $name, array $parameters = []): static
     {
         // Store the scope in the $scopes array with its associated parameters.
         $this->scopes[$name] = $parameters;
@@ -203,7 +206,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function where($attribute, $operator = null, $value = null, $boolean = 'and')
+    public function where(string $attribute, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static
     {
         // Add the where condition to the internal $where array.
         // The last `$boolean` expression ensures correct handling of logical operators.
@@ -226,7 +229,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function whereIn($attribute, $values, $boolean = 'and', $not = false)
+    public function whereIn(string $attribute, array $values, string $boolean = 'and', bool $not = false): static
     {
         // Add the whereIn condition to the internal $whereIn array.
         // The `$boolean` and `$not` expressions are added to ensure logical operators are handled correctly.
@@ -248,7 +251,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function whereNotIn($attribute, $values, $boolean = 'and')
+    public function whereNotIn(string $attribute, array $values, string $boolean = 'and'): static
     {
         // Add the whereNotIn condition to the internal $whereNotIn array.
         // The `$boolean` expression is used to ensure correct handling of logical operators.
@@ -342,10 +345,10 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function with($relations)
+    public function with(string|array $relations): static
     {
         // If the relations are provided as a string, convert them to an array using func_get_args().
-        if (is_string($relations)) {
+        if (Validator::isString($relations)) {
             $relations = func_get_args();
         }
 
@@ -370,7 +373,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function whereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1): static
+    public function whereHas(string $relation, ?Closure $callback = null, string $operator = '>=', int $count = 1): static
     {
         // Store the relation along with its callback, operator, and count for future query building.
         // The last `$operator` & `$count` expressions are intentional to fix list() & Arr::pad() results
@@ -389,7 +392,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function offset($offset): static
+    public function offset(int $offset): static
     {
         // Store the offset value to be used later in the query building process.
         $this->offset = $offset;
@@ -407,7 +410,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function limit($limit): static
+    public function limit(int $limit): static
     {
         // Store the limit value to be used later in the query building process.
         $this->limit = $limit;
@@ -426,7 +429,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function orderBy($attribute, $direction = 'asc'): static
+    public function orderBy(string $attribute, string $direction = 'asc'): static
     {
         // Store the attribute and direction for the order by condition.
         $this->orderBy[] = [$attribute, $direction ?: 'asc'];
@@ -444,10 +447,10 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function groupBy($column)
+    public function groupBy(string|array $column): static
     {
         // Merge the provided column(s) with the existing group by conditions.
-        $this->groupBy = Arr::merge((array)$this->groupBy, is_array($column) ? $column : [$column]);
+        $this->groupBy = Arr::merge((array)$this->groupBy, Validator::isArray($column) ? $column : [$column]);
 
         // Return the current instance for method chaining.
         return $this;
@@ -465,7 +468,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function having($column, $operator = null, $value = null, $boolean = 'and'): static
+    public function having(string $column, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static
     {
         // Store the having condition along with the column, operator, value, and boolean logic.
         $this->having[] = [$column, $operator, $value, $boolean ?: 'and'];
@@ -486,7 +489,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return static The current instance for method chaining.
      */
-    public function orHaving($column, $operator = null, $value = null, $boolean = 'and'): static
+    public function orHaving(string $column, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static
     {
         // Reuse the having method to add an "or" condition.
         return $this->having($column, $operator, $value, 'or');
@@ -494,8 +497,6 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
 
     /**
      * Get the model name from a given class, lowercased.
-     *
-     * @param string $class The class name.
      *
      * @return string The lowercased base class name.
      */
@@ -543,7 +544,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      *
      * @return mixed The result of executing the callback.
      */
-    protected function executeCallback($class, $method, $args, Closure $closure): mixed
+    protected function executeCallback(string $class, string $method, array $args, Closure $closure): mixed
     {
         // Check if cache is enabled and if the current request should not skip the cache.
         if ($this->getCacheLifetime() && Request::query($this->skipUri, 'false') !== 'true') {
@@ -571,17 +572,17 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
     protected function resetRepository(): static
     {
         // Reset all query-related properties to their default values.
-        $this->relations = [];
         $this->where = [];
-        $this->whereIn = [];
-        $this->whereNotIn = [];
-        $this->whereHas = [];
         $this->scopes = [];
-        $this->offset = null;
-        $this->limit = null;
+        $this->having = [];
         $this->orderBy = [];
         $this->groupBy = [];
-        $this->having = [];
+        $this->whereIn = [];
+        $this->limit = null;
+        $this->offset = null;
+        $this->whereHas = [];
+        $this->relations = [];
+        $this->whereNotIn = [];
 
         // If the repository has a flushCriteria method, call it to clean up additional criteria.
         if (Reflection::methodExists($this, 'flushCriteria')) {
@@ -597,14 +598,15 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      * This method applies various clauses to the query model such as where, whereIn, whereNotIn,
      * whereHas, scopes, offset, limit, orderBy, groupBy, and having.
      *
-     * @param object $model The model to prepare the query for.
+     * @param ModelInterface $model The model to prepare the query for.
      *
      * @return mixed The modified model with the applied query conditions.
      */
-    protected function prepareQuery($model): mixed
+    protected function prepareQuery(ModelInterface $model): mixed
     {
         // Check if there are any relationships to eager load
         // This ensures that related models are loaded in a single query
+        /** @var Model|ElasticModel $model */
         if (! empty($this->relations)) {
             // Apply eager loading for relations
             $model = $model->with($this->relations);
@@ -627,7 +629,11 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
             [$attribute, $values, $boolean, $not] = Arr::pad($whereIn, 4, null);
 
             // Add the whereIn condition to the model
-            $model = $model->whereIn($attribute, $values, $boolean, $not);
+            if ($model instanceof ElasticModel) {
+                $model = $model->whereIn($attribute, $values);
+            } else {
+                $model = $model->whereIn($attribute, $values, $boolean, $not);
+            }
         }
 
         // Apply "where not in" clauses to the query
@@ -737,8 +743,11 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
      */
     public function __call($method, $parameters): mixed
     {
+        // Build the scope method
+        $scopeMethod = 'scope' . Str::capital($method);
+
         // Check if a scope method exists for the given method name
-        if (Reflection::methodExists($this->createModel(),  'scope' . ucfirst($method))) {
+        if (Reflection::methodExists($this->createModel(),  $scopeMethod)) {
             // If scope exists, apply it with the provided parameters
             $this->scope($method, $parameters);
 

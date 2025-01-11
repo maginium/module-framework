@@ -9,6 +9,7 @@ use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Enums\SortOrder;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Constants\Criteria;
@@ -16,7 +17,7 @@ use Maginium\Framework\Crud\Interfaces\SearchInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Enums\ComparisonOperator;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
-use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Pagination\Constants\Paginator as PaginatorConstants;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
@@ -39,7 +40,7 @@ class Search implements SearchInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -49,13 +50,6 @@ class Search implements SearchInterface
      * @var string
      */
     protected string $modelName;
-
-    /**
-     *  The class name of the Elastic model.
-     *
-     * @var class-string<Model>
-     */
-    protected string $elasticModel;
 
     /**
      * Search constructor.
@@ -73,10 +67,7 @@ class Search implements SearchInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
-
-        // Fetch the Elasticsearch model associated with the entity.
-        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -108,7 +99,7 @@ class Search implements SearchInterface
             $criteria = $this->prepareCriteria($searchTerm, $filters, $sorts, $page, $perPage);
 
             // Fetch search results from the service based on the prepared criteria
-            $searchResults = $this->elasticModel::search($searchTerm)->filter($filters)->sortBy($sorts);
+            $searchResults = $this->service->query($searchTerm)->filter($filters)->sortBy($sorts);
 
             // Using Collection to map each search result models to an array representation
             $models = collect($searchResults->all())->map(function($model) {
@@ -134,7 +125,7 @@ class Search implements SearchInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {

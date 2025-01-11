@@ -5,18 +5,16 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud;
 
 use AllowDynamicProperties;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterface;
-use Maginium\Foundation\Exceptions\CouldNotDeleteException;
-use Maginium\Foundation\Exceptions\CouldNotSaveException;
 use Maginium\Foundation\Exceptions\Exception;
-use Maginium\Foundation\Exceptions\InvalidArgumentException;
-use Maginium\Foundation\Exceptions\LocalizedException;
-use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Framework\Crud\Abstracts\AbstractService;
+use Maginium\Framework\Crud\Exceptions\EntityNotFoundException;
+use Maginium\Framework\Crud\Exceptions\RepositoryException;
 use Maginium\Framework\Crud\Interfaces\Repositories\RepositoryInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
+use Maginium\Framework\Database\Eloquent\Collection;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
 use Maginium\Framework\Support\Facades\Log;
 
 /**
@@ -26,7 +24,7 @@ use Maginium\Framework\Support\Facades\Log;
  * This class interacts with the repository layer to perform operations such as
  * retrieving, saving, deleting, and creating models.
  */
-#[AllowDynamicProperties] // Allow dynamic properties for backward compatibility
+#[AllowDynamicProperties]
 class Service extends AbstractService implements ServiceInterface
 {
     /**
@@ -37,13 +35,6 @@ class Service extends AbstractService implements ServiceInterface
     protected RepositoryInterface $repository;
 
     /**
-     * The name of the model being managed by this service.
-     *
-     * @var string
-     */
-    protected string $modelName;
-
-    /**
      * Constructor for the Service class.
      * Initializes the repository and sets up logging and model naming.
      *
@@ -52,337 +43,448 @@ class Service extends AbstractService implements ServiceInterface
     public function __construct(
         RepositoryInterface $repository,
     ) {
-        // Assign the repository instance to the class property
         $this->repository = $repository;
 
         // Set the class name for log context
         Log::setClassName(static::class);
-
-        // Dynamically determine and set the model name using the repository
-        $this->modelName = $repository->getEntityName();
     }
 
     /**
-     * Retrieve a list of order payments matching the specified search criteria.
+     * Paginate the results based on a specified number of items per page.
+     * This method returns a paginated result set, which includes metadata like total pages, current page, etc.
      *
-     * This method retrieves a list of order payments that match the criteria provided
-     * in the SearchCriteriaInterface object. It is useful for filtering and paginating
-     * results based on specific conditions.
+     * @param int|null $perPage The number of items to display per page (default: null).
+     * @param array $attributes The columns to select (default: all columns).
+     * @param string $pageName The name of the page parameter for pagination (default: 'page').
+     * @param int|null $page The current page number (optional).
      *
-     * @param SearchCriteriaInterface $searchCriteria The search criteria to filter results.
-     *
-     * @return SearchResultsInterface The search results containing the list of order payments.
+     * @return LengthAwarePaginatorInterface The paginated result set.
      */
-    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface
-    {
-        // Execute the search and return the populated search results
-        return $this->repository->getList($searchCriteria);
-    }
-
-    /**
-     * Get an model by its ID.
-     *
-     * This method attempts to load an model using its unique identifier (ID). If no
-     * model with the specified ID exists, it throws an exception. This is typically used
-     * when you need to retrieve a single model based on its unique ID.
-     *
-     * @param int $id The ID of the model to load.
-     *
-     * @throws NoSuchEntityException If the model with the given ID doesn't exist.
-     * @throws LocalizedException If a general error occurs while retrieving the model.
-     *
-     * @return ModelInterface|false The model if found, false otherwise.
-     */
-    public function get($id): ModelInterface
+    public function paginate(?int $perPage = null, array $attributes = ['*'], ?int $page = null, string $pageName = 'page'): LengthAwarePaginatorInterface
     {
         try {
-            // Attempt to load the model by its ID from the repository
-            $model = $this->repository->get($id);
-
-            // Return the successfully loaded model
-            return $model;
-        } catch (NoSuchEntityException $e) {
-            // If the model is not found, throw the exception
-            throw $e;
+            return $this->repository->paginate($perPage, $attributes, $pageName, $page);
         } catch (Exception $e) {
-            // For other errors, throw a localized exception
-            throw LocalizedException::make(__('Could not save the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Get an model by a specific identifier.
+     * Find an entity by its ID.
      *
-     * This method allows retrieval of an model using a custom identifier field, such
-     * as 'email', 'sku', or any other identifier. If an model with the provided
-     * identifier value is found, it returns the model; otherwise, it returns false.
+     * This method prepares and executes a query to find an entity by its ID,
+     * using the specified attributes for selection.
      *
-     * @param mixed $value The value of the identifier to search for.
-     * @param string $identifier The name of the identifier field (e.g., 'email', 'sku').
+     * @param mixed $id The ID of the entity to find.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @throws NoSuchEntityException If the model with the given identifier doesn't exist.
-     * @throws LocalizedException If a general error occurs while retrieving the model.
-     *
-     * @return ModelInterface The model if found, false otherwise.
+     * @return ModelInterface The found entity or null if not found.
      */
-    public function getBy($value, string $identifier = self::DEFAULT_IDENTIFIER): ModelInterface
+    public function find(int|string|array $id, array $attributes = ['*']): ModelInterface
     {
         try {
-            // Filter the collection by the provided identifier field and value
-            $model = $this->repository->where($identifier, $value); // Retrieve the first item that matches
-
-            // Return the found model
-            return $model;
-        } catch (NoSuchEntityException $e) {
-            // If no model is found, throw the exception
-            throw $e;
+            return $this->repository->find($id, $attributes = ['*']);
         } catch (Exception $e) {
-            // For other errors, throw a localized exception
-            throw LocalizedException::make(__('Could not save the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Retrieve an model by its ID.
+     * Find an entity by its ID or fail.
      *
-     * This method loads an model using its unique ID. If no model is found, it returns false.
+     * This method finds an entity by ID or throws an exception if the entity
+     * cannot be found. It can handle arrays of IDs and check for missing entities.
      *
-     * @param int $id The ID of the model to load.
+     * @param mixed $id The ID(s) of the entity to find. This can be a single ID or an array of IDs.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @return ModelInterface|false The model if found, false otherwise.
+     * @throws EntityNotFoundException If the entity cannot be found.
+     *
+     * @return ModelInterface|ModelInterface[] The found entity or array of entities.
      */
-    public function getById(int $id): ModelInterface|false
+    public function findOrFail(int|string|array $id, array $attributes = ['*']): ModelInterface|array
     {
         try {
-            // Filter the collection by the provided identifier field and value
-            $model = $this->repository->find($id); // Retrieve the first item that matches
-
-            // Return the found model
-            return $model;
-        } catch (NoSuchEntityException $e) {
-            // If no model is found, throw the exception
-            throw $e;
+            return $this->repository->findOrFail($id, $attributes);
         } catch (Exception $e) {
-            // For other errors, throw a localized exception
-            throw LocalizedException::make(__('Could not save the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Save a new model to the database.
+     * Find an entity by its ID or create a new instance if not found.
      *
-     * This method creates a new model instance using the repository's factory,
-     * sets the provided data, and saves the model to the database.
+     * This method attempts to find an entity by ID. If it doesn't exist,
+     * it creates and returns a new instance of the model.
      *
-     * @param array $data The data to populate the new model.
+     * @param mixed $id The ID of the entity to find.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @throws CouldNotSaveException If the save operation fails.
-     *
-     * @return ModelInterface The saved model.
+     * @return ModelInterface The found entity or a new instance of the model.
      */
-    public function save(array $data): ModelInterface
+    public function findOrNew(int|string $id, array $attributes = ['*']): ModelInterface
     {
         try {
-            // Create a new model instance using the repository's factory
-            $model = $this->repository->factory();
-
-            // Set the data on the model instance
-            $model->setData($data);
-
-            // Save the model using the repository and return the result
-            return $this->repository->save($model);
-        } catch (CouldNotSaveException $e) {
-            // If saving fails, rethrow the exception
-            throw $e;
+            return $this->repository->findOrNew($id, $attributes);
         } catch (Exception $e) {
-            // Catch any other exceptions and throw a specific save exception
-            throw CouldNotSaveException::make(__('Could not save the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Update an existing model in the database.
+     * Find the first entity based on the provided attributes.
+     * This method returns the first entity without any specific condition.
      *
-     * This method loads an existing model instance using the provided ID,
-     * sets the provided data, and updates the model in the database.
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param int $id The ID of the model to update.
-     * @param array $data The data to update the model with.
-     *
-     * @throws CouldNotSaveException If the update operation fails.
-     * @throws NoSuchEntityException If the model with the given ID does not exist.
-     *
-     * @return ModelInterface The updated model.
+     * @return ModelInterface|null The first found entity, or null if no entities exist.
      */
-    public function update($id, array $data): ModelInterface
+    public function findFirst(array $attributes = ['*']): ?ModelInterface
     {
         try {
-            // Load the existing model instance by ID
-            $model = $this->repository->find($id);
-
-            // Ensure the model exists
-            if (! $model || ! $model->getId()) {
-                throw NoSuchEntityException::make(__('Entity with ID %1 does not exist.', $id));
-            }
-
-            // Set the new data on the model instance
-            $model->setData($data);
-
-            // Save the updated model using the repository and return the result
-            return $this->repository->save($model);
-        } catch (NoSuchEntityException $e) {
-            // If the model is not found, rethrow the exception
-            throw $e;
-        } catch (CouldNotSaveException $e) {
-            // If the update fails, rethrow the exception
-            throw $e;
+            return $this->repository->findFirst($attributes);
         } catch (Exception $e) {
-            // Catch any other exceptions and throw a specific update exception
-            throw CouldNotSaveException::make(__('Could not update the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Upsert (insert or update) an model in the database.
+     * Find entities that match a specific condition (e.g., where, operator, value).
+     * This method allows you to find entities based on a custom condition.
      *
-     * This method attempts to insert a new model if it does not exist or update the
-     * existing model if it already exists. It checks for an existing model based on
-     * the provided unique keys and performs an insert or update operation accordingly.
+     * @param array $where The condition to apply (e.g., ['attribute', '=', 'value']).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param array $data The data to populate the new model or update the existing one.
-     * @param array $uniqueBy The unique fields to check if the model already exists.
-     * @param array $update The data to update the model with if it already exists.
-     *
-     * @throws CouldNotSaveException If the upsert operation fails.
-     *
-     * @return ModelInterface The result of the upsert operation.
+     * @return Collection The collection of matching entities.
      */
-    public function upsert(array $data, array $uniqueBy, array $update): ModelInterface
+    public function findWhere(array $where, array $attributes = ['*']): Collection
     {
         try {
-            // Validate the input to ensure that the data, uniqueBy, and update arrays are not empty
-            if (empty($data)) {
-                throw InvalidArgumentException::make(__('Data array cannot be empty.'));
-            }
-
-            // Ensure that the uniqueBy array is not empty, as it's essential for identifying unique records
-            if (empty($uniqueBy)) {
-                throw InvalidArgumentException::make(__('Unique by columns cannot be empty.'));
-            }
-
-            // Ensure that the update array is not empty, as it will be used to update the model if it exists
-            if (empty($update)) {
-                throw InvalidArgumentException::make(__('Update columns cannot be empty.'));
-            }
-
-            // Attempt to find an existing model based on the unique fields provided in $uniqueBy
-            $existingEntity = $this->repository->getByUniqueFields($uniqueBy);
-
-            if ($existingEntity) {
-                // If an existing model is found, set the new data to the model (update it)
-                $existingEntity->setData($update);
-
-                // Save the updated model back to the repository (database)
-                $this->repository->save($existingEntity);
-
-                // Return the updated model (model) after saving
-                return $existingEntity;
-            }
-
-            // If no existing model is found, create a new model using the provided $data
-            $model = $this->repository->factory();
-
-            // Set the data on the newly created model
-            $model->setData($data);
-
-            // Save the new model to the repository (database)
-            $this->repository->save($model);
-
-            // Return the newly inserted model (model)
-            return $model;
-        } catch (CouldNotSaveException $e) {
-            // If the upsert operation fails due to a save error, rethrow the exception for further handling
-            throw $e;
+            return $this->repository->findWhere($where, $attributes);
         } catch (Exception $e) {
-            // Catch any other exceptions and throw a CouldNotSaveException with a relevant message
-            throw CouldNotSaveException::make(__('Could not upsert the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Delete an model from the database.
+     * Find entities where a specific attribute is within a given list of values.
+     * This method allows you to find entities that match any value in a list.
      *
-     * This method deletes the provided model from the database using the model repository.
-     * If the delete operation fails, an exception is thrown. It is useful for removing
-     * models from the database when they are no longer needed.
+     * @param array $where The condition with attribute and values (e.g., ['attribute', ['value1', 'value2']]).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param ModelInterface $model The model to be deleted.
-     *
-     * @throws Exception If the delete operation fails.
-     *
-     * @return ModelInterface The result of the delete operation.
+     * @return Collection The collection of matching entities.
      */
-    public function delete(ModelInterface $model): ModelInterface
+    public function findWhereIn(array $where, array $attributes = ['*']): Collection
     {
         try {
-            // Retrieve the model before deletion to ensure it exists
-            $beforeDelete = $this->get($model);
-
-            // Attempt to delete the model from the database
-            $this->repository->delete($model);
-
-            // Return the model that was deleted
-            return $beforeDelete;
-        } catch (CouldNotDeleteException $e) {
-            // If the delete operation fails, rethrow the exception
-            throw $e;
+            return $this->repository->findWhereIn($where, $attributes);
         } catch (Exception $e) {
-            // Catch general exceptions and throw a delete-specific exception
-            throw Exception::make(__('Could not delete the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Delete an model by its ID.
+     * Find entities where a specific attribute is not in a given list of values.
+     * This method allows you to find entities that don't match any value in a list.
      *
-     * This method retrieves an model by its ID and deletes it. If the model does not
-     * exist, a NotFoundException is thrown. It is useful when you need to delete an
-     * model by its unique identifier.
+     * @param array $where The condition with attribute and values (e.g., ['attribute', ['value1', 'value2']]).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param int $id The ID of the model to be deleted.
-     *
-     * @throws NotFoundException If the model with the provided ID is not found.
-     * @throws Exception If the delete operation fails.
-     *
-     * @return ModelInterface The result of the delete operation.
+     * @return Collection The collection of matching entities.
      */
-    public function deleteById(int $id): ModelInterface
+    public function findWhereNotIn(array $where, array $attributes = ['*']): Collection
     {
         try {
-            // Retrieve the model to ensure it exists before deletion
-            $beforeDelete = $this->getBy($id);
-
-            // Delete the model by its ID
-            $this->deleteById($id);
-
-            // Return the model that was deleted
-            return $beforeDelete;
-        } catch (NoSuchEntityException $e) {
-            // If the model is not found, throw the exception
-            throw $e;
+            return $this->repository->findWhereNotIn($where, $attributes);
         } catch (Exception $e) {
-            // Log the error if an exception occurs during deletion
-            Log::error('Error deleting model by ID: ' . $e->getMessage());
-
-            // Throw a general exception with a localized message
-            throw Exception::make(__('Could not delete the model.'));
+            throw $e;
         }
     }
 
     /**
-     * Get the repository instance.
+     * Find an entity by a specific attribute and value.
+     * This method returns the first matching result based on the given attribute and value.
      *
-     * @return RepositoryInterface The repository instance.
+     * @param string $attribute The attribute to search by.
+     * @param mixed $value The value to search for.
+     * @param array $attributes The columns to select (default: all columns).
+     *
+     * @return ModelInterface|null The found entity, or null if not found.
+     */
+    public function findBy(string $attribute, string|int|float|bool|null $value, array $attributes = ['*']): ?ModelInterface
+    {
+        try {
+            return $this->repository->findBy($attribute, $value, $attributes);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Counts the number of records in the database.
+     *
+     * This method performs a `count` query on the database, returning the total number of records that match the criteria.
+     * The method can count any column, with the default being `*` (all columns).
+     *
+     * @param string $columns The column to count. Defaults to '*' for counting all rows.
+     *
+     * @return int The number of records found.
+     */
+    public function count(string $columns = '*'): int
+    {
+        try {
+            return $this->repository->count($columns);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Retrieves the sum of a given column.
+     *
+     * This method performs a query to calculate the sum of values in a specific column.
+     *
+     * @param string $column The column to sum.
+     *
+     * @return float The sum of values in the column.
+     */
+    public function sum(string $column): float
+    {
+        try {
+            return $this->repository->sum($column);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Retrieves the maximum value of a given column.
+     *
+     * This method performs a query to get the maximum value of a specific column.
+     *
+     * @param string $column The column to retrieve the maximum value from.
+     *
+     * @return ModelInterface The maximum value of the column.
+     */
+    public function max(string $column): mixed
+    {
+        try {
+            return $this->repository->max($column);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Retrieves the minimum value of a given column.
+     *
+     * This method performs a query to get the minimum value of a specific column.
+     *
+     * @param string $column The column to retrieve the minimum value from.
+     *
+     * @return ModelInterface The minimum value of the column.
+     */
+    public function min(string $column): mixed
+    {
+        try {
+            return $this->repository->min($column);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Create a new entity instance and save it to the database.
+     *
+     * This method handles creating a new entity, dispatching events,
+     * syncing relationships, and saving the entity to the database.
+     *
+     * @param array $attributes Attributes for the new entity.
+     * @param bool $syncRelations Whether to sync the relationships with the entity.
+     *
+     * @return ModelInterface The created entity or false if the save operation failed.
+     */
+    public function create(array $attributes = [], bool $syncRelations = false): ModelInterface
+    {
+        try {
+            return $this->repository->create($attributes, $syncRelations);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Update an existing entity in the database.
+     *
+     * This method finds an existing entity by ID, fills it with new attributes,
+     * checks for changes, dispatches events, and updates the entity in the database.
+     *
+     * @param mixed $id The ID of the entity to update.
+     * @param array $attributes Attributes to update the entity with.
+     * @param bool $syncRelations Whether to sync the relationships with the entity.
+     *
+     * @return ModelInterface The updated entity or false if the update failed.
+     */
+    public function update(int|string $id, array $attributes = [], bool $syncRelations = false): ModelInterface
+    {
+        try {
+            return $this->repository->update($id, $attributes, $syncRelations);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Deletes the entity by its ID.
+     *
+     * This method will attempt to find the entity either by its ID or if the provided argument is already an instance of a model.
+     * Once the entity is found, the `deleting` event is fired, and the entity is deleted from the database.
+     * After deletion, the `deleted` event is triggered. The method returns the deleted entity or false if the deletion failed.
+     *
+     * @param mixed $id The ID or instance of the entity to be deleted.
+     *
+     * @return ModelInterface The deleted entity or false if the deletion failed.
+     */
+    public function delete(int|string|ModelInterface $id): ModelInterface
+    {
+        try {
+            return $this->repository->delete($id);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Create a new model instance.
+     *
+     * This method ensures that the correct model class is created, handles
+     * dependency injection for the model, and sets the connection if provided.
+     *
+     * @throws RepositoryException If the model class does not exist or is invalid.
+     *
+     * @return ModelInterface A new instance of the model.
+     */
+    public function createModel(): ModelInterface
+    {
+        try {
+            return $this->repository->createModel();
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Find all entities, retrieving all records from the database.
+     * This method returns all matching entities, typically used when no filters are applied.
+     *
+     * @param array $attributes The columns to select (default: all columns).
+     *
+     * @return Collection The collection of found entities.
+     */
+    public function findAll(array $attributes = ['*']): Collection
+    {
+        try {
+            return $this->repository->findAll($attributes);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Simplified pagination with fewer features, ideal for smaller datasets.
+     * This method provides a simpler paginated result, suitable for when you don't need full pagination features.
+     *
+     * @param int|null $perPage The number of items to display per page (default: null).
+     * @param array $attributes The columns to select (default: all columns).
+     * @param string $pageName The name of the page parameter for pagination (default: 'page').
+     * @param int|null $page The current page number (optional).
+     *
+     * @return PaginatorInterface The simpler paginated result set.
+     */
+    public function simplePaginate(
+        ?int $perPage = null,
+        array $attributes = ['*'],
+        string $pageName = 'page',
+        ?int $page = null,
+    ): PaginatorInterface {
+        try {
+            return $this->repository->simplePaginate($perPage, $attributes, $pageName, $page);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Find entities that have a related model matching specific conditions.
+     * This method allows you to find entities with a relation that matches the given condition.
+     *
+     * @param array $where The condition to apply (e.g., ['relation', callback, operator, count]).
+     * @param array $attributes The columns to select (default: all columns).
+     *
+     * @return Collection The collection of matching entities.
+     */
+    public function findWhereHas(array $where, array $attributes = ['*']): Collection
+    {
+        try {
+            return $this->repository->findWhereHas($where, $attributes = ['*']);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Restores the deleted entity by its ID.
+     *
+     * This method attempts to restore a previously soft-deleted entity. If the entity is found, the `restoring` event is fired,
+     * followed by the restoration of the entity. After restoring, the `restored` event is triggered.
+     * The method returns the restored entity or false if the restoration failed.
+     *
+     * @param mixed $id The ID or instance of the entity to be restored.
+     *
+     * @return ModelInterface The restored entity or false if the restoration failed.
+     */
+    public function restore(int|string|ModelInterface $id): ModelInterface
+    {
+        try {
+            return $this->repository->restore($id);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Retrieves the average value of a given column.
+     *
+     * This method performs a query to get the average value of a specific column.
+     *
+     * @param string $column The column to calculate the average value from.
+     *
+     * @return float The average value of the column.
+     */
+    public function avg(string $column): float
+    {
+        try {
+            return $this->repository->avg($column);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * Get the model name from a given class, lowercased.
+     *
+     * @return string The lowercased base class name.
+     */
+    public function getEntityName(): string
+    {
+        return $this->repository->getEntityName();
+    }
+
+    /**
+     * Retrieve the repository associated with the current model.
+     *
+     * @return RepositoryInterface The repository instance associated with the model.
      */
     public function getRepository(): RepositoryInterface
     {

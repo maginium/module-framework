@@ -8,12 +8,14 @@ use AllowDynamicProperties;
 use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\GetByIdInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Validator;
 
@@ -35,7 +37,7 @@ class GetById implements GetByIdInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -45,13 +47,6 @@ class GetById implements GetByIdInterface
      * @var string
      */
     protected string $modelName;
-
-    /**
-     *  The class name of the Elastic model.
-     *
-     * @var class-string<Model>
-     */
-    protected string $elasticModel;
 
     /**
      * GetById constructor.
@@ -69,10 +64,7 @@ class GetById implements GetByIdInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
-
-        // Fetch the Elasticsearch model associated with the entity.
-        $this->elasticModel = $service->getRepository()->factory()->getElasticModel();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -89,7 +81,8 @@ class GetById implements GetByIdInterface
     {
         try {
             // Use the service to get the model by its unique ID
-            $model = $this->elasticModel::find($id);
+            /** @var Model $model */
+            $model = $this->service->find($id);
 
             // Check if the model does not exist (empty result)
             if (Validator::isEmpty($model)) {
@@ -101,7 +94,7 @@ class GetById implements GetByIdInterface
                 );
             }
 
-            // Filter the columns from the deleted model's data
+            // Filter the columns from the model's data
             $filteredEntityData = $model->only($this->getColumns());
 
             // Prepare the response with the payload, status code, success message, and meta information
@@ -112,7 +105,7 @@ class GetById implements GetByIdInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {

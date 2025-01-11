@@ -6,12 +6,40 @@ namespace Maginium\Framework\Crud\Interfaces\Repositories;
 
 use Closure;
 use Maginium\Foundation\Exceptions\Exception;
-use Maginium\Framework\Crud\Abstracts\AbstractRepository;
+use Maginium\Framework\Database\Eloquent\Collection;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
 
 /**
  * Interface RepositoryInterface
  * Defines a contract for CRUD operations and repository configurations.
+ *
+ * @method LengthAwarePaginatorInterface paginate(?int $perPage = null, array $attributes = ['*'], string $pageName = 'page', ?int $page = null) Paginate the results based on the specified number of items per page.
+ * @method ModelInterface find(int|string|array $id, array $attributes = ['*']) Find an entity by its ID.
+ * @method ModelInterface|array findOrFail(int|string|array $id, array $attributes = ['*']) Find an entity by its ID or fail.
+ * @method ModelInterface findOrNew(int|string $id, array $attributes = ['*']) Find an entity by its ID or create a new instance if not found.
+ * @method ?ModelInterface findFirst(array $attributes = ['*']) Find the first entity based on the provided attributes.
+ * @method Collection findWhere(array $where, array $attributes = ['*']) Find entities that match a specific condition.
+ * @method Collection findWhereIn(array $where, array $attributes = ['*']) Find entities where a specific attribute is within a given list of values.
+ * @method Collection findWhereNotIn(array $where, array $attributes = ['*']) Find entities where a specific attribute is not in a given list of values.
+ * @method ?ModelInterface findBy(string $attribute, string|int|float|bool|null $value, array $attributes = ['*']) Find an entity by a specific attribute and value.
+ * @method int count(string $columns = '*') Count the number of records in the database.
+ * @method float sum(string $column) Retrieve the sum of a given column.
+ * @method mixed max(string $column) Retrieve the maximum value of a given column.
+ * @method mixed min(string $column) Retrieve the minimum value of a given column.
+ * @method ModelInterface create(array $attributes = [], bool $syncRelations = false) Create a new entity instance and save it to the database.
+ * @method ModelInterface update(int|string $id, array $attributes = [], bool $syncRelations = false) Update an existing entity in the database.
+ * @method ModelInterface delete(int|string|ModelInterface $id) Delete the entity by its ID.
+ * @method ModelInterface createModel() Create a new model instance.
+ * @method Collection findAll(array $attributes = ['*']) Find all entities, retrieving all records from the database.
+ * @method PaginatorInterface simplePaginate(?int $perPage = null, array $attributes = ['*'], string $pageName = 'page', ?int $page = null) Simplified pagination with fewer features.
+ * @method Collection findWhereHas(array $where, array $attributes = ['*']) Find entities that have a related model matching specific conditions.
+ * @method ModelInterface restore(int|string|ModelInterface $id) Restore the deleted entity by its ID.
+ * @method void beginTransaction() Begin a database transaction.
+ * @method void commit() Commit the current database transaction.
+ * @method void rollBack() Roll back the current database transaction.
+ * @method float avg(string $column) Retrieve the average value of a given column.
  */
 interface RepositoryInterface
 {
@@ -26,7 +54,7 @@ interface RepositoryInterface
      *
      * @return static The current instance of the repository to allow for method chaining.
      */
-    public function scope($name, array $parameters = []): static;
+    public function scope(string $name, array $parameters = []): static;
 
     /**
      * Store or update the repository data.
@@ -54,7 +82,7 @@ interface RepositoryInterface
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function where($attribute, $operator = null, $value = null, $boolean = 'and');
+    public function where(string $attribute, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static;
 
     /**
      * Add a "where in" condition to the query.
@@ -69,7 +97,7 @@ interface RepositoryInterface
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function whereIn($attribute, $values, $boolean = 'and', $not = false);
+    public function whereIn(string $attribute, array $values, string $boolean = 'and', bool $not = false): static;
 
     /**
      * Add a "where not in" condition to the query.
@@ -83,7 +111,16 @@ interface RepositoryInterface
      *
      * @return static The current instance of the repository for method chaining.
      */
-    public function whereNotIn($attribute, $values, $boolean = 'and');
+    public function whereNotIn(string $attribute, array $values, string $boolean = 'and'): static;
+
+    /**
+     * Get the repository model.
+     *
+     * This method retrieves the model class associated with the repository.
+     *
+     * @return ModelInterface The model class.
+     */
+    public function getModel(): ModelInterface;
 
     /**
      * Set the connection name for the repository.
@@ -127,15 +164,6 @@ interface RepositoryInterface
     public function getRepositoryId(): string;
 
     /**
-     * Get the repository model.
-     *
-     * This method retrieves the model class associated with the repository.
-     *
-     * @return ModelInterface The model class.
-     */
-    public function getModel(): ModelInterface;
-
-    /**
      * Set relationships to be eager-loaded.
      *
      * This method allows you to specify which relationships should be eager-loaded when querying the repository.
@@ -144,7 +172,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function with($relations);
+    public function with(string|array $relations): static;
 
     /**
      * Add a "where has" condition to the query.
@@ -160,7 +188,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function whereHas($relation, ?Closure $callback = null, $operator = '>=', $count = 1): static;
+    public function whereHas(string $relation, ?Closure $callback = null, string $operator = '>=', int $count = 1): static;
 
     /**
      * Set the offset for the query result.
@@ -171,7 +199,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function offset($offset): static;
+    public function offset(int $offset): static;
 
     /**
      * Set the limit for the query result.
@@ -182,7 +210,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function limit($limit): static;
+    public function limit(int $limit): static;
 
     /**
      * Add an "order by" condition to the query.
@@ -194,7 +222,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function orderBy($attribute, $direction = 'asc'): static;
+    public function orderBy(string $attribute, string $direction = 'asc'): static;
 
     /**
      * Add a "group by" condition to the query.
@@ -205,7 +233,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function groupBy($column);
+    public function groupBy(string|array $column): static;
 
     /**
      * Add a "having" condition to the query.
@@ -219,7 +247,7 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function having($column, $operator = null, $value = null, $boolean = 'and'): static;
+    public function having(string $column, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static;
 
     /**
      * Add an "or having" condition to the query.
@@ -233,12 +261,10 @@ interface RepositoryInterface
      *
      * @return static The current instance for method chaining.
      */
-    public function orHaving($column, $operator = null, $value = null, $boolean = 'and'): AbstractRepository;
+    public function orHaving(string $column, ?string $operator = null, mixed $value = null, string $boolean = 'and'): static;
 
     /**
      * Get the model name from a given class, lowercased.
-     *
-     * @param string $class The class name.
      *
      * @return string The lowercased base class name.
      */

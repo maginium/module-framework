@@ -4,168 +4,275 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Crud\Interfaces\Services;
 
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\Api\SearchResultsInterface;
-use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Crud\Exceptions\EntityNotFoundException;
+use Maginium\Framework\Crud\Exceptions\RepositoryException;
 use Maginium\Framework\Crud\Interfaces\Repositories\RepositoryInterface;
+use Maginium\Framework\Database\Eloquent\Collection;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Pagination\Interfaces\LengthAwarePaginatorInterface;
+use Maginium\Framework\Pagination\Interfaces\PaginatorInterface;
 
 /**
  * Interface ServiceInterface.
  *
- * Defines the contract for service classes that handle model operations.
+ * This interface defines the core contract for CRUD service classes,
+ * providing methods for managing entities, performing database operations,
+ * and handling pagination. Implementations of this interface ensure
+ * standardization across service layers within the application.
  */
 interface ServiceInterface
 {
     /**
-     * Default identifier field name.
+     * Paginate the results based on a specified number of items per page.
+     * This method returns a paginated result set, which includes metadata like total pages, current page, etc.
      *
-     * This constant holds the default identifier field name, which is used in methods where the
-     * identifier is not explicitly provided. The default is typically 'id'.
+     * @param int|null $perPage The number of items to display per page (default: null).
+     * @param array $attributes The columns to select (default: all columns).
+     * @param int|null $page The current page number (optional).
+     * @param string $pageName The name of the page parameter for pagination (default: 'page').
      *
-     * @var string
+     * @return LengthAwarePaginatorInterface The paginated result set.
      */
-    public const DEFAULT_IDENTIFIER = 'id';
+    public function paginate(?int $perPage = null, array $attributes = ['*'], ?int $page = null, string $pageName = 'page'): LengthAwarePaginatorInterface;
 
     /**
-     * Retrieve a list of order payments matching the specified search criteria.
+     * Find an entity by its ID.
      *
-     * This method retrieves a list of order payments that match the criteria provided
-     * in the SearchCriteriaInterface object. It is useful for filtering and paginating
-     * results based on specific conditions.
+     * @param int|string $id The ID of the entity to find.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @param SearchCriteriaInterface $searchCriteria The search criteria to filter results.
-     *
-     * @return SearchResultsInterface The search results containing the list of order payments.
+     * @return ModelInterface The found entity or null if not found.
      */
-    public function getList(SearchCriteriaInterface $searchCriteria): SearchResultsInterface;
+    public function find(int|string $id, array $attributes = ['*']): ModelInterface;
 
     /**
-     * Get an model by its ID.
+     * Find an entity by its ID or fail.
      *
-     * This method attempts to load an model using its unique identifier (ID). If no
-     * model with the specified ID exists, it throws an exception. This is typically used
-     * when you need to retrieve a single model based on its unique ID.
+     * @param int|string|array $id The ID(s) of the entity to find. This can be a single ID or an array of IDs.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @param int $id The ID of the model to load.
+     * @throws EntityNotFoundException If the entity cannot be found.
      *
-     * @throws NoSuchEntityException If the model with the given ID doesn't exist.
-     * @throws LocalizedException If a general error occurs while retrieving the model.
-     *
-     * @return ModelInterface|false The model if found, false otherwise.
+     * @return ModelInterface|ModelInterface[] The found entity or array of entities.
      */
-    public function get($id): ModelInterface;
+    public function findOrFail(int|string|array $id, array $attributes = ['*']): ModelInterface|array;
 
     /**
-     * Get an model by a specific identifier.
+     * Find an entity by its ID or create a new instance if not found.
      *
-     * This method allows retrieval of an model using a custom identifier field, such
-     * as 'email', 'sku', or any other identifier. If an model with the provided
-     * identifier value is found, it returns the model; otherwise, it returns false.
+     * @param int|string $id The ID of the entity to find.
+     * @param array $attributes The attributes to retrieve.
      *
-     * @param mixed $value The value of the identifier to search for.
-     * @param string $identifier The name of the identifier field (e.g., 'email', 'sku').
-     *
-     * @throws NoSuchEntityException If the model with the given identifier doesn't exist.
-     * @throws LocalizedException If a general error occurs while retrieving the model.
-     *
-     * @return ModelInterface The model if found, false otherwise.
+     * @return ModelInterface The found entity or a new instance of the model.
      */
-    public function getBy($value, string $identifier = self::DEFAULT_IDENTIFIER): ModelInterface;
+    public function findOrNew(int|string $id, array $attributes = ['*']): ModelInterface;
 
     /**
-     * Retrieve an model by its ID.
+     * Find the first entity based on the provided attributes.
      *
-     * This method loads an model using its unique ID. If no model is found, it returns false.
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param int $id The ID of the model to load.
-     *
-     * @return ModelInterface|false The model if found, false otherwise.
+     * @return ModelInterface|null The first found entity, or null if no entities exist.
      */
-    public function getById(int $id): ModelInterface|false;
+    public function findFirst(array $attributes = ['*']): ?ModelInterface;
 
     /**
-     * Save a new model to the database.
+     * Find entities that match a specific condition.
      *
-     * This method creates a new model instance using the repository's factory,
-     * sets the provided data, and saves the model to the database.
+     * @param array $where The condition to apply (e.g., ['attribute', '=', 'value']).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param array $data The data to populate the new model.
-     *
-     * @throws CouldNotSaveException If the save operation fails.
-     *
-     * @return ModelInterface The saved model.
+     * @return Collection The collection of matching entities.
      */
-    public function save(array $data): ModelInterface;
+    public function findWhere(array $where, array $attributes = ['*']): Collection;
 
     /**
-     * Update an existing model in the database.
+     * Find entities where a specific attribute is within a given list of values.
      *
-     * This method loads an existing model instance using the provided ID,
-     * sets the provided data, and updates the model in the database.
+     * @param array $where The condition with attribute and values (e.g., ['attribute', ['value1', 'value2']]).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param int $id The ID of the model to update.
-     * @param array $data The data to update the model with.
-     *
-     * @throws CouldNotSaveException If the update operation fails.
-     * @throws NoSuchEntityException If the model with the given ID does not exist.
-     *
-     * @return ModelInterface The updated model.
+     * @return Collection The collection of matching entities.
      */
-    public function update($id, array $data): ModelInterface;
+    public function findWhereIn(array $where, array $attributes = ['*']): Collection;
 
     /**
-     * Upsert (insert or update) an model in the database.
+     * Find entities where a specific attribute is not in a given list of values.
      *
-     * This method attempts to insert a new model if it does not exist or update the
-     * existing model if it already exists. It checks for an existing model based on
-     * the provided unique keys and performs an insert or update operation accordingly.
+     * @param array $where The condition with attribute and values (e.g., ['attribute', ['value1', 'value2']]).
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param array $data The data to populate the new model or update the existing one.
-     * @param array $uniqueBy The unique fields to check if the model already exists.
-     * @param array $update The data to update the model with if it already exists.
-     *
-     * @throws CouldNotSaveException If the upsert operation fails.
-     *
-     * @return ModelInterface The result of the upsert operation.
+     * @return Collection The collection of matching entities.
      */
-    public function upsert(array $data, array $uniqueBy, array $update): ModelInterface;
+    public function findWhereNotIn(array $where, array $attributes = ['*']): Collection;
 
     /**
-     * Delete an model from the database.
+     * Find an entity by a specific attribute and value.
      *
-     * This method deletes the provided model from the database using the model repository.
-     * If the delete operation fails, an exception is thrown. It is useful for removing
-     * models from the database when they are no longer needed.
+     * @param string $attribute The attribute to search by.
+     * @param string|int|float|bool|null $value The value to search for.
+     * @param array $attributes The columns to select (default: all columns).
      *
-     * @param ModelInterface $model The model to be deleted.
-     *
-     * @throws Exception If the delete operation fails.
-     *
-     * @return ModelInterface The result of the delete operation.
+     * @return ModelInterface|null The found entity, or null if not found.
      */
-    public function delete(ModelInterface $model): ModelInterface;
+    public function findBy(string $attribute, string|int|float|bool|null $value, array $attributes = ['*']): ?ModelInterface;
 
     /**
-     * Delete an model by its ID.
+     * Counts the number of records in the database.
      *
-     * This method retrieves an model by its ID and deletes it. If the model does not
-     * exist, a NotFoundException is thrown. It is useful when you need to delete an
-     * model by its unique identifier.
+     * @param string $columns The column to count. Defaults to '*' for counting all rows.
      *
-     * @param int $id The ID of the model to be deleted.
-     *
-     * @throws NotFoundException If the model with the provided ID is not found.
-     * @throws Exception If the delete operation fails.
-     *
-     * @return ModelInterface The result of the delete operation.
+     * @return int The number of records found.
      */
-    public function deleteById(int $id): ModelInterface;
+    public function count(string $columns = '*'): int;
 
     /**
-     * Get the repository instance.
+     * Retrieves the sum of a given column.
      *
-     * @return RepositoryInterface The repository instance.
+     * @param string $column The column to sum.
+     *
+     * @return float The sum of values in the column.
+     */
+    public function sum(string $column): float;
+
+    /**
+     * Retrieves the maximum value of a given column.
+     *
+     * @param string $column The column to retrieve the maximum value from.
+     *
+     * @return mixed The maximum value of the column.
+     */
+    public function max(string $column): mixed;
+
+    /**
+     * Retrieves the minimum value of a given column.
+     *
+     * @param string $column The column to retrieve the minimum value from.
+     *
+     * @return mixed The minimum value of the column.
+     */
+    public function min(string $column): mixed;
+
+    /**
+     * Create a new entity instance and save it to the database.
+     *
+     * @param array $attributes Attributes for the new entity.
+     * @param bool $syncRelations Whether to sync the relationships with the entity.
+     *
+     * @return ModelInterface The created entity.
+     */
+    public function create(array $attributes = [], bool $syncRelations = false): ModelInterface;
+
+    /**
+     * Update an existing entity in the database.
+     *
+     * @param int|string $id The ID of the entity to update.
+     * @param array $attributes Attributes to update the entity with.
+     * @param bool $syncRelations Whether to sync the relationships with the entity.
+     *
+     * @return ModelInterface The updated entity.
+     */
+    public function update(int|string $id, array $attributes = [], bool $syncRelations = false): ModelInterface;
+
+    /**
+     * Deletes the entity by its ID.
+     *
+     * This method will attempt to find the entity either by its ID or if the provided argument is already an instance of a model.
+     * Once the entity is found, the `deleting` event is fired, and the entity is deleted from the database.
+     * After deletion, the `deleted` event is triggered. The method returns the deleted entity or false if the deletion failed.
+     *
+     * @param int|string|ModelInterface $id The ID (int|string) or instance of the entity to be deleted.
+     *
+     * @return ModelInterface The deleted entity or false if the deletion failed.
+     */
+    public function delete(int|string|ModelInterface $id): ModelInterface;
+
+    /**
+     * Create a new model instance.
+     *
+     * This method ensures that the correct model class is created, handles
+     * dependency injection for the model, and sets the connection if provided.
+     *
+     * @throws RepositoryException If the model class does not exist or is invalid.
+     *
+     * @return ModelInterface A new instance of the model.
+     */
+    public function createModel(): ModelInterface;
+
+    /**
+     * Find all entities, retrieving all records from the database.
+     * This method returns all matching entities, typically used when no filters are applied.
+     *
+     * @param array<string> $attributes The columns to select (default: all columns).
+     *
+     * @return Collection The collection of found entities.
+     */
+    public function findAll(array $attributes = ['*']): Collection;
+
+    /**
+     * Simplified pagination with fewer features, ideal for smaller datasets.
+     * This method provides a simpler paginated result, suitable for when you don't need full pagination features.
+     *
+     * @param int|null $perPage The number of items to display per page (default: null).
+     * @param array<string> $attributes The columns to select (default: all columns).
+     * @param string $pageName The name of the page parameter for pagination (default: 'page').
+     * @param int|null $page The current page number (optional).
+     *
+     * @return PaginatorInterface The simpler paginated result set.
+     */
+    public function simplePaginate(
+        ?int $perPage = null,
+        array $attributes = ['*'],
+        string $pageName = 'page',
+        ?int $page = null,
+    ): PaginatorInterface;
+
+    /**
+     * Find entities that have a related model matching specific conditions.
+     * This method allows you to find entities with a relation that matches the given condition.
+     *
+     * @param array<string, mixed> $where The condition to apply (e.g., ['relation', callback, operator, count]).
+     * @param array<string> $attributes The columns to select (default: all columns).
+     *
+     * @return Collection The collection of matching entities.
+     */
+    public function findWhereHas(array $where, array $attributes = ['*']): Collection;
+
+    /**
+     * Restores the deleted entity by its ID.
+     *
+     * This method attempts to restore a previously soft-deleted entity. If the entity is found, the `restoring` event is fired,
+     * followed by the restoration of the entity. After restoring, the `restored` event is triggered.
+     * The method returns the restored entity or false if the restoration failed.
+     *
+     * @param int|string|ModelInterface $id The ID (int|string) or instance of the entity to be restored.
+     *
+     * @return ModelInterface The restored entity or false if the restoration failed.
+     */
+    public function restore(int|string|ModelInterface $id): ModelInterface;
+
+    /**
+     * Retrieves the average value of a given column.
+     *
+     * This method performs a query to get the average value of a specific column.
+     *
+     * @param string $column The column to calculate the average value from.
+     *
+     * @return float The average value of the column.
+     */
+    public function avg(string $column): float;
+
+    /**
+     * Get the model name from a given class, lowercased.
+     *
+     * @return string The lowercased base class name.
+     */
+    public function getEntityName(): string;
+
+    /**
+     * Retrieve the repository associated with the current model.
+     *
+     * @return RepositoryInterface The repository instance associated with the model.
      */
     public function getRepository(): RepositoryInterface;
 }

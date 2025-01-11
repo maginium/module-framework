@@ -9,13 +9,15 @@ use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Exceptions\CouldNotSaveException;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Crud\Interfaces\UpdateInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Support\Facades\Log;
-use Maginium\Framework\Support\Str;
 
 /**
  * Class Update.
@@ -35,7 +37,7 @@ class Update implements UpdateInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -62,7 +64,7 @@ class Update implements UpdateInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -87,13 +89,17 @@ class Update implements UpdateInterface
             $data = $this->input();
 
             // Create a data transfer object (DTO) with the provided data
-            $dto = $this->service->getRepository()->withData($data);
+            $dto = $this->service->getRepository()->getModel()->getDtoClass();
+
+            // Fill and validate the given data
+            $dto::make($data);
 
             // update the model through the service
+            /** @var Model $model */
             $model = $this->service->update($id, $dto->toArray());
 
-            // Filter the columns from the deleted model's data
-            $filteredEntityData = $this->applyColumnFilter($model->toDataArray());
+            // Filter the columns from the model's data
+            $filteredEntityData = $model->only($this->getColumns());
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
@@ -103,13 +109,13 @@ class Update implements UpdateInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|CouldNotSaveException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {
             // Wrap unexpected exceptions in a domain-specific exception
             throw LocalizedException::make(
-                __('An unexpected error occurred while updating a %1. %2.', Str::plural($this->modelName), $e->getMessage()),
+                __('An unexpected error occurred while updating a %1. %2.', $this->modelName, $e->getMessage()),
                 $e,
                 HttpStatusCode::INTERNAL_SERVER_ERROR,
             );

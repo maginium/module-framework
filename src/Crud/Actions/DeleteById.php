@@ -9,11 +9,14 @@ use Maginium\Foundation\Enums\HttpStatusCode;
 use Maginium\Foundation\Exceptions\CouldNotDeleteException;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Actions\Concerns\AsAction;
 use Maginium\Framework\Crud\Interfaces\DeleteInterface;
 use Maginium\Framework\Crud\Interfaces\Services\ServiceInterface;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
+use Maginium\Framework\Elasticsearch\Eloquent\Model;
+use Maginium\Framework\Elasticsearch\Interfaces\Services\ServiceInterface as ElasticServiceInterface;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Str;
 
@@ -35,7 +38,7 @@ class DeleteById implements DeleteInterface
     protected ModelInterface $modelFactory;
 
     /**
-     * @var ServiceInterface
+     * @var ServiceInterface|ElasticServiceInterface
      */
     protected $service;
 
@@ -62,7 +65,7 @@ class DeleteById implements DeleteInterface
         Log::setClassName(static::class);
 
         // Set model name (can be dynamically set in subclasses)
-        $this->modelName = $service->getRepository()->getEntityName();
+        $this->modelName = $service->getEntityName();
     }
 
     /**
@@ -84,10 +87,11 @@ class DeleteById implements DeleteInterface
     {
         try {
             // Proceed with deleting the model
-            $model = $this->service->deleteById($id);
+            /** @var Model $model */
+            $model = $this->service->delete($id);
 
-            // Filter the columns from the deleted model's data
-            $filteredEntityData = $this->applyColumnFilter($model->toDataArray());
+            // Filter the columns from the model's data
+            $filteredEntityData = $model->only($this->getColumns());
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
@@ -97,7 +101,7 @@ class DeleteById implements DeleteInterface
 
             // Return the formatted result as an associative array
             return $response->toArray();
-        } catch (NotFoundException|CouldNotDeleteException|LocalizedException $e) {
+        } catch (NoSuchEntityException|NotFoundException|LocalizedException $e) {
             // Propagate service exceptions as-is
             throw $e;
         } catch (Exception $e) {
