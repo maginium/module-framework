@@ -10,7 +10,8 @@ use Maginium\Framework\Crud\Exceptions\RepositoryException;
 use Maginium\Framework\Crud\Interfaces\Repositories\CriterionInterface;
 use Maginium\Framework\Crud\Interfaces\RepositoryInterface;
 use Maginium\Framework\Support\Arr;
-use ReflectionClass;
+use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Validator;
 
 trait Criteriable
 {
@@ -56,10 +57,11 @@ trait Criteriable
     public function getCriterionName($criteria): string
     {
         if ($criteria instanceof Closure) {
-            return spl_object_hash($criteria); // Generate a unique hash for the closure.
+            // Generate a unique hash for the closure.
+            return spl_object_hash($criteria);
         }
 
-        return is_object($criteria) ? get_class($criteria) : $criteria; // Return class name if object, else the string itself.
+        return Validator::isObject($criteria) ? get_class($criteria) : $criteria; // Return class name if object, else the string itself.
     }
 
     /**
@@ -71,7 +73,8 @@ trait Criteriable
      */
     public function pushCriterion($criterion)
     {
-        $this->addCriterion($criterion, 'criteria'); // Add criterion to the criteria list.
+        // Add criterion to the criteria list.
+        $this->addCriterion($criterion, 'criteria');
 
         return $this;
     }
@@ -85,7 +88,8 @@ trait Criteriable
      */
     public function removeCriterion($criterion)
     {
-        unset($this->criteria[$this->getCriterionName($criterion)]); // Remove the criterion by its name.
+        // Remove the criterion by its name.
+        unset($this->criteria[$this->getCriterionName($criterion)]);
 
         return $this;
     }
@@ -100,7 +104,8 @@ trait Criteriable
     public function removeCriteria(array $criteria)
     {
         Arr::walk($criteria, function($criterion): void {
-            $this->removeCriterion($criterion); // Remove each criterion in the array.
+            // Remove each criterion in the array.
+            $this->removeCriterion($criterion);
         });
 
         return $this;
@@ -115,7 +120,8 @@ trait Criteriable
      */
     public function pushCriteria(array $criteria)
     {
-        $this->addCriteria($criteria, 'criteria'); // Add all criteria to the list.
+        // Add all criteria to the list.
+        $this->addCriteria($criteria, 'criteria');
 
         return $this;
     }
@@ -144,7 +150,8 @@ trait Criteriable
      */
     public function setDefaultCriteria(array $criteria)
     {
-        $this->addCriteria($criteria, 'defaultCriteria'); // Add criteria to the default criteria list.
+        // Add criteria to the default criteria list.
+        $this->addCriteria($criteria, 'defaultCriteria');
 
         return $this;
     }
@@ -213,7 +220,8 @@ trait Criteriable
      */
     public function hasCriterion($criterion): bool
     {
-        return isset($this->getCriteria()[$this->getCriterionName($criterion)]); // Check if the criterion exists.
+        // Check if the criterion exists.
+        return isset($this->getCriteria()[$this->getCriterionName($criterion)]);
     }
 
     /**
@@ -271,7 +279,7 @@ trait Criteriable
     protected function instantiateCriterion($class, $arguments)
     {
         // Use reflection to inspect the class.
-        $reflection = new ReflectionClass($class);
+        $reflection = Reflection::getClass($class);
 
         // Ensure the class implements the CriterionInterface interface.
         if (! $reflection->implementsInterface(CriterionInterface::class)) {
@@ -337,18 +345,18 @@ trait Criteriable
         // Validate the criterion type.
         if (! ($criterion instanceof Closure ||
               $criterion instanceof CriterionInterface ||
-              is_string($criterion) ||
-              is_array($criterion))) {
+              Validator::isString($criterion) ||
+              Validator::isArray($criterion))) {
             throw CriterionException::wrongCriterionType($criterion);
         }
 
         // Normalize string criteria as a class name with no arguments.
-        if (is_string($criterion)) {
+        if (Validator::isString($criterion)) {
             $criterion = [$criterion, []];
         }
 
         // If the criterion is an array, instantiate it as a class with arguments.
-        if (is_array($criterion)) {
+        if (Validator::isArray($criterion)) {
             $criterion = call_user_func_array([$this, 'instantiateCriterion'], $this->extractCriterionClassAndArgs($criterion));
         }
 
@@ -371,7 +379,7 @@ trait Criteriable
         // Iterate over each criterion and add it to the specified list.
         Arr::walk($criteria, function($value, $key) use ($list): void {
             // Normalize each criterion, handling both associative and non-associative cases.
-            $criterion = is_string($key) ? [$key, $value] : $value;
+            $criterion = Validator::isString($key) ? [$key, $value] : $value;
             $this->addCriterion($criterion, $list);
         });
     }

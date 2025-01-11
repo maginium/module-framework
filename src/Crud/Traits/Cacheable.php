@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Traits;
 
 use Closure;
+use Laravel\SerializableClosure\SerializableClosure as BaseSerializableClosure;
 use Maginium\Foundation\Enums\CacheTTL;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Cache;
+use Maginium\Framework\Support\Facades\Event;
 use Maginium\Framework\Support\Facades\Json;
+use Maginium\Framework\Support\Facades\SerializableClosure;
 use Maginium\Framework\Support\Reflection;
 
 /**
@@ -20,18 +23,14 @@ use Maginium\Framework\Support\Reflection;
 trait Cacheable
 {
     /**
-     * The repository cache lifetime in minutes.
-     *
-     * @var int|null Cache expiration time; `null` means default configuration.
+     * Constant for default cache tags.
      */
-    protected ?int $cacheLifetime = CacheTTL::HOUR;
+    public const CACHE_TAG = 'repository_cache';
 
     /**
-     * The repository cache driver.
-     *
-     * @var string|null Cache driver name; `null` uses the default driver.
+     * Constant for cache tags related to entities.
      */
-    protected ?string $cacheDriver = null;
+    public const ENTITY_CACHE_TAG = 'entity_cache';
 
     /**
      * Determines if cache clearing is enabled.
@@ -39,6 +38,13 @@ trait Cacheable
      * @var bool True if cache clearing is allowed; false otherwise.
      */
     protected bool $cacheClearEnabled = true;
+
+    /**
+     * The repository cache lifetime in minutes.
+     *
+     * @var int|null Cache expiration time; `null` means default configuration.
+     */
+    protected ?int $cacheLifetime = CacheTTL::HOUR;
 
     /**
      * Set the cache lifetime.
@@ -107,15 +113,10 @@ trait Cacheable
             if (Reflection::methodExists(Cache::getStore(), 'tags')) {
                 // Use cache tags to flush all cache entries related to the repository.
                 Cache::tags($this->getRepositoryId())->flush();
-            } else {
-                // For cache drivers without tags, manually forget cache keys.
-                foreach ($this->flushCacheKeys() as $cacheKey) {
-                    Cache::forget($cacheKey);
-                }
             }
 
             // Dispatch an event indicating that the cache has been flushed for the repository.
-            $this->getContainer('events')->dispatch("{$this->getRepositoryId()}.entity.cache.flushed", [$this]);
+            Event::dispatch("{$this->getRepositoryId()}.entity.cache.flushed", [$this]);
         }
 
         // Return the current instance to allow method chaining.
@@ -148,90 +149,46 @@ trait Cacheable
     }
 
     /**
-     * Retrieve all stored cache keys from the keys file.
-     *
-     * @param string $file Path to the cache keys file.
-     *
-     * @return array List of stored cache keys.
-     */
-    protected function getCacheKeys(string $file): array
-    {
-        // Check if the cache keys file exists.
-        // If not, create it and initialize it with an empty JSON array.
-        if (! file_exists($file)) {
-            file_put_contents($file, Json::encode([]));
-        }
-
-        // Read the content of the cache keys file and decode it into an array.
-        // If decoding fails or the file is empty, return an empty array.
-        return Json::decode(file_get_contents($file)) ?: [];
-    }
-
-    /**
-     * Flush all cache keys for the repository.
-     *
-     * @return array List of flushed cache keys.
-     */
-    protected function flushCacheKeys(): array
-    {
-        // Initialize an empty array to store flushed keys.
-        $flushedKeys = [];
-
-        // Get the fully qualified class name of the current repository.
-        $calledClass = static::class;
-
-        // Retrieve cache configuration.
-        $config = $this->getContainer('config')->get('rinvex.repository.cache');
-
-        // Get the cache keys from the keys file.
-        $cacheKeys = $this->getCacheKeys($config['keys_file']);
-
-        // Check if the current repository has any associated cache keys.
-        if (isset($cacheKeys[$calledClass]) && is_array($cacheKeys[$calledClass])) {
-            // Loop through each cache key and add it to the list of flushed keys.
-            foreach ($cacheKeys[$calledClass] as $cacheKey) {
-                $flushedKeys[] = "{$calledClass}@{$cacheKey}";
-            }
-
-            // Remove the current repository's cache keys from the file.
-            unset($cacheKeys[$calledClass]);
-
-            // Update the keys file.
-            file_put_contents($config['keys_file'], Json::encode($cacheKeys));
-        }
-
-        // Return the list of flushed keys.
-        return $flushedKeys;
-    }
-
-    /**
      * Execute and cache the result of a given callback.
      *
      * @param string $class Class name of the repository.
      * @param string $method Method name being executed.
      * @param array $args Method arguments to generate the cache key.
      * @param Closure $closure Closure to execute and cache its result.
+     * @param array|null $tags Optional array of cache tags.
      *
      * @return mixed Result of the closure execution.
      */
-    protected function cacheCallback(string $class, string $method, array $args, Closure $closure)
+    protected function cacheCallback(string $class, string $method, array $args, Closure $closure, ?array $tags = null)
     {
         // Retrieve the unique identifier for the repository.
         $repositoryId = $this->getRepositoryId();
 
-        // Get the cache lifetime setting.
+        // Get the total cache lifetime (e.g., 3600 seconds).
         $lifetime = $this->getCacheLifetime();
 
-        // Generate a unique hash for the current method and arguments.
-        $hash = $this->generateCacheHash($args);
+        // Construct the value as SerializableClosure
+        $callback = fn(): BaseSerializableClosure => SerializableClosure::make($closure);
 
-        // Create a unique cache key based on the class, method, and hash.
-        $cacheKey = "{$class}@{$method}.{$hash}";
+        // Set default tags if none are provided, including the new `ENTITY_CACHE_TAG`
+        $tags ??= [self::CACHE_TAG, self::ENTITY_CACHE_TAG, $repositoryId];
 
-        // Cache the result using tags.
-        $result = $lifetime === -1
-            ? Cache::rememberForever($cacheKey, $closure, [$repositoryId])
-            : Cache::remember($cacheKey, $lifetime, $closure, [$repositoryId]);
+        // If the lifetime is indefinite (-1), use rememberForever.
+        if ($lifetime === -1) {
+            return Cache::tags($tags)->rememberForever("{$class}@{$method}.{$this->generateCacheHash($args)}", $callback);
+        }
+
+        // Split the total lifetime into fresh and stale periods.
+        $freshPeriod = (int)($lifetime * 0.75); // 75% fresh
+        $stalePeriod = $lifetime - $freshPeriod; // Remaining 25% stale
+
+        $lifetimeArray = [$freshPeriod, $stalePeriod];
+
+        // Generate a unique cache key.
+        $cacheKey = "{$class}@{$method}.{$this->generateCacheHash($args)}";
+
+        // Cache the result using the flexible method.
+        $result = Cache::tags($tags)->flexible($cacheKey, $lifetimeArray, $callback);
 
         // Reset the cached repository state to default values after caching.
         $this->resetCachedRepository();
@@ -254,7 +211,6 @@ trait Cacheable
 
         // Clear the cache-specific properties to avoid interference with future operations.
         $this->cacheLifetime = null;
-        $this->cacheDriver = null;
 
         // Return the current instance for method chaining.
         return $this;
