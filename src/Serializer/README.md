@@ -8,14 +8,14 @@ serialization.
 
 Serializers Overview
 
-1. ClosureSerializer • Purpose: Handles the serialization and unserialization of closures using Laravel’s SerializableClosure library. • Key Features:
-   • Serializes closures into a storable and transferable format. • Unserializes closures back into executable forms. • Utilizes
+1. SerializableClosure • Purpose: Handles the serialization and unserialization of closures using Laravel’s SerializableClosure library. • Key
+   Features: • Serializes closures into a storable and transferable format. • Unserializes closures back into executable forms. • Utilizes
    SerializableClosureFactory for creating closure instances. • Methods: • make(Closure $closure): SerializableClosure • serialize(Closure $closure):
    string • unserialize(string $string): Closure • Usage Example:
 
 $closure = function () { return 'Hello, Serializer!'; };
 
-$serializer = new ClosureSerializer(new SerializableClosureFactory());
+$serializer = new SerializableClosure(new SerializableClosureFactory());
 $serialized = $serializer->serialize($closure);
 $unserialized = $serializer->unserialize($serialized); echo $unserialized(); // Outputs: Hello, Serializer!
 

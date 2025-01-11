@@ -47,31 +47,40 @@ class Serializer extends BaseSerialize implements SerializerInterface
     }
 
     /**
-     * Unserialize a string back into its original data format.
+     * Safely unserializes a string into its original data format.
      *
-     * This method takes a serialized string and converts it back to its
-     * original data type. If the unserialization fails due to invalid input,
-     * an InvalidArgumentException is thrown with an error message.
+     * This method takes a serialized string and converts it back into its
+     * original data type. It offers an option to allow or disallow classes during
+     * the unserialization process for security and flexibility.
      *
-     * @param  string  $string  String to be unserialized.
+     * @param string $string The serialized string to be unserialized.
+     * @param bool $allowedClasses Whether to allow class instances during unserialization.
+     *                             `true` allows all classes; `false` disallows all classes.
      *
-     * @throws InvalidArgumentException If the string cannot be unserialized
-     *                                  into its original data format.
+     * @throws InvalidArgumentException If the unserialization fails due to invalid input.
      *
-     * @return mixed The original data, which can be string, int, float,
-     *               bool, array, or null.
+     * @return mixed The unserialized data, which can be any valid PHP data type.
      */
-    public function unserialize($string): mixed
+    public function unserialize($string, bool $allowedClasses = false): mixed
     {
         try {
-            // Attempt to unserialize the provided string.
+            // If $allowedClasses is true, allow all classes during unserialization.
+            // This enables object deserialization, which can be useful but poses security risks.
+            if ($allowedClasses) {
+                // Standard PHP unserialize function without restrictions.
+                return unserialize($string);
+            }
+
+            // If $allowedClasses is false, proceed with stricter unserialization.
+            // Use parent::unserialize to leverage any overridden or specialized behavior.
             $unserializedData = parent::unserialize($string);
 
             // Return the successfully unserialized data.
             return $unserializedData;
         } catch (Exception $e) {
             // Throw an InvalidArgumentException with a clear error message.
-            throw new $e;
+
+            throw $e;
         }
     }
 }
