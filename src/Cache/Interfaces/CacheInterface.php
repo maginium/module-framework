@@ -25,7 +25,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return mixed Returns the cached value or the default value if not found.
      */
-    public function get($key, $default = null): mixed;
+    public function get(array|string $key, $default = null): mixed;
 
     /**
      * {@inheritdoc}
@@ -34,18 +34,16 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool True if the item was successfully removed; false otherwise.
      */
-    public function delete($key): bool;
+    public function delete(string $key): bool;
 
     /**
      * {@inheritdoc}
      *
      * This method clears all items from the cache.
      *
-     * @param  array  $tags
-     *
      * @return bool True if the cache was successfully cleared; false otherwise.
      */
-    public function clear($tags = []): bool;
+    public function clear(): bool;
 
     /**
      * Increment the value of an item in the cache.
@@ -55,7 +53,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return int|bool The new value after incrementing, or false on failure.
      */
-    public function increment($key, $value = 1);
+    public function increment(string $key, $value = 1);
 
     /**
      * Decrement the value of an item in the cache.
@@ -65,7 +63,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return int|bool The new value after decrementing, or false on failure.
      */
-    public function decrement($key, $value = 1);
+    public function decrement(string $key, $value = 1);
 
     /**
      * Determine if an item exists in the cache.
@@ -77,7 +75,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true if the item exists in the cache; otherwise, false.
      */
-    public function has($key): bool;
+    public function has(string $key): bool;
 
     /**
      * Determine if an item doesn't exist in the cache.
@@ -89,7 +87,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true if the item does not exist in the cache; otherwise, false.
      */
-    public function missing($key): bool;
+    public function missing(string $key): bool;
 
     /**
      * Retrieve multiple items from the cache by key.
@@ -127,7 +125,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return mixed Returns the cached value or the default value if not found.
      */
-    public function pull($key, $default = null);
+    public function pull(array|string $key, $default = null);
 
     /**
      * Store an item in the cache.
@@ -141,12 +139,21 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true on success, false on failure.
      */
-    public function put($key, $value, $tags = [], $ttl = null): bool;
+    public function put(array|string $key, $value, $ttl = null): bool;
 
     /**
-     * {@inheritdoc}
+     * Store an item in the cache.
+     *
+     * This method stores a value in the cache associated with the given key.
+     * The value can be stored with an optional time-to-live (TTL) duration.
+     *
+     * @param  string  $key  The key identifying the cached item.
+     * @param  mixed  $value  The value to store in the cache.
+     * @param  DateTimeInterface|DateInterval|int|null  $ttl  The time-to-live duration for the cached item.
+     *
+     * @return bool Returns true on success, false on failure.
      */
-    public function set($key, $value, $tags = [], $ttl = null): bool;
+    public function set(string $key, $value, $ttl = null): bool;
 
     /**
      * Store multiple items in the cache for a given number of seconds.
@@ -156,26 +163,24 @@ interface CacheInterface extends ArrayAccess
      * remain in the cache. If no TTL is provided, the items will be stored indefinitely.
      *
      * @param  array  $values  An associative array of key-value pairs to store in the cache.
-     * @param  array  $tags  An array of tags to associate with the cached items.
      * @param  DateTimeInterface|DateInterval|int|null  $ttl  The time-to-live for the cache items.
      *
      * @return bool Returns true if all items are successfully stored, false if any item fails.
      */
-    public function putMany(array $values, array $tags = [], $ttl = null);
+    public function putMany(array $values, $ttl = null);
 
     /**
      * Store multiple items in the cache.
      *
      * This method accepts a set of values, converts them to an array if necessary,
-     * and stores them in the cache with optional tags and a time-to-live (TTL).
+     * and stores them in the cache with optional time-to-live (TTL).
      *
      * @param  mixed  $values  The values to be stored, which can be an array or an iterable.
-     * @param  array  $tags  An optional array of tags to associate with the cached items.
      * @param  DateTimeInterface|DateInterval|int|null  $ttl  Optional time-to-live for the cached items.
      *
      * @return bool Returns true if all items were successfully stored, false otherwise.
      */
-    public function setMultiple($values, array $tags = [], $ttl = null): bool;
+    public function setMultiple($values, $ttl = null): bool;
 
     /**
      * Store an item in the cache if the key does not exist.
@@ -186,18 +191,17 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true if the item was added, false if it already exists.
      */
-    public function add($key, $value, $ttl = null);
+    public function add(string $key, $value, $ttl = null);
 
     /**
      * Store an item in the cache indefinitely.
      *
      * @param  string  $key  The key to store the value under.
      * @param  mixed  $value  The value to store in the cache.
-     * @param  array  $tags  An array of tags to associate with the cached item.
      *
      * @return bool Returns true on successful storage, false otherwise.
      */
-    public function forever($key, $value, array $tags = []): bool;
+    public function forever(string $key, $value): bool;
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
@@ -214,7 +218,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function remember($key, $ttl, Closure $callback);
+    public function remember(string $key, DateTimeInterface|DateInterval|int|null $ttl, Closure $callback): mixed;
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
@@ -230,7 +234,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function sear($key, Closure $callback);
+    public function sear(string $key, Closure $callback);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
@@ -246,24 +250,24 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function rememberForever($key, Closure $callback);
+    public function rememberForever(string $key, Closure $callback);
 
     /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
      *
-     * This method fetches the cached item and checks its freshness based on the provided TTL values.
-     * If the item is stale, it schedules a background refresh using the given callback.
+     * This method fetches the cached item and checks its freshness based on the provided TTL (Time To Live) values.
+     * If the item is stale, it schedules a background refresh using the provided callback.
      *
      * @template TCacheValue
      *
      * @param  string  $key  The key of the cached item.
-     * @param  array{ 0: DateTimeInterface|DateInterval|int, 1: DateTimeInterface|DateInterval|int }  $ttl  An array containing the TTL values for the cache.
-     * @param  (callable(): TCacheValue)  $callback  The callback to execute to refresh the cache if it is stale.
-     * @param  array{ seconds?: int, owner?: string }|null  $lock  Optional locking mechanism parameters.
+     * @param  array{0: DateTimeInterface|DateInterval|int, 1: DateTimeInterface|DateInterval|int}  $ttl  TTLs for freshness and staleness.
+     * @param  callable(): TCacheValue  $callback  Callback to execute for cache refresh if stale.
+     * @param  array{seconds?: int, owner?: string}|null  $lock  Locking parameters to avoid race conditions.
      *
      * @return TCacheValue The cached value.
      */
-    public function flexible($key, $ttl, $callback, $lock = null);
+    public function flexible(string $key, array $ttl, callable $callback, ?array $lock = null): mixed;
 
     /**
      * Remove an item from the cache.
@@ -275,7 +279,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool True if the item was successfully removed; false otherwise.
      */
-    public function forget($key);
+    public function forget(string $key);
 
     /**
      * Remove multiple items from the cache based on the provided keys.

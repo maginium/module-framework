@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Cache\Events;
 
+use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Str;
+use ReflectionClass;
+
 /**
  * Class CacheEvent.
  *
@@ -32,9 +36,9 @@ abstract class CacheEvent
     /**
      * Create a new event instance.
      *
-     * @param  string|null  $storeName  The name of the cache store.
-     * @param  string  $key  The key of the event.
-     * @param  string[]  $tags  The tags assigned to the key.
+     * @param string|null $storeName The name of the cache store.
+     * @param string      $key       The key of the event.
+     * @param string[]    $tags      The tags assigned to the key.
      */
     public function __construct(?string $storeName, string $key, array $tags = [])
     {
@@ -45,6 +49,8 @@ abstract class CacheEvent
 
     /**
      * Get the name of the cache store.
+     *
+     * @return string|null The cache store name.
      */
     public function getStoreName(): ?string
     {
@@ -54,8 +60,9 @@ abstract class CacheEvent
     /**
      * Set the name of the cache store.
      *
+     * @param string|null $storeName The cache store name.
      *
-     * @return $this
+     * @return $this The current instance.
      */
     public function setStoreName(?string $storeName): self
     {
@@ -66,6 +73,8 @@ abstract class CacheEvent
 
     /**
      * Get the key of the event.
+     *
+     * @return string The key associated with the event.
      */
     public function getKey(): string
     {
@@ -75,8 +84,9 @@ abstract class CacheEvent
     /**
      * Set the key of the event.
      *
+     * @param string $key The event key.
      *
-     * @return $this
+     * @return $this The current instance.
      */
     public function setKey(string $key): self
     {
@@ -88,7 +98,7 @@ abstract class CacheEvent
     /**
      * Get the tags assigned to the event.
      *
-     * @return string[]
+     * @return string[] The tags assigned to the event.
      */
     public function getTags(): array
     {
@@ -98,9 +108,9 @@ abstract class CacheEvent
     /**
      * Set the tags for the cache event.
      *
-     * @param  string[]  $tags
+     * @param string[] $tags The tags to assign.
      *
-     * @return $this
+     * @return $this The current instance.
      */
     public function setTags(array $tags): self
     {
@@ -111,6 +121,8 @@ abstract class CacheEvent
 
     /**
      * Retrieve the event details as an associative array.
+     *
+     * @return array The event details, including store name, key, and tags.
      */
     public function toArray(): array
     {
@@ -119,5 +131,22 @@ abstract class CacheEvent
             'key' => $this->key,
             'tags' => $this->tags,
         ];
+    }
+
+    /**
+     * Get the event name based on the class name.
+     *
+     * This method uses reflection to get the base class name (short name)
+     * and converts it to lowercase using the `Str::lower` utility.
+     *
+     * @return string The lowercase name of the event class.
+     */
+    public function getName(): string
+    {
+        // Use ReflectionClass to get the base class name.
+        $classname = Reflection::getClassBasename(static::class);
+
+        // Convert the class name to lowercase using Str::lower and return.
+        return Str::lower(Str::snake($this->getStoreName() . $classname));
     }
 }

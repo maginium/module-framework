@@ -6,6 +6,7 @@ namespace Maginium\Framework\Cache;
 
 use DateInterval;
 use DateTimeInterface;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait RetrievesMultipleKeys.
@@ -34,7 +35,7 @@ trait RetrievesMultipleKeys
         // Normalize the keys to ensure they are all valid. If the keys array has both keys and values,
         // we ensure that the values are null where no default is specified.
         $keys = collect($keys)->mapWithKeys(fn($value, $key) => [
-            is_string($key) ? $key : $value => is_string($key) ? $value : null,
+            Validator::isString($key) ? $key : $value => Validator::isString($key) ? $value : null,
         ])->all();
 
         // Iterate through each key and retrieve its corresponding cache value
@@ -56,12 +57,12 @@ trait RetrievesMultipleKeys
      * remain in the cache. If no TTL is provided, the items will be stored indefinitely.
      *
      * @param  array  $values  An associative array of key-value pairs to store in the cache.
-     * @param  array  $tags  An array of tags to associate with the cached items.
      * @param  DateTimeInterface|DateInterval|int|null  $ttl  The time-to-live for the cache items.
+     * @param array $tags array of tags to associate with the cached items.
      *
      * @return bool Returns true if all items are successfully stored, false if any item fails.
      */
-    public function putMany(array $values, array $tags = [], $ttl = null): bool
+    public function putMany(array $values, $ttl = null, $tags = []): bool
     {
         // Initialize a variable to track the result of each put operation
         $manyResult = null;
@@ -69,7 +70,7 @@ trait RetrievesMultipleKeys
         // Loop through each key-value pair in the provided array
         foreach ($values as $key => $value) {
             // Store each item in the cache using the put method
-            $result = $this->put($key, $value, $ttl);
+            $result = $this->put($key, $value, $ttl, $tags);
 
             // Update the result for all cache operations, ensuring that all must succeed
             $manyResult = $manyResult === null ? $result : $result && $manyResult;

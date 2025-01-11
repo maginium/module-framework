@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Cache;
+namespace Maginium\Framework\Cache\Locks;
 
+use Maginium\Framework\Cache\Lock;
+use Maginium\Framework\Cache\Stores\ArrayStore;
 use Maginium\Framework\Support\Carbon;
 
 /**
@@ -26,12 +28,12 @@ class ArrayLock extends Lock
      * This constructor initializes the lock instance, accepts the cache store,
      * lock name, expiration time in seconds, and an optional owner identifier.
      *
-     * @param  ArrayStore  $store  The cache store that holds the locks.
-     * @param  string  $name  The unique name for the lock.
-     * @param  int  $seconds  The expiration time for the lock in seconds.
-     * @param  string|null  $owner  The identifier for the lock owner, optional.
+     * @param ArrayStore $store  The cache store that holds the locks.
+     * @param string $name  The unique name for the lock.
+     * @param int $seconds  The expiration time for the lock in seconds.
+     * @param string|null $owner  The identifier for the lock owner, optional.
      */
-    public function __construct($store, $name, $seconds, $owner = null)
+    public function __construct(ArrayStore $store, string $name, int $seconds, ?string $owner = null)
     {
         // Call the parent constructor to initialize the lock's basic properties.
         parent::__construct($name, $seconds, $owner);
@@ -102,7 +104,7 @@ class ArrayLock extends Lock
      *
      * @return void
      */
-    public function forceRelease()
+    public function forceRelease(): void
     {
         // Unset the lock entry from the store.
         unset($this->store->locks[$this->name]);

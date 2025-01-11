@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Cache;
 
-use Maginium\Framework\Cache\Interfaces\CacheInterface;
+use Maginium\Framework\Cache\Interfaces\StoreInterface;
 use Maginium\Framework\Support\Arr;
 
 /**
@@ -19,7 +19,7 @@ class TagSet
     /**
      * The cache store implementation used to interact with the cache.
      */
-    protected CacheInterface $store;
+    protected StoreInterface $store;
 
     /**
      * The names of the tags in this set.
@@ -33,10 +33,10 @@ class TagSet
      * The store is used to persist and retrieve tag-related data, while the names array
      * holds the tags that belong to the set.
      *
-     * @param  CacheInterface  $store  The cache store instance to interact with.
-     * @param  array  $names  The array of tag names.
+     * @param StoreInterface $store The cache store instance to interact with.
+     * @param array $names  The array of tag names.
      */
-    public function __construct(CacheInterface $store, array $names = [])
+    public function __construct(StoreInterface $store, array $names = [])
     {
         $this->store = $store;
         $this->names = $names;
@@ -50,8 +50,11 @@ class TagSet
      *
      * @return void
      */
-    public function reset()
+    public function reset(): void
     {
+        // Flush Tags using store
+        $this->store->flushTags($this->getNames());
+
         // Loop through each tag name and reset it by generating a new identifier.
         Arr::walk($this->names, [$this, 'resetTag']);
     }
@@ -65,12 +68,13 @@ class TagSet
      *
      * @return string The newly generated tag identifier.
      */
-    public function resetTag($name)
+    public function resetTag($name): string
     {
         // Store the unique identifier for the tag in the cache, using the tag's key.
         $this->store->forever($this->tagKey($name), $id = str_replace('.', '', uniqid('', true)));
 
-        return $id; // Return the newly generated unique identifier.
+        // Return the newly generated unique identifier.
+        return $id;
     }
 
     /**
@@ -80,7 +84,7 @@ class TagSet
      *
      * @return void
      */
-    public function flush()
+    public function flush(): void
     {
         // Loop through each tag name and flush it by removing its cache entry.
         Arr::walk($this->names, [$this, 'flushTag']);
@@ -93,8 +97,11 @@ class TagSet
      *
      * @param  string  $name  The name of the tag to flush.
      */
-    public function flushTag($name)
+    public function flushTag($name): void
     {
+        // Flush Tags using store
+        $this->store->flushTags($this->getNames());
+
         // Remove the tag's entry from the cache.
         $this->store->forget($this->tagKey($name));
     }
@@ -107,7 +114,7 @@ class TagSet
      *
      * @return string The namespace string representing the tag set.
      */
-    public function getNamespace()
+    public function getNamespace(): string
     {
         // Return a concatenated string of all tag identifiers in the set.
         return implode('|', $this->tagIds());
@@ -123,7 +130,7 @@ class TagSet
      *
      * @return string The tag's unique identifier.
      */
-    public function tagId($name)
+    public function tagId($name): string
     {
         // Attempt to retrieve the tag's identifier from the cache, or generate a new one if it doesn't exist.
         return $this->store->get($this->tagKey($name)) ?: $this->resetTag($name);
@@ -138,7 +145,7 @@ class TagSet
      *
      * @return string The cache key for the tag.
      */
-    public function tagKey($name)
+    public function tagKey($name): string
     {
         // Return a string that uniquely identifies the cache entry for this tag.
         return 'tag:' . $name . ':key';
@@ -151,9 +158,10 @@ class TagSet
      *
      * @return array The array of tag names.
      */
-    public function getNames()
+    public function getNames(): array
     {
-        return $this->names; // Return the list of tag names.
+        // Return the list of tag names.
+        return $this->names;
     }
 
     /**
@@ -163,7 +171,7 @@ class TagSet
      *
      * @return array An array of tag identifiers.
      */
-    protected function tagIds()
+    protected function tagIds(): array
     {
         // Map each tag name to its corresponding identifier.
         return Arr::each([$this, 'tagId'], $this->names);
