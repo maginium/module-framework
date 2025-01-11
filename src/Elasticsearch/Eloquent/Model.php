@@ -16,6 +16,7 @@ use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 use RuntimeException;
 
 /**
@@ -509,7 +510,7 @@ abstract class Model extends BaseModel
         }
 
         // If the attribute is numeric, compare them as numbers.
-        return is_numeric($attribute) && is_numeric($original) && strcmp((string)$attribute, (string)$original) === 0;
+        return Validator::isNumeric($attribute) && Validator::isNumeric($original) && strcmp((string)$attribute, (string)$original) === 0;
     }
 
     /**
@@ -700,7 +701,7 @@ abstract class Model extends BaseModel
 
         // Append values to the current array, ensuring uniqueness if specified.
         foreach ($values as $value) {
-            if ($unique && (! is_array($current) || in_array($value, $current))) {
+            if ($unique && (! Validator::isArray($current) || in_array($value, $current))) {
                 continue;
             }
 
@@ -747,7 +748,7 @@ abstract class Model extends BaseModel
     {
         $current = $this->getAttributeFromArray($column) ?: [];
 
-        if (is_array($current)) {
+        if (Validator::isArray($current)) {
             // Remove the specified values from the current array.
             foreach ($values as $value) {
                 $keys = Arr::keys($current, $value);

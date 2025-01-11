@@ -15,6 +15,7 @@ use Maginium\Framework\Elasticsearch\DSL\exceptions\QueryException;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Bridge class for interacting with Elasticsearch.
@@ -396,7 +397,7 @@ class Bridge
             $columns = ['*'];
         }
 
-        if (! is_array($columns)) {
+        if (! Validator::isArray($columns)) {
             $columns = [$columns];
         }
         $allColumns = $columns[0] === '*';  // Check if all columns are requested
@@ -484,7 +485,7 @@ class Bridge
     public function processDistinct($wheres, $options, $columns, $includeDocCount = false): Results
     {
         // Ensure that the columns are always in an array format
-        if ($columns && ! is_array($columns)) {
+        if ($columns && ! Validator::isArray($columns)) {
             $columns = [$columns];
         }
 
@@ -1473,7 +1474,7 @@ class Bridge
         $params = $this->buildParams($this->index, $wheres, $options);
 
         // Ensure that $columns is a flat array of column names
-        if (is_array($columns[0])) {
+        if (Validator::isArray($columns[0])) {
             $columns = $columns[0];
         }
 
@@ -1512,7 +1513,7 @@ class Bridge
         $params = $this->buildParams($this->index, $wheres, $options);
 
         // Ensure that $columns is a flat array of column names
-        if (is_array($columns[0])) {
+        if (Validator::isArray($columns[0])) {
             $columns = $columns[0];
         }
 
@@ -1551,7 +1552,7 @@ class Bridge
         $params = $this->buildParams($this->index, $wheres, $options);
 
         // Ensure that $columns is a flat array of column names
-        if (is_array($columns[0])) {
+        if (Validator::isArray($columns[0])) {
             $columns = $columns[0];
         }
 
@@ -1590,7 +1591,7 @@ class Bridge
         $params = $this->buildParams($this->index, $wheres, $options);
 
         // Ensure that $columns is a flat array of column names
-        if (is_array($columns[0])) {
+        if (Validator::isArray($columns[0])) {
             $columns = $columns[0];
         }
 
@@ -1901,7 +1902,7 @@ class Bridge
      */
     private function _return($data, $meta, $params, $queryTag): Results
     {
-        if (is_object($meta)) {
+        if (Validator::isObject($meta)) {
             $metaAsArray = [];
 
             // Check if the meta data can be converted to an array
@@ -2215,7 +2216,7 @@ class Bridge
         foreach ($values as $subKey => $value) {
             if (in_array($subKey, $aggTypes)) {
                 $data[$key] = $this->_formatAggs($subKey, $value)[$subKey];
-            } elseif (is_array($value)) {
+            } elseif (Validator::isArray($value)) {
                 $data[$key][$subKey] = $this->_formatAggs($subKey, $value)[$subKey];
             } else {
                 $data[$key][$subKey] = $value;

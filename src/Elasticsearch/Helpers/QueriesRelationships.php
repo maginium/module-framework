@@ -14,6 +14,7 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Elasticsearch\Eloquent\Model;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait QueriesRelationships.
@@ -51,12 +52,12 @@ trait QueriesRelationships
         ?Closure $callback = null,
     ): Builder|static {
         // Handle nested relations by calling `hasNested` if the relation name contains a dot
-        if (is_string($relation) && str_contains($relation, '.')) {
+        if (Validator::isString($relation) && str_contains($relation, '.')) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
         }
 
         // Resolve the relation if it's a string (i.e., relation name)
-        if (is_string($relation)) {
+        if (Validator::isString($relation)) {
             $relation = $this->getRelationWithoutConstraints($relation);
         }
 
@@ -183,7 +184,7 @@ trait QueriesRelationships
     protected function getConstrainedRelatedIds($relations, $operator, $count): array
     {
         // Count the occurrences of each related ID
-        $relationCount = Arr::count_values(Arr::map(is_array($relations) ? $relations : $relations->flatten()->toArray(), function($id) {
+        $relationCount = Arr::count_values(Arr::map(Validator::isArray($relations) ? $relations : $relations->flatten()->toArray(), function($id) {
             return (string)$id; // Convert object IDs to strings
         }));
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch;
 
 use Elasticsearch\Client;
-use Maginium\Framework\Database\Connection as BaseConnection;
+use Maginium\Framework\Database\Connections\Connection as BaseConnection;
 use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Elasticsearch\DSL\Bridge;
 use Maginium\Framework\Elasticsearch\DSL\Results;

@@ -9,6 +9,7 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\DSL\Results;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class Builder.
@@ -409,7 +410,7 @@ class Builder
         $result = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value)) {
+            if (Validator::isArray($value)) {
                 $result = $result + $this->flatten($value, $prefix . $key . '.');
             } else {
                 $result[$prefix . $key] = $value;
@@ -473,7 +474,7 @@ class Builder
         // Iterate through each key-value pair in the array
         foreach ($array as $key => $value) {
             // If the value is an array, recursively flatten it
-            if (is_array($value)) {
+            if (Validator::isArray($value)) {
                 $result = $result + $this->_flattenFields($value, $prefix . $key . '.');
             } else {
                 // If it's a scalar value, assign it to the result with the proper key in dot notation

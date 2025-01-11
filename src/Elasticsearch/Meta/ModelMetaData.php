@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Meta;
 
+use Maginium\Framework\Support\Validator;
+
 /**
  * Class ModelMetaData.
  *
@@ -268,7 +270,7 @@ final class ModelMetaData
                         $current[$part] = $value;
                     } else {
                         // Ensure the part exists and is an array
-                        if (! isset($current[$part]) || ! is_array($current[$part])) {
+                        if (! isset($current[$part]) || ! Validator::isArray($current[$part])) {
                             $current[$part] = [];
                         }
                         $current = &$current[$part];

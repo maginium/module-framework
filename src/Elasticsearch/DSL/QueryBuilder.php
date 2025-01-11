@@ -8,6 +8,7 @@ use Maginium\Framework\Elasticsearch\DSL\exceptions\ParameterException;
 use Maginium\Framework\Elasticsearch\DSL\exceptions\QueryException;
 use Maginium\Framework\Elasticsearch\Helpers\Utilities;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
 
 trait QueryBuilder
 {
@@ -372,7 +373,7 @@ trait QueryBuilder
 
         $value = current($condition);
 
-        if (! is_array($value)) {
+        if (! Validator::isArray($value)) {
             return ['match' => [$field => $value]];
         }
         $operator = key($value);

@@ -28,6 +28,7 @@ use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\LazyCollection;
+use Maginium\Framework\Support\Validator;
 use RuntimeException;
 
 /**
@@ -795,7 +796,7 @@ class Builder extends BaseBuilder
     public function matrix($column)
     {
         // Ensure the column is an array for the aggregation
-        if (! is_array($column)) {
+        if (! Validator::isArray($column)) {
             $column = [$column];
         }
 
@@ -818,7 +819,7 @@ class Builder extends BaseBuilder
     public function agg(array $functions, $column)
     {
         // Ensure the column is a string for aggregation
-        if (is_array($column)) {
+        if (Validator::isArray($column)) {
             throw new RuntimeException('Column must be a string');
         }
 
@@ -1498,7 +1499,7 @@ class Builder extends BaseBuilder
             $highlightFields = [];
 
             foreach ($fields as $field => $payload) {
-                if (is_int($field)) {
+                if (Validator::isInt($field)) {
                     // If field is an integer (index), treat it as a field with empty options
                     $highlightFields[$payload] = (object)[];
                 } else {
@@ -1509,11 +1510,11 @@ class Builder extends BaseBuilder
         }
 
         // Ensure preTag and postTag are arrays
-        if (! is_array($preTag)) {
+        if (! Validator::isArray($preTag)) {
             $preTag = [$preTag];
         }
 
-        if (! is_array($postTag)) {
+        if (! Validator::isArray($postTag)) {
             $postTag = [$postTag];
         }
 
@@ -1647,7 +1648,7 @@ class Builder extends BaseBuilder
      */
     public function orderBy($column, $direction = 'asc'): static
     {
-        if (is_string($direction)) {
+        if (Validator::isString($direction)) {
             $direction = (mb_strtolower($direction) === 'asc' ? 'asc' : 'desc');
         }
 
@@ -1773,7 +1774,7 @@ class Builder extends BaseBuilder
      */
     public function groupBy(...$groups): self
     {
-        if (is_array($groups[0])) {
+        if (Validator::isArray($groups[0])) {
             $groups = $groups[0];
         }
 
@@ -1794,7 +1795,7 @@ class Builder extends BaseBuilder
      */
     public function addSelect($column): static
     {
-        if (! is_array($column)) {
+        if (! Validator::isArray($column)) {
             $column = [$column];
         }
 
@@ -1819,7 +1820,7 @@ class Builder extends BaseBuilder
     public function select($columns = ['*']): static
     {
         // If the $columns parameter is not an array, convert it into one
-        $columns = is_array($columns) ? $columns : [$columns];
+        $columns = Validator::isArray($columns) ? $columns : [$columns];
 
         // Store the selected columns
         $this->columns = $columns;
@@ -2033,7 +2034,7 @@ class Builder extends BaseBuilder
             $highlightFields = [];
 
             foreach ($fields as $field => $payload) {
-                if (is_int($field)) {
+                if (Validator::isInt($field)) {
                     // If the field is an integer, treat it as a simple field with no additional options
                     $highlightFields[$payload] = (object)[];
                 } else {
@@ -2044,11 +2045,11 @@ class Builder extends BaseBuilder
         }
 
         // Ensure that preTag and postTag are arrays (they may be passed as a single string)
-        if (! is_array($preTag)) {
+        if (! Validator::isArray($preTag)) {
             $preTag = [$preTag];
         }
 
-        if (! is_array($postTag)) {
+        if (! Validator::isArray($postTag)) {
             $postTag = [$postTag];
         }
 
@@ -2600,7 +2601,7 @@ class Builder extends BaseBuilder
         }
 
         if ($columns) {
-            if (! is_array($columns)) {
+            if (! Validator::isArray($columns)) {
                 $columns = [$columns];
             }
 
@@ -2957,7 +2958,7 @@ class Builder extends BaseBuilder
             $this->refresh = false;
         }
 
-        if (! is_array(reset($values))) {
+        if (! Validator::isArray(reset($values))) {
             $values = [$values];
         }
         $this->applyBeforeQueryCallbacks();
@@ -3217,7 +3218,7 @@ class Builder extends BaseBuilder
      */
     private function _formatTimestamp($value): string|int
     {
-        if (is_numeric($value)) {
+        if (Validator::isNumeric($value)) {
             // Convert to integer if it's a string
             $value = (int)$value;
 
@@ -3247,7 +3248,7 @@ class Builder extends BaseBuilder
      */
     private function _ensureValueAsArray(&$value): void
     {
-        if (! is_array($value)) {
+        if (! Validator::isArray($value)) {
             $value = [$value];
         }
     }

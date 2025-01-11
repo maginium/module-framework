@@ -21,6 +21,7 @@ use Maginium\Framework\Pagination\Facades\Paginator;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Validator;
 use RuntimeException;
 
 /**
@@ -389,7 +390,7 @@ class Builder extends BaseEloquentBuilder
             $recordIndex = null;
 
             // If the item contains an index, extract it
-            if (is_array($item)) {
+            if (Validator::isArray($item)) {
                 $recordIndex = ! empty($item['_index']) ? $item['_index'] : null;
 
                 if ($recordIndex) {
@@ -808,12 +809,12 @@ class Builder extends BaseEloquentBuilder
         // Loop through the provided attributes and apply 'where' conditions.
         foreach ($attributes as $field => $value) {
             // Determine the appropriate method based on the type of value (string or array).
-            $method = is_string($value) ? 'whereExact' : 'where';
+            $method = Validator::isString($value) ? 'whereExact' : 'where';
 
             // If the value is an array, apply a 'where' condition for each item.
-            if (is_array($value)) {
+            if (Validator::isArray($value)) {
                 foreach ($value as $v) {
-                    $specificMethod = is_string($v) ? 'whereExact' : 'where';
+                    $specificMethod = Validator::isString($v) ? 'whereExact' : 'where';
                     $instance = $instance->{$specificMethod}($field, $v);
                 }
             } else {

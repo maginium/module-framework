@@ -6,6 +6,7 @@ namespace Maginium\Framework\Elasticsearch\DSL\Exceptions;
 
 use Magento\Framework\Phrase;
 use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class ParameterException.
@@ -36,12 +37,12 @@ class ParameterException extends Exception
         array $details = [],
     ) {
         // Convert string message to Phrase if it's a string
-        if (is_string($message)) {
+        if (Validator::isString($message)) {
             $message = __($message);
         }
 
         // Call the parent constructor to initialize the base exception properties.
-        parent::__construct($message, $previous, $code);
+        parent::__construct($message, $code, $previous);
 
         // Store the additional details for later retrieval.
         $this->_details = $details;

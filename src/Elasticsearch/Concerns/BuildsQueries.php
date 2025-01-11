@@ -14,6 +14,7 @@ use Maginium\Framework\Pagination\LengthAwarePaginator;
 use Maginium\Framework\Pagination\Paginator;
 use Maginium\Framework\Support\Collection;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Trait BuildsQueries.
@@ -42,7 +43,7 @@ trait BuildsQueries
     {
         // Check and resolve the cursor if it's not already an instance of Cursor
         if (! $cursor instanceof Cursor) {
-            $cursor = is_string($cursor)
+            $cursor = Validator::isString($cursor)
                 ? Cursor::fromEncoded($cursor) // Decode the cursor if it's a string
                 : CursorPaginator::resolveCurrentCursor($cursorName, $cursor); // Resolve current cursor
         }
