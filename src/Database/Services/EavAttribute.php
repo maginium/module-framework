@@ -639,7 +639,7 @@ abstract class EavAttribute implements ScopedAttributeInterface
         }
 
         // If attribute set is an object, return its ID.
-        if (is_object($attributeSet)) {
+        if (Validator::isObject($attributeSet)) {
             return (int)$attributeSet->getId();
         }
 
@@ -684,7 +684,7 @@ abstract class EavAttribute implements ScopedAttributeInterface
         }
 
         // If group is an object, return its ID.
-        if (is_object($group)) {
+        if (Validator::isObject($group)) {
             return (int)$group->getId();
         }
 

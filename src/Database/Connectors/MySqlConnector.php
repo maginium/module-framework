@@ -73,7 +73,7 @@ class MySqlConnector extends BaseMySqlConnector
         return sprintf(
             'mysql:unix_socket=%s;dbname=%s',
             $config['unix_socket'], // The Unix socket path.
-            $config['dbname'],      // The database name.
+            $config['dbname'], // The database name.
         );
     }
 

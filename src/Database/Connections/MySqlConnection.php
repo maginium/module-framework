@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Database;
+namespace Maginium\Framework\Database\Connections;
 
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;

@@ -51,6 +51,34 @@ class Blueprint extends BaseBlueprint
     protected const RECORD_ID = 'record_id';
 
     /**
+     * Adds a store-specific column to the database table.
+     *
+     * This method adds a store-related column, creates an index for the column,
+     * and logs the process to the console. It is designed for Magento's multi-store setup.
+     *
+     * @param string $column The name of the store column (default: 'store_id').
+     * @param string|null $indexName Optional name for the index (default: auto-generated).
+     *
+     * @return void
+     */
+    public function addStoreColumn(string $column = 'store_id', ?string $indexName = null): void
+    {
+        // Log the start of the process
+        ConsoleOutput::info('🏬 Adding store-specific column "' . $column . '" to table "' . $this->getTable() . '"...');
+
+        // Add the store-related column
+        $this->unsignedInteger($column)
+            ->nullable(false)
+            ->comment('Store identifier');
+
+        // Add a composite index including the store column and site root ID
+        $this->index([$column], $indexName ?? $this->generateIndexName($column));
+
+        // Log completion of the process
+        ConsoleOutput::success('✅ Store-specific column "' . $column . '" added successfully.');
+    }
+
+    /**
      * Adds a UUID column to the database table.
      *
      * This method adds a UUID field that serves as the primary key and
@@ -202,5 +230,20 @@ class Blueprint extends BaseBlueprint
 
         // Log the creation of the metadata table
         ConsoleOutput::success('Metadata table "' . $this->getTable() . '_metadata" created successfully! 🎉');
+    }
+
+    /**
+     * Generates an index name for the store column.
+     *
+     * This method creates a default index name based on the table and column names
+     * if no custom index name is provided.
+     *
+     * @param string $column The name of the column.
+     *
+     * @return string The generated index name.
+     */
+    protected function generateIndexName(string $column): string
+    {
+        return $this->getTable() . '_' . $column . '_index';
     }
 }

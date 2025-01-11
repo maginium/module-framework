@@ -6,7 +6,7 @@ namespace Maginium\Framework\Database\Schema;
 
 use Closure;
 use Illuminate\Database\Schema\Builder as BaseBuilder;
-use Maginium\Framework\Database\Connection;
+use Maginium\Framework\Database\Connections\Connection;
 use Maginium\Framework\Database\Interfaces\BuilderInterface;
 use Maginium\Framework\Support\Facades\Container;
 

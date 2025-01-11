@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Scope;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\AbstractModel;
 use Maginium\Foundation\Exceptions\RuntimeException;
+use Maginium\Framework\Database\Concerns\HasAttributes;
 use Maginium\Framework\Database\Concerns\HasTimestamps;
+use Maginium\Framework\Database\Eloquent\Docs\ModelDocs;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Database\Query\Builder as QueryBuilder;
 use Maginium\Framework\Database\Traits\Identifiable;
@@ -23,6 +25,7 @@ use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Event;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Traits\DataObject;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class Model.
@@ -32,6 +35,8 @@ use Maginium\Framework\Support\Traits\DataObject;
  * ensures queries are built with enhanced flexibility and alignment with the framework's architecture.
  *
  * @property string $slugKey
+ *
+ * @mixin ModelDocs
  */
 class Model extends BaseModel implements ModelInterface
 {
@@ -40,6 +45,8 @@ class Model extends BaseModel implements ModelInterface
         __call as dataObjectCall;
     }
 
+    // Adding Attributes functionality for the model.
+    use HasAttributes;
     // Handles timestamp fields (`created_at`, `updated_at`).
     use HasTimestamps;
     // Handles unique identifiers for the model.
@@ -168,7 +175,7 @@ class Model extends BaseModel implements ModelInterface
     public static function with($relations)
     {
         return static::query()->with(
-            is_string($relations) ? func_get_args() : $relations,
+            Validator::isString($relations) ? func_get_args() : $relations,
         );
     }
 
@@ -192,7 +199,7 @@ class Model extends BaseModel implements ModelInterface
     public static function all($columns = ['*'])
     {
         return static::query()->get(
-            is_array($columns) ? $columns : func_get_args(),
+            Validator::isArray($columns) ? $columns : func_get_args(),
         );
     }
 
@@ -216,6 +223,22 @@ class Model extends BaseModel implements ModelInterface
     public static function query()
     {
         return (new static)->newQuery();
+    }
+
+    /**
+     * reload the model attributes from the database.
+     *
+     * @return static
+     */
+    public function reload(): static
+    {
+        if (! $this->exists) {
+            $this->syncOriginal();
+        } elseif ($fresh = static::find($this->getKey())) {
+            $this->setRawAttributes($fresh->getAttributes(), true);
+        }
+
+        return $this;
     }
 
     /**
@@ -484,7 +507,7 @@ class Model extends BaseModel implements ModelInterface
         $data = collect($this->getData());
 
         // Return the full data if no specific keys are provided or '*' is included
-        if (empty($keys) || in_array('*', $keys, true)) {
+        if (Validator::isEmpty($keys) || $this->isWildcard($keys)) {
             return $data->toArray();
         }
 
@@ -505,7 +528,7 @@ class Model extends BaseModel implements ModelInterface
         // First, we will get the proper method to call on the event dispatcher, and then we
         // will attempt to fire a custom, object based event for the given event. If that
         // returns a result we can return that result, or we'll call the string events.
-        $method = $halt ? 'until' : 'dispatch';
+        $method = $halt ? 'dispatch' : 'dispatch';
 
         $result = $this->filterModelEventResults(
             $this->fireCustomModelEvent($event, $method),

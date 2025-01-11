@@ -20,6 +20,7 @@ use Magento\Framework\Setup\Patch\PatchRegistryFactory;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\SetupInterface;
 use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Apply patches per specific module.
@@ -174,7 +175,7 @@ class PatchApplier extends BasePatchApplier
                 $schemaPatch->revert();
 
                 // Get the class name of the schema patch (in case it's an object)
-                $schemaPatchClass = is_object($schemaPatch) ? get_class($schemaPatch) : $schemaPatch;
+                $schemaPatchClass = Validator::isObject($schemaPatch) ? get_class($schemaPatch) : $schemaPatch;
 
                 // Throw a setup exception with detailed error message
                 throw new SetupException(

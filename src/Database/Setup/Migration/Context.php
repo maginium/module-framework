@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Setup\Migration;
 
-use Magento\Eav\Model\Config as EavConfig;
+use Magento\Framework\App\DeploymentConfig\Writer as DeploymentConfig;
 use Magento\Framework\App\State;
 use Magento\Framework\Setup\ModuleDataSetupInterface as ModuleDataSetup;
 use Magento\Framework\Setup\Patch\PatchHistory;
@@ -43,11 +43,11 @@ class Context
     private State $state;
 
     /**
-     *  Provides access to the EAV attribute configuration in Magento.
+     *  Retrieves the deployment configuration manager.
      *
-     * @var EavConfig
+     * @var DeploymentConfig
      */
-    private EavConfig $config;
+    private DeploymentConfig $deploymentConfig;
 
     /**
      * Manages and retrieves admin-specific configuration settings.
@@ -71,7 +71,7 @@ class Context
      * for interacting with the Magento setup and EAV (Entity-Attribute-Value) models.
      *
      * @param State $state The current application state, used for retrieving configuration and store information.
-     * @param EavConfig $config Configuration manager for EAV attributes, allowing modification of model attributes.
+     * @param DeploymentConfig $deploymentConfig Retrieves the deployment configuration manager.
      * @param AdminConfig $adminConfig Manages admin-specific configuration for Magento.
      * @param PatchHistory $patchHistory Tracks the history of applied patches, preventing duplicate executions.
      * @param ModuleDataSetup $moduleDataSetup Provides methods for interacting with the database setup.
@@ -79,18 +79,18 @@ class Context
      */
     public function __construct(
         State $state,
-        EavConfig $config,
         AdminConfig $adminConfig,
         PatchHistory $patchHistory,
         ModuleDataSetup $moduleDataSetup,
         SchemaSetupInterface $schemaSetup,
+        DeploymentConfig $deploymentConfig,
     ) {
         $this->state = $state;
-        $this->config = $config;
         $this->adminConfig = $adminConfig;
         $this->schemaSetup = $schemaSetup;
         $this->patchHistory = $patchHistory;
         $this->moduleDataSetup = $moduleDataSetup;
+        $this->deploymentConfig = $deploymentConfig;
     }
 
     /**
@@ -145,16 +145,17 @@ class Context
     }
 
     /**
-     * Get the EAV configuration manager.
+     * Retrieves the deployment configuration manager.
      *
-     * Provides access to the Config instance, which manages EAV (Entity-Attribute-Value)
-     * configurations, allowing manipulation of attribute data in the system.
+     * Provides access to the deployment configuration instance, which manages
+     * system settings and configurations for deployment, such as environment
+     * variables and runtime parameters.
      *
-     * @return EavConfig The instance of Config for managing EAV attributes.
+     * @return DeploymentConfig The configuration instance for deployment management.
      */
-    public function getConfig(): EavConfig
+    public function getDeploymentConfig(): DeploymentConfig
     {
-        return $this->config;
+        return $this->deploymentConfig;
     }
 
     /**

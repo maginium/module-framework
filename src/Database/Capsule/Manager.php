@@ -8,7 +8,7 @@ use Magento\Framework\Config\File\ConfigFilePool;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\FileSystemException;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
-use Maginium\Framework\Database\Connection;
+use Maginium\Framework\Database\Connections\Connection;
 use Maginium\Framework\Database\DatabaseManager;
 use Maginium\Framework\Database\DatabaseManagerFactory;
 use Maginium\Framework\Database\Eloquent\Model;

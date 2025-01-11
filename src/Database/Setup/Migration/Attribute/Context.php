@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Database\Setup\Migration\Attribute;
 
 use Illuminate\Support\Traits\Macroable;
-use Magento\Eav\Model\Config as EavConfig;
+use Magento\Framework\App\DeploymentConfig\Writer as DeploymentConfig;
 use Magento\Framework\App\State;
 use Magento\Framework\Setup\ModuleDataSetupInterface as ModuleDataSetup;
 use Magento\Framework\Setup\Patch\PatchHistory;
@@ -57,7 +57,7 @@ class Context extends BaseContext
      * are available for modifying model attributes and maintaining a stable Magento setup.
      *
      * @param State $state The current application state, used to retrieve store and configuration information.
-     * @param EavConfig $config Configuration manager for EAV attributes, enabling modifications for models.
+     * @param DeploymentConfig $deploymentConfig Retrieves the deployment configuration manager.
      * @param AdminConfig $adminConfig Manages admin-specific configurations for Magento.
      * @param PatchHistory $patchHistory Tracks the history of applied patches to prevent duplicate executions.
      * @param ModuleDataSetup $moduleDataSetup Provides methods for interacting with database setup operations.
@@ -68,17 +68,17 @@ class Context extends BaseContext
      */
     public function __construct(
         State $state,
-        EavConfig $config,
         AdminConfig $adminConfig,
         PatchHistory $patchHistory,
         ModuleDataSetup $moduleDataSetup,
         SchemaSetupInterface $schemaSetup,
+        DeploymentConfig $deploymentConfig,
         ProductAttribute $productAttribute,
         CategoryAttribute $categoryAttribute,
         CustomerAttribute $customerAttribute,
     ) {
         // Call the parent constructor to initialize inherited dependencies.
-        parent::__construct($state, $config, $adminConfig, $patchHistory, $moduleDataSetup, $schemaSetup);
+        parent::__construct($state, $adminConfig, $patchHistory, $moduleDataSetup, $schemaSetup, $deploymentConfig);
 
         // Assign dependencies for managing EAV attributes.
         $this->productAttribute = $productAttribute;

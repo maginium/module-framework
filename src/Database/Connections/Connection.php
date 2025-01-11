@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Database;
+namespace Maginium\Framework\Database\Connections;
 
 use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Connection as BaseConnection;

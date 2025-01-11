@@ -7,8 +7,10 @@ namespace Maginium\Framework\Database\Connectors;
 use Illuminate\Database\Connectors\ConnectionFactory as BaseConnectionFactory;
 use Illuminate\Database\Connectors\ConnectorInterface;
 use InvalidArgumentException;
+use Maginium\Framework\Database\Connections\Connection;
+use Maginium\Framework\Database\Connections\MySqlConnectionFactory;
+use Maginium\Framework\Database\Connections\PostgresConnectionFactory;
 use Maginium\Framework\Database\Interfaces\ConnectionInterface;
-use Maginium\Framework\Database\MySqlConnectionFactory;
 
 /**
  * Class ConnectionFactory.
@@ -36,18 +38,24 @@ class ConnectionFactory extends BaseConnectionFactory
     private $mySqlConnectorFactory;
 
     /**
+     * Factory to create Postgres connections.
+     *
+     * @var PostgresConnectionFactory
+     */
+    private $postgresConnectionFactory;
+
+    /**
      * Constructor to initialize the ConnectionFactory with the required connector factories.
      *
-     * @param MySqlConnectionFactory $mySqlConnectionFactory  Factory to create MySQL connections.
-     * @param MySqlConnectorFactory $mySqlConnectorFactory  Factory to create MySQL connectors.
+     * @param MySqlConnectorFactory $mySqlConnectorFactory Factory to create MySQL connectors.
+     * @param MySqlConnectionFactory $mySqlConnectionFactory Factory to create MySQL connections.
+     * @param PostgresConnectionFactory $postgresConnectionFactory Factory to create Postgres connections.
      */
-    public function __construct(MySqlConnectionFactory $mySqlConnectionFactory, MySqlConnectorFactory $mySqlConnectorFactory)
+    public function __construct(MySqlConnectorFactory $mySqlConnectorFactory, MySqlConnectionFactory $mySqlConnectionFactory, PostgresConnectionFactory $postgresConnectionFactory)
     {
-        // Store the MySQL connection factory instance.
-        $this->mySqlConnectionFactory = $mySqlConnectionFactory;
-
-        // Store the MySQL connector factory instance.
         $this->mySqlConnectorFactory = $mySqlConnectorFactory;
+        $this->mySqlConnectionFactory = $mySqlConnectionFactory;
+        $this->postgresConnectionFactory = $postgresConnectionFactory;
     }
 
     /**
@@ -109,25 +117,56 @@ class ConnectionFactory extends BaseConnectionFactory
     /**
      * Creates a new database connection instance.
      *
-     * @param string $driver  The database driver.
-     * @param Closure $pdo  The PDO resolver.
-     * @param string $database  The database name.
-     * @param string $prefix  The table prefix.
-     * @param array $config  The database configuration.
+     * This method creates a connection instance based on the provided database driver.
+     * It supports custom resolvers and specific factories for MySQL and PostgreSQL.
+     * If no resolver or factory is found, it falls back to the default connection instance.
      *
-     * @return ConnectionInterface  The created connection instance.
+     * @param string $driver The database driver (e.g., 'mysql', 'pgsql').
+     * @param mixed $connection The PDO connection resolver or connection instance.
+     * @param string $database The name of the database.
+     * @param string $prefix The table prefix to use (optional).
+     * @param array $config Additional configuration options (optional).
+     *
+     * @throws InvalidArgumentException If the driver is unsupported.
+     *
+     * @return ConnectionInterface The created connection instance.
      */
     protected function createConnection($driver, $connection, $database, $prefix = '', array $config = []): ConnectionInterface
     {
-        /** @var ConnectionInterface */
-        $connection = $this->mySqlConnectionFactory->create([
-            'config' => $config,
-            'pdo' => $connection,
-            'database' => $database,
-            'tablePrefix' => $prefix,
-        ]);
+        // Check if a custom resolver is registered for the driver
+        $resolver = Connection::getResolver($driver);
 
-        // Fall back to the default connector factory.
-        return $connection;
+        if ($resolver) {
+            return $resolver($connection, $database, $prefix, $config);
+        }
+
+        // Factory method mapping for supported drivers
+        $factories = [
+            'mysql' => fn() => $this->mySqlConnectionFactory->create([
+                'config' => $config,
+                'pdo' => $connection,
+                'database' => $database,
+                'tablePrefix' => $prefix,
+            ]),
+            'pgsql' => fn() => $this->postgresConnectionFactory->create([
+                'config' => $config,
+                'pdo' => $connection,
+                'database' => $database,
+                'tablePrefix' => $prefix,
+            ]),
+        ];
+
+        // Check if a factory exists for the given driver and use it
+        if (array_key_exists($driver, $factories)) {
+            return $factories[$driver]();
+        }
+
+        // Fallback to the default connection instance
+        if ($connection instanceof ConnectionInterface) {
+            return $connection;
+        }
+
+        // Throw an exception for unsupported drivers
+        throw new InvalidArgumentException("Unsupported database driver: {$driver}");
     }
 }

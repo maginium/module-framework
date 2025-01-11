@@ -11,12 +11,15 @@ use Maginium\Framework\Database\Interfaces\HasTimestampsInterface;
 use Maginium\Framework\Database\Interfaces\IdentifiableInterface;
 use Maginium\Framework\Database\Interfaces\SearchableInterface;
 use Maginium\Framework\Dto\DataTransferObject;
+use Maginium\Framework\Elasticsearch\Eloquent\Docs\ModelDocs;
 use Maginium\Framework\Elasticsearch\Eloquent\Model as ElasticModel;
 
 /**
  * Interface ModelInterface.
  *
  * This interface defines the contract for entities.
+ *
+ * @mixin ModelDocs
  */
 interface ModelInterface extends DataObjectInterface, HasTimestampsInterface, IdentifiableInterface, SearchableInterface
 {
