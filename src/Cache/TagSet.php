@@ -36,7 +36,7 @@ class TagSet
      * @param StoreInterface $store The cache store instance to interact with.
      * @param array $names  The array of tag names.
      */
-    public function __construct(StoreInterface $store, array $names = [])
+    public function __construct($store, array $names = [])
     {
         $this->store = $store;
         $this->names = $names;

@@ -91,7 +91,7 @@ class RedisStore extends TaggableStore implements LockableInterface, StoreInterf
         $this->cache = $cache;
 
         // Set cache prefix
-        $this->setPrefix($prefix);
+        $this->setPrefix($prefix ?? '');
 
         // Set cache connection name
         $this->setConnection($connection);

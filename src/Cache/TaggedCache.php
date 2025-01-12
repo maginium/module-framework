@@ -190,7 +190,7 @@ class TaggedCache extends Repository
      *
      * @return bool Returns true on success, false on failure.
      */
-    public function put(array|string $key, $value, $ttl = null, $tags = []): bool
+    public function put($key, $value, $ttl = null, $tags = []): bool
     {
         // If the key is an array, delegate the storage to the putMany method.
         if (Validator::isArray($key)) {
@@ -313,7 +313,7 @@ class TaggedCache extends Repository
      *
      * @return bool Returns true on successful storage, false otherwise.
      */
-    public function forever(string $key, $value, $tags = []): bool
+    public function forever($key, $value, $tags = []): bool
     {
         $tags = Arr::merge($tags, $this->getTags()->getNames());
 
@@ -377,7 +377,7 @@ class TaggedCache extends Repository
      *
      * @return TCacheValue The cached value.
      */
-    public function remember(string $key, DateTimeInterface|DateInterval|int|null $ttl, Closure $callback, $tags = []): mixed
+    public function remember($key, $ttl, Closure $callback, $tags = []): mixed
     {
         $tags = Arr::merge($tags, $this->getTags()->getNames());
 

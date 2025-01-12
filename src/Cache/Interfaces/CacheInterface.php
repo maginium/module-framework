@@ -8,11 +8,12 @@ use ArrayAccess;
 use Closure;
 use DateInterval;
 use DateTimeInterface;
+use Illuminate\Contracts\Cache\Repository;
 
 /**
  * Interface CacheInterface.
  */
-interface CacheInterface extends ArrayAccess
+interface CacheInterface extends ArrayAccess, Repository
 {
     /**
      * Retrieve an item from the cache by key.
@@ -51,9 +52,9 @@ interface CacheInterface extends ArrayAccess
      * @param  string  $key  The key of the item to increment.
      * @param  mixed  $value  The amount to increment by (default is 1).
      *
-     * @return int|bool The new value after incrementing, or false on failure.
+     * @return int The new value after incrementing, or false on failure.
      */
-    public function increment(string $key, $value = 1);
+    public function increment($key, $value = 1): int;
 
     /**
      * Decrement the value of an item in the cache.
@@ -61,9 +62,9 @@ interface CacheInterface extends ArrayAccess
      * @param  string  $key  The key of the item to decrement.
      * @param  mixed  $value  The amount to decrement by (default is 1).
      *
-     * @return int|bool The new value after decrementing, or false on failure.
+     * @return int The new value after decrementing, or false on failure.
      */
-    public function decrement(string $key, $value = 1);
+    public function decrement($key, $value = 1): int;
 
     /**
      * Determine if an item exists in the cache.
@@ -125,7 +126,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return mixed Returns the cached value or the default value if not found.
      */
-    public function pull(array|string $key, $default = null);
+    public function pull($key, $default = null);
 
     /**
      * Store an item in the cache.
@@ -139,7 +140,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true on success, false on failure.
      */
-    public function put(array|string $key, $value, $ttl = null): bool;
+    public function put($key, $value, $ttl = null): bool;
 
     /**
      * Store an item in the cache.
@@ -191,7 +192,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true if the item was added, false if it already exists.
      */
-    public function add(string $key, $value, $ttl = null);
+    public function add($key, $value, $ttl = null);
 
     /**
      * Store an item in the cache indefinitely.
@@ -201,7 +202,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool Returns true on successful storage, false otherwise.
      */
-    public function forever(string $key, $value): bool;
+    public function forever($key, $value): bool;
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result.
@@ -218,7 +219,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function remember(string $key, DateTimeInterface|DateInterval|int|null $ttl, Closure $callback): mixed;
+    public function remember($key, $ttl, Closure $callback): mixed;
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
@@ -234,7 +235,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function sear(string $key, Closure $callback);
+    public function sear($key, Closure $callback);
 
     /**
      * Get an item from the cache, or execute the given Closure and store the result forever.
@@ -250,7 +251,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return TCacheValue The cached value.
      */
-    public function rememberForever(string $key, Closure $callback);
+    public function rememberForever($key, Closure $callback);
 
     /**
      * Retrieve an item from the cache by key, refreshing it in the background if it is stale.
@@ -279,7 +280,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool True if the item was successfully removed; false otherwise.
      */
-    public function forget(string $key);
+    public function forget($key);
 
     /**
      * Remove multiple items from the cache based on the provided keys.
@@ -290,7 +291,7 @@ interface CacheInterface extends ArrayAccess
      *
      * @return bool True if all items were successfully removed; false otherwise.
      */
-    public function deleteMultiple(array|string $keyOrKeys): bool;
+    public function deleteMultiple($keyOrKeys): bool;
 
     /**
      * Get the default cache time.

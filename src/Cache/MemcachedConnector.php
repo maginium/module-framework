@@ -27,7 +27,7 @@ class MemcachedConnector
      *
      * @param MemcachedFactory $memcachedFactory Factory for creating Memcached instances.
      */
-    public function __construct($memcachedFactory)
+    public function __construct($memcachedFactory = null)
     {
         $this->memcachedFactory = $memcachedFactory;
     }

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Support\InteractsWithTime;
 use Magento\Framework\App\CacheInterface;
 use Maginium\Framework\Cache\Interfaces\LockableInterface;
+use Maginium\Framework\Cache\Interfaces\StoreInterface;
 use Maginium\Framework\Cache\Locks\ArrayLock;
 use Maginium\Framework\Cache\Locks\ArrayLockFactory;
 use Maginium\Framework\Cache\RetrievesMultipleKeys;
@@ -30,7 +31,7 @@ use Maginium\Framework\Support\Facades\Serializer;
  * It extends TaggableStore to provide cache tagging features and implements
  * LockableInterface to allow cache locking functionality, using Laravel's cache locking system.
  */
-class ArrayStore extends TaggableStore implements LockableInterface
+class ArrayStore extends TaggableStore implements LockableInterface, StoreInterface
 {
     // Provides time-related methods for time-based cache expiry.
     use InteractsWithTime;

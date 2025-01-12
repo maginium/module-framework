@@ -274,9 +274,9 @@ class Repository implements ArrayAccess, CacheInterface
      * @param  string  $key  The key of the item to increment.
      * @param  mixed  $value  The amount to increment by (default is 1).
      *
-     * @return int|bool The new value after incrementing, or false on failure.
+     * @return int The new value after incrementing, or false on failure.
      */
-    public function increment($key, $value = 1)
+    public function increment($key, $value = 1): int
     {
         // Delegate the increment operation to the store and return the result.
         return $this->store->increment($key, $value);
@@ -288,9 +288,9 @@ class Repository implements ArrayAccess, CacheInterface
      * @param  string  $key  The key of the item to decrement.
      * @param  mixed  $value  The amount to decrement by (default is 1).
      *
-     * @return int|bool The new value after decrementing, or false on failure.
+     * @return int The new value after decrementing, or false on failure.
      */
-    public function decrement($key, $value = 1)
+    public function decrement($key, $value = 1): int
     {
         // Delegate the decrement operation to the store and return the result.
         return $this->store->decrement($key, $value);
@@ -418,7 +418,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return mixed Returns the cached value or the default value if not found.
      */
-    public function pull(array|string $key, $default = null)
+    public function pull($key, $default = null)
     {
         // Retrieve the item and delete it from the cache using tap.
         return tap($this->get($key, $default), function() use ($key): void {
@@ -439,7 +439,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return bool Returns true on success, false on failure.
      */
-    public function put(array|string $key, $value, $ttl = null): bool
+    public function put($key, $value, $ttl = null): bool
     {
         // If the key is an array, delegate the storage to the putMany method.
         if (Validator::isArray($key)) {
@@ -597,7 +597,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return bool Returns true if the item was added, false if it already exists.
      */
-    public function add(string $key, $value, $ttl = null)
+    public function add($key, $value, $ttl = null)
     {
         // Initialize seconds to null for TTL.
         $seconds = null;
@@ -638,7 +638,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return bool Returns true on successful storage, false otherwise.
      */
-    public function forever(string $key, $value): bool
+    public function forever($key, $value): bool
     {
         // Use handleClosure to process closures or other value types.
         $value = $this->handleClosure($value);
@@ -682,7 +682,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return TCacheValue The cached value.
      */
-    public function remember(string $key, DateTimeInterface|DateInterval|int|null $ttl, Closure $callback): mixed
+    public function remember($key, $ttl, Closure $callback): mixed
     {
         // Try to retrieve the value from the cache
         $value = $this->get($key);
@@ -720,7 +720,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return TCacheValue The cached value.
      */
-    public function sear(string $key, Closure $callback)
+    public function sear($key, Closure $callback)
     {
         return $this->rememberForever($key, $callback);
     }
@@ -739,7 +739,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return TCacheValue The cached value or the newly generated value.
      */
-    public function rememberForever(string $key, Closure $callback)
+    public function rememberForever($key, Closure $callback)
     {
         // Try to get the value from the cache using the key.
         $value = $this->get($key);
@@ -866,7 +866,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return bool True if the item was successfully removed; false otherwise.
      */
-    public function forget(string $key)
+    public function forget($key)
     {
         // Fire an event to notify that a key is being forgotten
         $this->triggerCacheEvent(CacheEvents::FORGETTING, $key, [
@@ -904,7 +904,7 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * @return bool True if all items were successfully removed; false otherwise.
      */
-    public function deleteMultiple(array|string $keyOrKeys): bool
+    public function deleteMultiple($keyOrKeys): bool
     {
         // Ensure $keyOrKeys is always an array, even if it's passed as a single string.
         $keys = Validator::isArray($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
