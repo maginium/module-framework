@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Console\Commands\Make;
 
-use DOMDocument;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Console\Enums\MakeCommands;
 use Maginium\Framework\Console\GeneratorCommand;
@@ -198,7 +197,7 @@ class Command extends GeneratorCommand
         $commandItem->addAttribute('xsi:type', 'object');
 
         // Format the XML with proper indentation using DOMDocument
-        $dom = new DOMDocument('1.0', 'UTF-8');
+        $dom = $this->createDOMDocument(['version' => '1.0', 'encoding' => 'UTF-8']);
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
 

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Console;
 
+use Illuminate\Console\CommandMutex as CommandMutexInterface;
 use Illuminate\Console\OutputStyleFactory;
+use Illuminate\Console\View\Components\FactoryFactory as ComponentsFactory;
 use Magento\Framework\App\State;
 use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Application\Interfaces\ApplicationInterface;
 use Maginium\Framework\Support\DataObject;
 use ReflectionFunctionFactory;
 use Symfony\Component\Console\Input\InputOptionFactory;
@@ -41,20 +44,29 @@ abstract class GeneratorCommand extends Command
      * output styling, input options, and reflection-based function handling.
      *
      * @param  State  $state  The application's state object.
+     * @param  ApplicationInterface $app Instance for ApplicationInterface.
+     * @param  CommandMutexInterface $commandMutex Instance for CommandMutexInterface.
      * @param  StubGeneratorFactory  $stubGenerator  Factory to generate files from stubs.
      * @param  OutputStyleFactory  $outputStyleFactory  Factory to create OutputStyle instances.
      * @param  InputOptionFactory  $inputOptionFactory  Factory to create InputOption instances.
+     * @param  ComponentsFactory $componentsFactory Factory to create ComponentsFactory instances.
      * @param  ReflectionFunctionFactory  $reflectionFunctionFactory  Factory for creating reflection functions.
      */
     public function __construct(
         State $state,
+        ApplicationInterface $app,
+        CommandMutexInterface $commandMutex,
         StubGeneratorFactory $stubGenerator,
+        ComponentsFactory $componentsFactory,
         OutputStyleFactory $outputStyleFactory,
         InputOptionFactory $inputOptionFactory,
         ReflectionFunctionFactory $reflectionFunctionFactory,
     ) {
         parent::__construct(
             $state,
+            $app,
+            $commandMutex,
+            $componentsFactory,
             $outputStyleFactory,
             $inputOptionFactory,
             $reflectionFunctionFactory,

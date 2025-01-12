@@ -184,16 +184,16 @@ if (! defined('SP')) {
 }
 
 /**
- * MAGENTO_BIN constant.
+ * MAGENTO_BINARY constant.
  *
  * This constant defines the path to the Magento binary. It is
  * used to execute Magento commands from the command line.
  *
  * @var string
  */
-if (! defined('MAGENTO_BIN')) {
+if (! defined('MAGENTO_BINARY')) {
     // Define a constant for the Magento binary path if it is not already defined.
-    define('MAGENTO_BIN', 'bin/magento');
+    define('MAGENTO_BINARY', value: 'bin/magento');
 }
 
 // Define the http_build_url function if it doesn't exist.

@@ -2,27 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Console;
+namespace Illuminate\Console;
 
-use Closure;
 use Illuminate\Console\CommandMutex as CommandMutexInterface;
 use Illuminate\Console\Concerns\CallsCommands;
 use Illuminate\Console\Concerns\HasParameters;
 use Illuminate\Console\Concerns\InteractsWithSignals;
 use Illuminate\Console\Concerns\PromptsForMissingInput;
-use Illuminate\Console\OutputStyleFactory;
-use Illuminate\Console\Parser;
 use Illuminate\Console\View\Components\FactoryFactory as ComponentsFactory;
 use Illuminate\Support\Traits\Macroable;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\LocalizedException;
-use Maginium\Framework\Application\Interfaces\ApplicationInterface;
 use Maginium\Framework\Console\Exceptions\InvalidModeException;
 use Maginium\Framework\Console\Interfaces\Isolatable;
 use Maginium\Framework\Console\Traits\ConfiguresPrompts;
-use Maginium\Framework\Console\Traits\InjectingFactories;
 use Maginium\Framework\Console\Traits\InteractsWithIO;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Php;
@@ -40,7 +35,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputOptionFactory;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Terminal;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
  * Class AbstractCommand.
@@ -56,8 +51,6 @@ abstract class Command extends SymfonyCommand
     use ConfiguresPrompts;
     // Manages command parameters.
     use HasParameters;
-    // Manages factories injection.
-    use InjectingFactories;
     // Facilitates input and output interactions.
     use InteractsWithIO;
     // Manages system signals.
@@ -66,26 +59,6 @@ abstract class Command extends SymfonyCommand
     use Macroable;
     // Prompts for any missing required input.
     use PromptsForMissingInput;
-
-    /**
-     * @var string|null The default command name
-     */
-    protected static $defaultName;
-
-    /**
-     * @var string|null The default command description
-     */
-    protected static $defaultDescription;
-
-    /**
-     * The terminal width resolver callback.
-     *
-     * Used to determine the width of the terminal dynamically for proper
-     * formatting of the output.
-     *
-     * @var Closure|callable|null
-     */
-    protected static $terminalWidthResolver;
 
     /**
      * Indicates that the parameter or argument is required.
@@ -98,24 +71,34 @@ abstract class Command extends SymfonyCommand
     public const OPTIONAL = 'optional';
 
     /**
+     * The default path to the PHP binary.
+     */
+    public const DEFAULT_PHP_BINARY = 'php';
+
+    /**
+     * The default path to the Magento binary.
+     */
+    public const DEFAULT_MAGENTO_BINARY = 'bin/magento';
+
+    /**
      * The name of the command.
      */
-    protected ?string $name;
+    protected $name;
 
     /**
      * A brief description of the command.
      */
-    protected ?string $description;
+    protected $description;
 
     /**
      * The signature of the console command.
      */
-    protected ?string $signature;
+    protected $signature;
 
     /**
      * The console command help text.
      */
-    protected ?string $help = null;
+    protected $help = null;
 
     /**
      * The console command name aliases.
@@ -163,18 +146,12 @@ abstract class Command extends SymfonyCommand
     protected CommandMutexInterface $commandMutex;
 
     /**
-     *  Instance for ApplicationInterface.
-     */
-    protected ApplicationInterface $app;
-
-    /**
      * Constructor for the Command class.
      *
      * Initializes the command with dependencies required for managing the application's state,
      * handling output, input options, and PHP executable discovery.
      *
      * @param  State  $state  The application's state object.
-     * @param  ApplicationInterface $app Instance for ApplicationInterface.
      * @param  CommandMutexInterface $commandMutex Instance for CommandMutexInterface.
      * @param  OutputStyleFactory  $outputStyleFactory  Factory to create OutputStyle instances.
      * @param  InputOptionFactory  $inputOptionFactory  Factory to create InputOption instances.
@@ -183,7 +160,6 @@ abstract class Command extends SymfonyCommand
      */
     public function __construct(
         State $state,
-        ApplicationInterface $app,
         CommandMutexInterface $commandMutex,
         ComponentsFactory $componentsFactory,
         OutputStyleFactory $outputStyleFactory,
@@ -191,16 +167,12 @@ abstract class Command extends SymfonyCommand
         ReflectionFunctionFactory $reflectionFunctionFactory,
     ) {
         // Assign dependencies to class properties for later use
-        $this->app = $app;
         $this->state = $state;
         $this->commandMutex = $commandMutex;
         $this->componentsFactory = $componentsFactory;
         $this->outputStyleFactory = $outputStyleFactory;
         $this->inputOptionFactory = $inputOptionFactory;
         $this->reflectionFunctionFactory = $reflectionFunctionFactory;
-
-        // Call the internal constructor method for further initialization
-        $this->_construct();
 
         // Set the area code for the current context.
         // TODO: FIX HERE
@@ -249,6 +221,18 @@ abstract class Command extends SymfonyCommand
             // Call a method to configure the command for isolated execution.
             $this->configureIsolation();
         }
+    }
+
+    /**
+     * Format the given command as a fully-qualified executable command.
+     *
+     * @param  string  $string
+     *
+     * @return string
+     */
+    public static function formatCommandString($string)
+    {
+        return Str::format('%s %s %s', static::phpBinary(), static::magentoBinary(), $string);
     }
 
     /**
@@ -332,40 +316,30 @@ abstract class Command extends SymfonyCommand
     }
 
     /**
-     * Retrieve the terminal's width.
+     * Get the PHP binary path.
      *
-     * This method checks if a custom resolver for the terminal width has been set.
-     * If a resolver exists, it calls the resolver to determine the width; otherwise,
-     * it creates a new instance of the Terminal class to fetch the width.
+     * This method utilizes the PhpExecutableFinder to locate the PHP binary
+     * available in the system. If not found, it defaults to the constant `DEFAULT_PHP_BINARY`.
      *
-     * @return int The width of the terminal in characters.
+     * @return string The path to the PHP binary.
      */
-    protected static function getTerminalWidth()
+    protected static function phpBinary(): string
     {
-        // Check if a custom resolver for terminal width is set.
-        // If not, use the default Terminal class to get the width.
-        return static::$terminalWidthResolver === null
-            ? Container::resolve(Terminal::class)->getWidth() // Fetch width using Terminal instance.
-            : call_user_func(static::$terminalWidthResolver); // Call the custom resolver.
+        // Use PhpExecutableFinder to locate the PHP binary or default to the constant value.
+        return Container::resolve(PhpExecutableFinder::class)->find(false) ?: self::DEFAULT_PHP_BINARY;
     }
 
     /**
-     * Define a callback to resolve the terminal width dynamically.
+     * Get the Magento binary path.
      *
-     * This method allows developers to override the default behavior for determining
-     * the terminal width by providing a custom callback resolver. If set to null,
-     * the default Terminal class logic will be used.
+     * This method checks if the `MAGENTO_BINARY` constant is defined. If not, it defaults to `DEFAULT_MAGENTO_BINARY`.
      *
-     * @param Closure|null $resolver The callback function to determine terminal width,
-     *                                or null to reset to default behavior.
-     *
-     * @return void
+     * @return string The path to the Magento binary.
      */
-    protected static function resolveTerminalWidthUsing($resolver)
+    protected static function magentoBinary(): string
     {
-        // Assign the provided resolver to the static property.
-        // This will be used by `getTerminalWidth()` to determine the terminal width.
-        static::$terminalWidthResolver = $resolver;
+        // Return the defined MAGENTO_BINARY constant or default to the constant value.
+        return defined('MAGENTO_BINARY') ? MAGENTO_BINARY : self::DEFAULT_MAGENTO_BINARY;
     }
 
     /**
@@ -430,13 +404,6 @@ abstract class Command extends SymfonyCommand
 
         // Return the determined exit code
         return $exitCode;
-    }
-
-    /**
-     * Class further initialization.
-     */
-    public function _construct(): void
-    {
     }
 
     /**
@@ -551,16 +518,6 @@ abstract class Command extends SymfonyCommand
     public function getSignture(): string
     {
         return $this->signature;
-    }
-
-    /**
-     * Get the application instance.
-     *
-     * @return ApplicationInterface
-     */
-    public function getApp()
-    {
-        return $this->app;
     }
 
     /**
