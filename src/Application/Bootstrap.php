@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Magento\Framework\App;
 
-use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Application\BaseBootstrap;
 use Maginium\Framework\Application\ServiceProvider\Registry as ServiceProviderRegistry;
 use Maginium\Framework\Support\Arr;
@@ -305,29 +304,9 @@ class Bootstrap extends BaseBootstrap
         $index = 0;
 
         while ($index < count($this->bootingCallbacks)) {
-            $this->call($this->bootingCallbacks[$index]);
+            Container::call($this->bootingCallbacks[$index]);
             $index++;
         }
-    }
-
-    /**
-     * Call a method or callback dynamically.
-     *
-     * @param callable $callback The callback to execute.
-     * @param array $parameters Parameters for the callback.
-     *
-     * @return mixed The result of the callback execution.
-     */
-    public function call($callback, array $parameters = [])
-    {
-        // Ensure the callback is callable before executing.
-        if (is_callable($callback)) {
-            // Execute the callback with provided parameters.
-            return call_user_func_array($callback, $parameters);
-        }
-
-        // Throw an error if the callback is not callable.
-        throw InvalidArgumentException::make('Provided callback is not callable');
     }
 
     /**
@@ -355,7 +334,7 @@ class Bootstrap extends BaseBootstrap
 
         // Call the 'boot' method if it exists.
         if (method_exists($provider, 'boot')) {
-            $this->call([$provider, 'boot']);
+            Container::call([$provider, 'boot']);
         }
 
         // Call the booted callbacks for the provider.
