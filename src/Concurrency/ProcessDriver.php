@@ -8,8 +8,8 @@ use Closure;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
 use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Application\Application;
 use Maginium\Framework\Concurrency\Interfaces\DriverInterface;
-use Maginium\Framework\Console\Command;
 use Maginium\Framework\Defer\DeferredCallback;
 use Maginium\Framework\Defer\Interfaces\DeferInterface;
 use Maginium\Framework\Support\Arr;
@@ -60,7 +60,7 @@ class ProcessDriver implements DriverInterface
     public function run(Closure|array $tasks): array
     {
         // Format the command to be executed in the process pool.
-        $command = Command::formatCommandString('invoke-serialized-closure');
+        $command = Application::formatCommandString('invoke-serialized-closure');
 
         // Start a pool of processes to run the tasks concurrently.
         $results = $this->processFactory->pool(function(Pool $pool) use ($tasks, $command): void {
@@ -101,7 +101,7 @@ class ProcessDriver implements DriverInterface
     public function defer(Closure|array $tasks): DeferredCallback
     {
         // Format the command for serialized closure invocation.
-        $command = Command::formatCommandString('invoke-serialized-closure');
+        $command = Application::formatCommandString('invoke-serialized-closure');
 
         // Use the injected Defer service to run the tasks in the background after the current task is finished.
         return $this->defer->execute(function() use ($tasks, $command): void {

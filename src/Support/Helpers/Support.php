@@ -3,12 +3,15 @@
 declare(strict_types=1);
 
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Env;
+use Maginium\Framework\Config\Enums\ConfigDrivers;
 use Maginium\Framework\Defer\DeferredCallback;
 use Maginium\Framework\Defer\DeferredCallbackCollection;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Request\Request;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Collection;
+use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Event;
 use Maginium\Framework\Support\Facades\Log;
@@ -1329,7 +1332,7 @@ if (! function_exists('Maginium\Framework\Support\defer')) {
  * @see Request
  */
 if (! function_exists('request')) {
-    function request($key = null, $default = null)
+    function request($key = null, $default = null): mixed
     {
         // Retrieve the current request instance from the container
         /** @var Request $instance */
@@ -1350,5 +1353,41 @@ if (! function_exists('request')) {
 
         // If the value is found, return it, otherwise return the default value (if provided)
         return $value === null ? value($default) : $value;
+    }
+}
+
+if (! function_exists('config')) {
+    /**
+     * Get / set the specified configuration value.
+     *
+     * If an array is passed as the key, we will assume you want to set an array of values.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     *
+     * @return ($key is string ? mixed : null))
+     */
+    function config($key = null, $default = null): mixed
+    {
+        if ($key === null) {
+            return Config::getFacadeRoot()->driver(ConfigDrivers::ENV);
+        }
+
+        return Config::driver(ConfigDrivers::ENV)->get($key, $default);
+    }
+}
+
+if (! function_exists('env')) {
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     *
+     * @return mixed
+     */
+    function env($key, $default = null)
+    {
+        return Env::get($key, $default);
     }
 }

@@ -122,7 +122,7 @@ use Maginium\Framework\Support\Facade;
 class DB extends Facade
 {
     /**
-     * Indicate if destructive Artisan commands should be prohibited.
+     * Indicate if destructive Magento commands should be prohibited.
      *
      * Prohibits: db:wipe, migrate:fresh, migrate:refresh, and migrate:reset
      *

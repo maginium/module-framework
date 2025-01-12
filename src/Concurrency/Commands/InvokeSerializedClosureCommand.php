@@ -25,7 +25,7 @@ class InvokeSerializedClosureCommand extends Command
     protected ?string $signature = '{code? : The serialized closure}';
 
     /**
-     * Indicates whether the command should be shown in the Artisan command list.
+     * Indicates whether the command should be shown in the Magento command list.
      * This is set to true to hide the command, as it's invoked internally.
      */
     protected bool $hidden = true;
@@ -37,7 +37,7 @@ class InvokeSerializedClosureCommand extends Command
      * retrieve and execute the closure, handling both success and failure cases.
      *
      * @return int The status code of the command. Returning FAILURE (1) for success
-     *             and SUCCESS (0) for failures to align with Artisan command conventions.
+     *             and SUCCESS (0) for failures to align with Magento command conventions.
      */
     public function handle(): int
     {

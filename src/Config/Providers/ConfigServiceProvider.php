@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Config\Providers;
 
 use Maginium\Framework\Config\EnvConfigLoader;
+use Maginium\Framework\Support\Facades\Schedule;
 use Maginium\Framework\Support\ServiceProvider;
 
 /**
@@ -35,6 +36,10 @@ class ConfigServiceProvider extends ServiceProvider
     {
         // Load environment-specific configurations from the EnvConfigLoader.
         // This step ensures that configuration settings are accessible globally in the application.
-        EnvConfigLoader::load();
+        EnvConfigLoader::load($this->app);
+
+        Schedule::call(function() {
+            dump(static::class);
+        })->hourly()->name('check_uptime:laravel.com');
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Filesystem\Interfaces;
 
+use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemInterface;
 
 /**
@@ -13,7 +14,7 @@ use Illuminate\Contracts\Filesystem\Filesystem as FilesystemInterface;
  * This includes retrieving specific filesystem instances, such as local, S3, or any custom disk configuration.
  * The interface allows flexible management of file storage and retrieval across various environments.
  */
-interface FactoryInterface
+interface FactoryInterface extends Factory
 {
     /**
      * Get a filesystem implementation by name.
@@ -25,5 +26,5 @@ interface FactoryInterface
      *
      * @return FilesystemInterface The filesystem instance corresponding to the provided name or default.
      */
-    public function disk(?string $name = null): FilesystemInterface;
+    public function disk($name = null): FilesystemInterface;
 }

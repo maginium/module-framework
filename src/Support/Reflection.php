@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Support;
 
+use Closure;
 use Illuminate\Support\Reflector as BaseReflector;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionClassConstant;
+use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionProperty;
 
@@ -42,6 +44,28 @@ class Reflection extends BaseReflector
     public static function getClass(string|object $classOrObject): ReflectionClass
     {
         return static::getReflectionClass($classOrObject);
+    }
+
+    /**
+     * Gets the ReflectionFunction instance for a given function.
+     *
+     * This method returns a ReflectionFunction object which provides detailed information
+     * about a function, such as its parameters, return type, and more.
+     * It can be used to inspect the structure of a function.
+     *
+     * @param Closure|string $function The name of the function.
+     *
+     * @throws InvalidArgumentException if the function does not exist.
+     *
+     * @return ReflectionFunction The ReflectionFunction instance associated with the provided function name.
+     */
+    public static function getFunction(Closure|string $function): ReflectionFunction
+    {
+        if (Validator::isString($function) && ! function_exists($function)) {
+            throw new InvalidArgumentException("Function '{$function}' does not exist.");
+        }
+
+        return new ReflectionFunction($function);
     }
 
     /**

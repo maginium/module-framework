@@ -13,50 +13,19 @@ use Maginium\Framework\Support\Facade;
  * This class acts as a simplified interface to access the ContainerInterface.
  * By extending AbstractFacade, it inherits basic functionality for service access.
  *
- * @method static bool has(string $className)
- *     Check if a class can be resolved.
- *     Parameters:
- *     - $className: The name of the class to check.
- *     Returns:
- *     - bool: True if the class can be resolved; false otherwise.
- * @method static mixed get(string $className)
- *     Retrieve a singleton instance of a specified class.
- *     Parameters:
- *     - $className: The name of the class to retrieve a singleton instance of.
- *     Returns:
- *     - mixed: Singleton instance of the specified class.
- * @method static mixed resolve(?string $className, ?array $arguments = [])
- *     Resolve an instance of a specified class.
- *     Parameters:
- *     - $className: The name of the class to resolve.
- *     - $arguments: Optional arguments to pass to the class constructor.
- *     Returns:
- *     - mixed: Instance of the resolved class or null if not resolved.
- * @method static mixed make(string $className, mixed ...$arguments)
- *     Create a new instance of a specified class.
- *     Parameters:
- *     - $className: The name of the class to instantiate.
- *     - $arguments: Optional parameters to pass to the class constructor as key-value pairs.
- *         Each argument is expected to be provided in pairs: a parameter name (string)
- *         followed by its corresponding value.
- *         For example, you can use:
- *         - make(Note::class, $message, 'alert')
- *         Which will be converted to:
- *         ['message' => $message, 'type' => 'alert']
- *     Returns:
- *     - mixed: Instance of the specified class.
- *     Throws:
- *     - InvalidArgumentException: If $className is null or empty.
- * @method static bool isEnabled(string $moduleName)
- *     Check if a module is installed and enabled.
- *     Parameters:
- *     - $moduleName: The name of the module to check.
- *     Returns:
- *     - bool: True if the module is installed and enabled; false otherwise.
- * @method static array getBindings()
- *     Retrieve all bindings in the container.
- *     Returns:
- *     - array: An associative array of all class bindings.
+ * @method static ContainerInterface getInstance() Returns the current instance of the ContainerManager.
+ * @method static mixed get(string $className) Retrieve a singleton instance of a specified class.
+ * @method static bool has(string $className) Check if a class can be resolved.
+ * @method static ?object resolve(?string $className, ?array $arguments = []) Check if a module is active and resolve an instance of a specified class.
+ * @method static mixed make(string $className, ...$arguments) Create a new instance of a specified class.
+ * @method static bool isEnabled(string $moduleName) Check if a module is installed and enabled.
+ * @method static array<string, mixed> getBindings() Retrieve all bindings in the container.
+ * @method static bool hasMethodBinding(string $method) Determine if the container has a method binding.
+ * @method static void bindMethod($method, $callback) Bind a callback to resolve with Container::call.
+ * @method static mixed callMethodBinding(string $method, mixed $instance) Get the method binding for the given method.
+ * @method static mixed call(callable|string $callback, array $parameters = [], string|null $defaultMethod = null) Call the given Closure/class@method and inject its dependencies.
+ * @method static mixed resolveFromAttribute(ReflectionAttribute $attribute) Resolve a dependency based on an attribute.
+ * @method static void fireAfterResolvingAttributeCallbacks(array $attributes, mixed $object) Fire all of the after resolving attribute callbacks.
  *
  * @see ContainerInterface
  */

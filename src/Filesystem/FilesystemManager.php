@@ -151,7 +151,7 @@ class FilesystemManager extends MultipleInstanceManager implements FactoryInterf
      *
      * @return FilesystemInterface The filesystem instance corresponding to the specified disk name.
      */
-    public function disk(?string $name = null): FilesystemInterface
+    public function disk($name = null): FilesystemInterface
     {
         // Retrieve the driver instance for the given disk name.
         return $this->driver($name);

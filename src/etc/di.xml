@@ -1,5 +1,9 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Application -->
+    <preference for="Illuminate\Console\Application" type="Maginium\Framework\Application\Application" />
+    <preference for="Maginium\Framework\Application\Interfaces\ApplicationInterface" type="Maginium\Framework\Application\Application" />
+
     <!-- Support and Utilities -->
     <preference for="Magento\Framework\DataObject" type="Maginium\Framework\Support\DataObject" />
 
@@ -29,6 +33,8 @@
     <preference for="Maginium\Framework\Prompts\Interfaces\PromptsInterface" type="Maginium\Framework\Prompts\PromptsManager" />
 
     <!-- Dependency container manager -->
+    <preference for="Illuminate\Container\Container" type="Maginium\Framework\Container\ContainerManager" />
+    <preference for="Illuminate\Contracts\Container\Container" type="Maginium\Framework\Container\Interfaces\ContainerInterface" />
     <preference for="Maginium\Framework\Container\Interfaces\ContainerInterface" type="Maginium\Framework\Container\ContainerManager" />
 
     <!-- Locale Management -->
@@ -36,6 +42,8 @@
     <preference for="Maginium\Framework\Locale\Interfaces\TranslationInterface" type="Maginium\Framework\Locale\TranslatorManager" />
 
     <!-- Cache and Redis -->
+    <preference for="Illuminate\Contracts\Cache\Repository" type="Maginium\Framework\Cache\Repository" />
+    <preference for="Illuminate\Contracts\Cache\Factory" type="Maginium\Framework\Cache\Interfaces\FactoryInterface" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
     <preference for="Maginium\Framework\Cache\Interfaces\FactoryInterface" type="Maginium\Framework\Cache\CacheManager" />
 
@@ -186,6 +194,15 @@
     <preference for="Maginium\Framework\Pusher\Interfaces\ClientInterface" type="Maginium\Framework\Pusher\Client" />
     <preference for="Maginium\Framework\Pusher\Interfaces\PusherInterface" type="Maginium\Framework\Pusher\PusherManager" />
 
+    <!-- Console -->
+    <preference for="Illuminate\Console\Command" type="Maginium\Framework\Console\Command" />
+    <preference for="Illuminate\Console\CommandMutex" type="Illuminate\Console\CacheCommandMutex" />
+    <preference for="Illuminate\Console\Scheduling\Schedule" type="Maginium\Framework\Console\Scheduling\Schedule" />
+    <preference for="Illuminate\Console\Scheduling\EventMutex" type="Illuminate\Console\Scheduling\CacheEventMutex" />
+    <preference for="Illuminate\Console\Scheduling\SchedulingMutex" type="Illuminate\Console\Scheduling\CacheSchedulingMutex" />
+    <preference for="Maginium\Framework\Console\Interfaces\ScheduleInterface" type="Maginium\Framework\Console\Scheduling\Schedule" />
+    <preference for="Maginium\Framework\Console\Interfaces\EventMutexInterface" type="Maginium\Framework\Console\Scheduling\CacheEventMutex" />
+
     <!-- Commands Plugin Configuration -->
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
@@ -234,6 +251,18 @@
                 <item xsi:type="object" name="app_list_modules_command">Maginium\Framework\Component\Commands\ListModulesCommand</item>
                 <item xsi:type="object" name="app_enable_modules_command">Maginium\Framework\Component\Commands\DisableModuleCommand</item>
                 <item xsi:type="object" name="app_disable_modules_command">Maginium\Framework\Component\Commands\EnableModuleCommand</item>
+
+                <!-- Console Scheduler -->
+                <item xsi:type="object" name="schedule_run_command">Maginium\Framework\Console\Commands\Schedule\ScheduleRunCommand</item>
+                <item xsi:type="object" name="schedule_test_command">Maginium\Framework\Console\Commands\Schedule\ScheduleTestCommand</item>
+                <item xsi:type="object" name="schedule_work_command">Maginium\Framework\Console\Commands\Schedule\ScheduleWorkCommand</item>
+                <item xsi:type="object" name="schedule_list_command">Maginium\Framework\Console\Commands\Schedule\ScheduleListCommand</item>
+                <item xsi:type="object" name="schedule_finish_command">Maginium\Framework\Console\Commands\Schedule\ScheduleFinishCommand</item>
+                <item xsi:type="object" name="schedule_interrupt_command">Maginium\Framework\Console\Commands\Schedule\ScheduleInterruptCommand</item>
+                <item
+                    xsi:type="object"
+                    name="schedule_clear_cache_command"
+                >Maginium\Framework\Console\Commands\Schedule\ScheduleClearCacheCommand</item>
             </argument>
         </arguments>
     </type>

@@ -7,6 +7,7 @@ namespace Maginium\Framework\Config;
 use Dotenv\Dotenv;
 use Dotenv\Exception\InvalidFileException;
 use Illuminate\Support\Env;
+use Maginium\Framework\Application\Interfaces\ApplicationInterface;
 use Maginium\Framework\Support\Debug\ConsoleOutput;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Crypt;
@@ -21,35 +22,6 @@ use Maginium\Framework\Support\Facades\Crypt;
 class EnvConfigLoader
 {
     /**
-     * The environment file name used for bootstrapping.
-     *
-     * @var string
-     */
-    protected static $envFile = '.env';
-
-    /**
-     * Retrieve the name of the environment file used for bootstrapping.
-     *
-     * @return string The environment file name.
-     */
-    public static function getEnvFile(): string
-    {
-        // Return the environment file name, defaulting to '.env' if not set.
-        return static::$envFile ?: '.env';
-    }
-
-    /**
-     * Get the directory path where the environment file is located.
-     *
-     * @return string The directory path for the environment file.
-     */
-    public static function getEnvPath(): string
-    {
-        // Return the directory path of the current file (BP).
-        return BP;
-    }
-
-    /**
      * Load the .env file from the project directory or root.
      *
      * This method searches for the .env file starting from the current directory
@@ -57,7 +29,7 @@ class EnvConfigLoader
      *
      * @param  string  $directory  The directory to start the search from.
      */
-    public static function load(string $rootDirectory = BP): void
+    public static function load(ApplicationInterface $app, string $rootDirectory = BP): void
     {
         // Traverse up the directory tree to find the .env file
         while ($rootDirectory !== SP) { // SP represents the root directory constant.
@@ -68,7 +40,7 @@ class EnvConfigLoader
             if (file_exists($envFilePath)) {
                 // Load environment variables from the .env file safely.
                 try {
-                    static::createDotenv()->safeLoad(); // Safely load the environment variables.
+                    static::createDotenv($app)->safeLoad(); // Safely load the environment variables.
                 } catch (InvalidFileException $e) {
                     // If there's an error with the .env file, handle it and exit.
                     static::handleError($e);
@@ -155,13 +127,13 @@ class EnvConfigLoader
      *
      * @return Dotenv The Dotenv instance.
      */
-    protected static function createDotenv(): Dotenv
+    protected static function createDotenv(ApplicationInterface $app): Dotenv
     {
         // Create and return a Dotenv instance for loading environment variables.
         return Dotenv::create(
             Env::getRepository(),
-            static::getEnvPath(), // Directory path where the environment file is located.
-            static::getEnvFile(), // The name of the environment file to load.
+            $app->environmentPath(), // Directory path where the environment file is located.
+            $app->environmentFile(), // The name of the environment file to load.
         );
     }
 

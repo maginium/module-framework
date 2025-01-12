@@ -19,6 +19,26 @@ use voku\helper\ASCII;
 class Str extends BaseStr
 {
     /**
+     * Pad the left side of a string with another.
+     *
+     * @param  string  $value
+     * @param  int  $length
+     * @param  string  $pad
+     *
+     * @return string
+     */
+    public static function pad($value, $length, $pad = ' ', $pad_type = STR_PAD_RIGHT)
+    {
+        if (function_exists('mb_str_pad')) {
+            return mb_str_pad($value, $length, $pad, $pad_type);
+        }
+
+        $short = max(0, $length - mb_strlen($value));
+
+        return mb_substr(str_repeat($pad, $short), 0, $short) . $value;
+    }
+
+    /**
      * Formats a string or phrase with the provided arguments.
      *
      * Supports multiple placeholder formats including:
