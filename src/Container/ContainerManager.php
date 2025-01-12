@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Container;
 
+use Closure;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Module\Manager as ModuleManager;
 use Magento\Framework\ObjectManager\ConfigInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Container\Interfaces\ContainerInterface;
+use Maginium\Framework\Container\Interfaces\ContextualAttributeInterface;
 use Maginium\Framework\Support\Php;
-use Maginium\Framework\Support\Reflection;
+use ReflectionAttribute;
+use ReflectionFunction;
 
 /**
  * Class ContainerManager.
@@ -22,6 +26,34 @@ use Maginium\Framework\Support\Reflection;
  */
 class ContainerManager implements ContainerInterface
 {
+    /**
+     * The contextual attribute handlers.
+     *
+     * @var array[]
+     */
+    public $contextualAttributes = [];
+
+    /**
+     * The stack of concretions currently being built.
+     *
+     * @var array[]
+     */
+    protected $buildStack = [];
+
+    /**
+     * The container's method bindings.
+     *
+     * @var Closure[]
+     */
+    protected $methodBindings = [];
+
+    /**
+     * All of the after resolving attribute callbacks by class type.
+     *
+     * @var array[]
+     */
+    protected $afterResolvingAttributeCallbacks = [];
+
     /**
      * @var ObjectManagerInterface|null Object Manager instance.
      */
@@ -56,31 +88,39 @@ class ContainerManager implements ContainerInterface
     }
 
     /**
-     * Check if a class can be resolved.
+     * Returns the current instance of the ContainerManager.
      *
-     * @param  string  $className  The class name to check.
-     *
-     * @return bool True if the class can be resolved, false otherwise.
+     * @return ContainerInterface The current instance of this class.
      */
-    public function has(string $className): bool
+    public function getInstance(): ContainerInterface
     {
-        if ($className === null || $className === '') {
-            return false;
+        return $this;
+    }
+
+    /**
+     * Determine if the container has a binding or preference for a given abstract type.
+     *
+     * This method checks if the container has a mapping for the provided abstract class
+     * or interface name, ensuring that the name is valid and exists in the container bindings.
+     *
+     * @param string $abstract The abstract class or interface name to check.
+     *
+     * @throws InvalidArgumentException If the provided abstract type is null, empty, or invalid.
+     *
+     * @return bool True if the binding or preference exists, false otherwise.
+     */
+    public function has(string $abstract): bool
+    {
+        // Validate the provided abstract class or interface name
+        if ($abstract === null || $abstract === '') {
+            throw InvalidArgumentException::make(__('The class name cannot be null or empty.'));
         }
 
-        // Extract module name from the class name for module-specific checks
-        $moduleName = $this->extractModuleName($className);
+        // Retrieve all container bindings
+        $bindings = $this->getBindings();
 
-        // Check if the module is active and the class is not an interface, facade, or trait
-        if ($this->isEnabled($moduleName) &&
-            ! Reflection::isFacade($className) &&
-            ! Reflection::isTrait($className) &&
-            ! interface_exists($className)) {
-            return true;
-        }
-
-        // Check if the class itself is an interface
-        return interface_exists($className);
+        // Check if the abstract type exists in the bindings array
+        return isset($bindings[$abstract]);
     }
 
     /**
@@ -172,6 +212,218 @@ class ContainerManager implements ContainerInterface
     }
 
     /**
+     * Determine if the container has a method binding.
+     *
+     * @param  string  $method The method name to check for binding.
+     *
+     * @return bool True if the method is bound, otherwise false.
+     */
+    public function hasMethodBinding($method): bool
+    {
+        // Check if the given method exists in the methodBindings array.
+        return isset($this->methodBindings[$method]);
+    }
+
+    /**
+     * Bind a callback to resolve with Container::call.
+     *
+     * @param  array|string  $method The method to bind.
+     * @param  Closure  $callback The callback to bind to the method.
+     *
+     * @return void
+     */
+    public function bindMethod($method, $callback): void
+    {
+        // Parse the method to its class@method format and bind it to the callback
+        $this->methodBindings[$this->parseBindMethod($method)] = $callback;
+    }
+
+    /**
+     * Get the method binding for the given method.
+     *
+     * @param  string  $method The method name to call.
+     * @param  mixed  $instance The instance to call the method on.
+     *
+     * @return mixed The result of the method call.
+     */
+    public function callMethodBinding($method, $instance): mixed
+    {
+        // Call the method binding with the provided instance and the container
+        return call_user_func($this->methodBindings[$method], $instance, $this);
+    }
+
+    /**
+     * Call the given Closure / class@method and inject its dependencies.
+     *
+     * @param  callable|string  $callback The callback to call.
+     * @param  array<string, mixed>  $parameters Parameters to inject into the callback.
+     * @param  string|null  $defaultMethod The default method to call, if applicable.
+     *
+     * @throws \InvalidArgumentException If the callback is invalid or the method cannot be found.
+     *
+     * @return mixed The result of the callback execution.
+     */
+    public function call($callback, array $parameters = [], $defaultMethod = null): mixed
+    {
+        // Initialize a flag to track if the class has been pushed to the build stack
+        $pushedToBuildStack = false;
+
+        // Determine the class name for the callback and ensure it's not already in the build stack
+        if (($className = $this->getClassForCallable($callback)) && ! in_array(
+            $className,
+            $this->buildStack,
+            true,
+        )) {
+            // Add the class name to the build stack
+            $this->buildStack[] = $className;
+
+            // Set the flag indicating that the class was pushed
+            $pushedToBuildStack = true;
+        }
+
+        // Call the method using BoundMethod and return the result
+        $result = BoundMethod::call($this, $callback, $parameters, $defaultMethod);
+
+        // If the class was pushed to the stack, pop it off after the call
+        if ($pushedToBuildStack) {
+            array_pop($this->buildStack);
+        }
+
+        // Return the result of the callback call
+        return $result;
+    }
+
+    /**
+     * Resolve a dependency based on an attribute.
+     *
+     * @param  ReflectionAttribute  $attribute The attribute to resolve from.
+     *
+     * @return mixed The resolved dependency.
+     */
+    public function resolveFromAttribute(ReflectionAttribute $attribute): mixed
+    {
+        // Get the handler registered for this attribute, if any
+        $handler = $this->contextualAttributes[$attribute->getName()] ?? null;
+
+        // Create an instance of the attribute
+        $instance = $attribute->newInstance();
+
+        // If no handler is found and the instance has a resolve method, call it
+        if ($handler === null && method_exists($instance, 'resolve')) {
+            $handler = $instance->resolve(...);
+        }
+
+        // If no handler is found, throw an exception
+        if ($handler === null) {
+            throw new BindingResolutionException("Contextual binding attribute [{$attribute->getName()}] has no registered handler.");
+        }
+
+        // Return the resolved dependency
+        return $handler($instance, $this);
+    }
+
+    /**
+     * Fire all of the after resolving attribute callbacks.
+     *
+     * @param  ReflectionAttribute[]  $attributes List of attributes to fire callbacks for.
+     * @param  mixed  $object The object being resolved.
+     *
+     * @return void
+     */
+    public function fireAfterResolvingAttributeCallbacks(array $attributes, $object): void
+    {
+        // Iterate through each attribute
+        foreach ($attributes as $attribute) {
+            // Check if the attribute implements ContextualAttributeInterface
+            if (is_a($attribute->getName(), ContextualAttributeInterface::class, true)) {
+                // Create an instance of the attribute
+                $instance = $attribute->newInstance();
+
+                // If the instance has an 'after' method, call it
+                if (method_exists($instance, 'after')) {
+                    $instance->after($instance, $object, $this);
+                }
+            }
+
+            // Get the callbacks for the given attribute type
+            $callbacks = $this->getCallbacksForType(
+                $attribute->getName(),
+                $object,
+                $this->afterResolvingAttributeCallbacks,
+            );
+
+            // Execute each callback
+            foreach ($callbacks as $callback) {
+                $callback($attribute->newInstance(), $object, $this);
+            }
+        }
+    }
+
+    /**
+     * Get all callbacks for a given type.
+     *
+     * @param  string  $abstract The type to search for callbacks.
+     * @param  object  $object The object to check callbacks for.
+     * @param  array  $callbacksPerType All registered callbacks for each type.
+     *
+     * @return array List of callbacks associated with the type.
+     */
+    protected function getCallbacksForType($abstract, $object, array $callbacksPerType)
+    {
+        // Initialize an array to store matching callbacks
+        $results = [];
+
+        // Iterate through the callbacks per type
+        foreach ($callbacksPerType as $type => $callbacks) {
+            // If the type matches or the object is an instance of the type, merge callbacks
+            if ($type === $abstract || $object instanceof $type) {
+                $results = array_merge($results, $callbacks);
+            }
+        }
+
+        // Return the list of matching callbacks
+        return $results;
+    }
+
+    /**
+     * Get the class name for the given callback, if one can be determined.
+     *
+     * @param  callable|string  $callback The callback to check for a class.
+     *
+     * @return string|false The class name if callable, otherwise false.
+     */
+    protected function getClassForCallable($callback): string|false
+    {
+        // If the callback is callable and is not an anonymous function
+        if (is_callable($callback) &&
+            ! ($reflector = new ReflectionFunction($callback(...)))->isAnonymous()) {
+            // Return the class name of the callback's closure scope
+            return $reflector->getClosureScopeClass()->name ?? false;
+        }
+
+        // Return false if no class can be determined
+        return false;
+    }
+
+    /**
+     * Get the method to be bound in class@method format.
+     *
+     * @param  array|string  $method The method to bind.
+     *
+     * @return string The method in class@method format.
+     */
+    protected function parseBindMethod($method): string
+    {
+        // If the method is an array (class and method), return the class@method format
+        if (is_array($method)) {
+            return $method[0] . '@' . $method[1];
+        }
+
+        // If it's a string, return it as is
+        return $method;
+    }
+
+    /**
      * Extract module name from the full class name.
      *
      * @param  string  $className  The full class name.
@@ -183,7 +435,7 @@ class ContainerManager implements ContainerInterface
         // Split the class name by namespace separator and extract the first two parts
         $parts = Php::explode('\\', $className, 3);
 
-        // Form the module name by joining the first two parts with underscore
+        // Form the module name by joining the first two parts with an underscore
         return Php::implode('_', Php::arraySlice($parts, 0, 2));
     }
 }

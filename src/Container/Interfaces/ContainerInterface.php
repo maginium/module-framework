@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Container\Interfaces;
 
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
+use ReflectionAttribute;
 
 /**
  * Interface ContainerInterface.
@@ -23,6 +24,13 @@ interface ContainerInterface
      * @return mixed The singleton instance of the specified class.
      */
     public function get(string $className): mixed;
+
+    /**
+     * Returns the current instance of the ContainerManager.
+     *
+     * @return ContainerInterface The current instance of this class.
+     */
+    public function getInstance(): self;
 
     /**
      * Check if a class can be resolved.
@@ -77,4 +85,65 @@ interface ContainerInterface
      * @return array<string, mixed> An associative array of bindings.
      */
     public function getBindings(): array;
+
+    /**
+     * Determine if the container has a method binding.
+     *
+     * @param  string  $method The method name to check for binding.
+     *
+     * @return bool True if the method is bound, otherwise false.
+     */
+    public function hasMethodBinding($method): bool;
+
+    /**
+     * Bind a callback to resolve with Container::call.
+     *
+     * @param  array|string  $method The method to bind.
+     * @param  Closure  $callback The callback to bind to the method.
+     *
+     * @return void
+     */
+    public function bindMethod($method, $callback): void;
+
+    /**
+     * Get the method binding for the given method.
+     *
+     * @param  string  $method The method name to call.
+     * @param  mixed  $instance The instance to call the method on.
+     *
+     * @return mixed The result of the method call.
+     */
+    public function callMethodBinding($method, $instance): mixed;
+
+    /**
+     * Call the given Closure / class@method and inject its dependencies.
+     *
+     * @param  callable|string  $callback The callback to call.
+     * @param  array<string, mixed>  $parameters Parameters to inject into the callback.
+     * @param  string|null  $defaultMethod The default method to call, if applicable.
+     *
+     * @throws \InvalidArgumentException If the callback is invalid or the method cannot be found.
+     *
+     * @return mixed The result of the callback execution.
+     */
+    public function call($callback, array $parameters = [], $defaultMethod = null): mixed;
+
+    /**
+     * Resolve a dependency based on an attribute.
+     *
+     * @param  ReflectionAttribute  $attribute The attribute to resolve from.
+     *
+     * @return mixed The resolved dependency.
+     */
+    public function resolveFromAttribute(ReflectionAttribute $attribute): mixed;
+
+    /**
+     * Fire all of the after resolving attribute callbacks.
+     *
+     * @param  ReflectionAttribute[]  $attributes List of attributes to fire callbacks for.
+     * @param  mixed  $object The object being resolved.
+     *
+     * @return void
+     */
+    public function fireAfterResolvingAttributeCallbacks(array $attributes, $object): void;
 }

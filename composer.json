@@ -60,6 +60,7 @@
     "league/flysystem-aws-s3-v3": "^2.5",
     "maginium/module-foundation": "*",
     "laravel/serializable-closure": "^1.3",
+    "dragonmantank/cron-expression": "^3.4",
     "beeyev/disposable-email-filter-php": "^1.3",
     "lasserafn/php-string-script-language": "^0.4.0",
     "run-as-root/magento2-message-queue-retry": "^3.0"
@@ -100,7 +101,8 @@
       "src/registration.php",
       "src/Application/Bootstrap.php",
       "src/Support/Helpers/Support.php",
-      "src/Support/Helpers/Polyfills.php"
+      "src/Support/Helpers/Polyfills.php",
+      "src/Console/Interceptors/Console/Command.php"
     ],
     "classmap": [
       "helpers/"
