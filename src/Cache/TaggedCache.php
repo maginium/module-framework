@@ -7,8 +7,9 @@ namespace Maginium\Framework\Cache;
 use Closure;
 use DateInterval;
 use DateTimeInterface;
+use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\RuntimeException;
-use Maginium\Framework\Cache\Events\CacheEvent;
+use Maginium\Framework\Cache\Enums\CacheEvents;
 use Maginium\Framework\Cache\Events\CacheHitFactory;
 use Maginium\Framework\Cache\Events\CacheMissedFactory;
 use Maginium\Framework\Cache\Events\ForgettingKeyFactory;
@@ -211,14 +212,7 @@ class TaggedCache extends Repository
         }
 
         // Trigger an event indicating that a key is being written to the cache.
-        $this->event(
-            $this->writingKeyFactory->create([
-                'storeName' => $this->getName(),
-                'key' => $key,
-                'value' => $value,
-                'seconds' => $seconds,
-            ]),
-        );
+        $this->dispatch(CacheEvents::WRITING, $key, ['value' => $value, 'seconds' => $seconds]);
 
         // Check if the value is not already a string
         if (! Validator::isString($value)) {
@@ -242,24 +236,10 @@ class TaggedCache extends Repository
         // Trigger appropriate events based on the result of the storage operation.
         if ($result) {
             // Success event.
-            $this->event(
-                $this->keyWrittenFactory->create([
-                    'storeName' => $this->getName(),
-                    'key' => $key,
-                    'value' => $value,
-                    'seconds' => $seconds,
-                ]),
-            );
+            $this->dispatch(CacheEvents::WRITTEN, $key, ['seconds' => $seconds, 'value' => $value]);
         } else {
             // Failure event.
-            $this->event(
-                $this->keyWriteFailedFactory->create([
-                    'storeName' => $this->getName(),
-                    'key' => $key,
-                    'value' => $value,
-                    'seconds' => $seconds,
-                ]),
-            );
+            ${$this}->dispatch(CacheEvents::WRITE_FAILED, $key, ['seconds' => $seconds, 'value' => $value]);
         }
 
         // Return the result of the storage operation.
@@ -326,13 +306,7 @@ class TaggedCache extends Repository
         }
 
         // Trigger an event to log that a key is being written to the cache.
-        $this->event(
-            $this->writingKeyFactory->create([
-                'storeName' => $this->getName(),
-                'key' => $key,
-                'value' => $value,
-            ]),
-        );
+        $this->dispatch(CacheEvents::WRITING, $key, ['storeName' => $this->getName(), 'value' => $value]);
 
         // Store the item in the cache indefinitely using the store's save method.
         $result = $this->store->put(key: $this->itemKey($key), value: $value, tags: $tags);
@@ -340,22 +314,10 @@ class TaggedCache extends Repository
         // Trigger the success or failure event based on the result of the storage operation.
         if ($result) {
             // Event indicating the key was successfully written to the cache.
-            $this->event(
-                $this->keyWrittenFactory->create([
-                    'storeName' => $this->getName(),
-                    'key' => $key,
-                    'value' => $value,
-                ]),
-            );
+            $this->dispatch(CacheEvents::WRITTEN, $key, ['storeName' => $this->getName(), 'value' => $value]);
         } else {
             // Event indicating the key write failed.
-            $this->event(
-                $this->keyWriteFailedFactory->create([
-                    'storeName' => $this->getName(),
-                    'key' => $key,
-                    'value' => $value,
-                ]),
-            );
+            $this->dispatch(CacheEvents::WRITE_FAILED, $key, ['storeName' => $this->getName(), 'value' => $value]);
         }
 
         // Return the result of the forever operation.
@@ -419,19 +381,22 @@ class TaggedCache extends Repository
     }
 
     /**
-     * Dispatch an event for cache operations.
+     * Trigger a cache event with relevant data.
      *
-     * This method is responsible for dispatching events related to cache operations such as
-     * storing, retrieving, or removing cache items. Events provide a way to notify other
-     * parts of the application about changes in cache state.
+     * This helper method standardizes the process of firing cache-related events.
      *
-     * @param CacheEvent $event
+     * @param string $eventType The type of event to trigger (e.g., CacheEvents::HIT, CacheEvents::MISSED, etc.).
+     * @param mixed       $key       The cache key involved in the event, optional for some events.
+     * @param array       $context   Contextual data such as `keys`, `value`, `seconds`, etc., required for specific events.
      *
-     * @return void
+     * @throws InvalidArgumentException If the provided event type is invalid.
      */
-    protected function event($event): void
-    {
+    protected function dispatch(
+        string $eventType,
+        mixed $key = null,
+        array $context = [],
+    ): void {
         // Dispatch the event with the associated tags.
-        parent::event($event->setTags($this->tags->getNames()));
+        parent::dispatch($eventType, $key, ['tags' => $this->tags->getNames(), ...$context]);
     }
 }

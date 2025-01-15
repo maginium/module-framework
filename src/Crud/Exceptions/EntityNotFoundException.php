@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Crud\Exceptions;
 
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Support\Validator;
 use RuntimeException;
@@ -60,7 +60,7 @@ class EntityNotFoundException extends RuntimeException
         parent::__construct(
             $this->message, // The custom error message
             null,           // No previous exception or cause
-            HttpStatusCode::NOT_FOUND, // Default HTTP status code 404 (Not Found)
+            HttpStatusCodes::NOT_FOUND, // Default HTTP status code 404 (Not Found)
         );
     }
 

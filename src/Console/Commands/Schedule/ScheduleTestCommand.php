@@ -8,6 +8,8 @@ use Maginium\Framework\Application\Application;
 use Maginium\Framework\Console\Command;
 use Maginium\Framework\Console\Interfaces\ScheduleInterface;
 use Maginium\Framework\Console\Scheduling\CallbackEvent;
+use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Str;
 use Symfony\Component\Console\Attribute\AsCommand;
 
 use function Laravel\Prompts\select;
@@ -74,7 +76,7 @@ class ScheduleTestCommand extends Command
             $commandBinary = $phpBinary . ' ' . Application::magentoBinary();
 
             // Filter commands matching the provided name
-            $matches = array_filter($commandNames, fn($commandName) => trim(str_replace($commandBinary, '', $commandName)) === $name);
+            $matches = Arr::filter($commandNames, fn($commandName) => Str::trim(Str::replace($commandBinary, '', $commandName)) === $name);
 
             // If no matching command is found, inform the user and exit
             if (count($matches) !== 1) {
@@ -134,9 +136,9 @@ class ScheduleTestCommand extends Command
     protected function getSelectedCommandByIndex(array $commandNames): int
     {
         // Check for duplicate command names
-        if (count($commandNames) !== count(array_unique($commandNames))) {
+        if (count($commandNames) !== count(Arr::unique($commandNames))) {
             // For duplicate command names (likely closures), append a unique index
-            $uniqueCommandNames = array_map(fn($index, $value) => "{$value} [{$index}]", array_keys($commandNames), $commandNames);
+            $uniqueCommandNames = array_map(fn($index, $value) => "{$value} [{$index}]", Arr::keys($commandNames), $commandNames);
 
             // Prompt the user to select one of the commands
             $selectedCommand = select('Which command would you like to run?', $uniqueCommandNames);
@@ -148,7 +150,7 @@ class ScheduleTestCommand extends Command
         }
 
         // If no duplicates are found, simply return the index of the selected command
-        return array_search(
+        return Arr::search(
             select('Which command would you like to run?', $commandNames),
             $commandNames,
         );

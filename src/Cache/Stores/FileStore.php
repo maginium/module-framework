@@ -18,6 +18,7 @@ use Maginium\Framework\Cache\RetrievesMultipleKeys;
 use Maginium\Framework\Filesystem\Filesystem;
 use Maginium\Framework\Filesystem\LockableFileFactory;
 use Maginium\Framework\Serializer\Facades\Serializer;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Path;
 
 /**
@@ -355,7 +356,7 @@ class FileStore implements LockableInterface, StoreInterface
         $hash = sha1($key);
 
         // Break the hash into smaller parts (2 characters each) for directory structure.
-        $parts = array_slice(mb_str_split($hash, 2), 0, 2);
+        $parts = Arr::slice(mb_str_split($hash, 2), 0, 2);
 
         // If tags are provided, generate a tags-specific subdirectory.
         $tagPath = '';

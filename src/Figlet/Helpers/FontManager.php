@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Figlet\Helpers;
 
-use Maginium\Foundation\Enums\FileExtension;
+use Maginium\Foundation\Enums\FileExtensions;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Figlet\Interfaces\Data\FontInterfaceFactory;
@@ -203,7 +203,7 @@ class FontManager
     private function getFileName(string $fontName, string $fontDirectory): string
     {
         // Construct the full file name with the directory and font name.
-        $fileName = Path::join($fontDirectory, $fontName, FileExtension::FLF);
+        $fileName = Path::join($fontDirectory, $fontName, FileExtensions::FLF);
 
         // Check if the font file exists.
         if (! Filesystem::exists($fileName)) {

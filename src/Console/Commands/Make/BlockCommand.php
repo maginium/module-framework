@@ -58,7 +58,7 @@ class BlockCommand extends GeneratorCommand
      *
      * @return int The exit code indicating success or failure of the block execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Retrieve the user inputs for the module name, namespace, and block name

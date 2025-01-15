@@ -761,35 +761,39 @@ class Filesystem extends BaseFilesystem implements FilesystemInterface
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string  $directory The path to the directory.
-     * @param  bool  $hidden Whether to include hidden files in the result.
+     * This method scans a specified directory for files matching a pattern,
+     * excluding specified directories and files as necessary.
      *
-     * @return SplFileInfo[] Returns an array of file info objects.
+     * @param  string       $directory The directory to search in.
+     * @param  string       $pattern The pattern for including files (default: '*.php').
+     * @param  array        $excludedDirectories An array of directory names to exclude (default: empty array).
+     * @param  array|null   $excludedFiles An optional array of file patterns to exclude (default: null).
+     *
+     * @return SplFileInfo[] An array of SplFileInfo objects representing the files that match the criteria.
      */
-    public function files(string $directory, bool $hidden = false): array
-    {
-        // Use the Finder component to locate files in the specified directory, ignoring dot files if not hidden.
-        return iterator_to_array(
-            $this->finderFactory->create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
-            false,
-        );
-    }
+    public function files(
+        string $directory,
+        string $pattern = '*.php',
+        array $excludedDirectories = [],
+        ?array $excludedFiles = [],
+    ): array {
+        // Create a new Finder instance to search for files in the specified directory.
+        $finder = $this->finderFactory->create()
+            ->in($directory) // Set the directory to search in.
+            ->files() // Search for files only.
+            ->name($pattern) // Filter files by the specified name pattern.
 
-    /**
-     * Get all of the files from the given directory (recursive).
-     *
-     * @param  string  $directory The path to the directory.
-     * @param  bool  $hidden Whether to include hidden files in the result.
-     *
-     * @return \Symfony\Component\Finder\SplFileInfo[] Returns an array of file info objects.
-     */
-    public function allFiles(string $directory, bool $hidden = false): array
-    {
-        // Use the Finder component to locate all files in the specified directory, regardless of depth.
-        return iterator_to_array(
-            $this->finderFactory->create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
-            false,
-        );
+            // Exclude specified directories from the search.
+            ->exclude($excludedDirectories);
+
+        // Apply additional filtering if excluded files patterns are provided.
+        if ($excludedFiles !== null) {
+            // Exclude files matching the specified patterns.
+            $finder->notName($excludedFiles);
+        }
+
+        // Convert the Finder result to an array of SplFileInfo objects and return it.
+        return iterator_to_array($finder, false);
     }
 
     /**
@@ -1474,44 +1478,6 @@ class Filesystem extends BaseFilesystem implements FilesystemInterface
     {
         // Return absolute path or false.
         return realpath($path) ?: false;
-    }
-
-    /**
-     * Retrieves an array of files from a directory with optional filtering and sorting.
-     *
-     * This method scans a specified directory for files matching a pattern,
-     * excluding specified directories and files as necessary.
-     *
-     * @param  string       $directory The directory to search in.
-     * @param  string       $name The pattern for including files (default: '*.php').
-     * @param  array        $excludedDirectories An array of directory names to exclude (default: empty array).
-     * @param  array|null   $excludedFiles An optional array of file patterns to exclude (default: null).
-     *
-     * @return SplFileInfo[] An array of SplFileInfo objects representing the files that match the criteria.
-     */
-    public function scanDirectory(
-        string $directory,
-        string $name = '*.php',
-        array $excludedDirectories = [],
-        ?array $excludedFiles = [],
-    ): array {
-        // Create a new Finder instance to search for files in the specified directory.
-        $finder = $this->finderFactory->create()
-            ->in($directory) // Set the directory to search in.
-            ->files() // Search for files only.
-            ->name($name) // Filter files by the specified name pattern.
-
-            // Exclude specified directories from the search.
-            ->exclude($excludedDirectories);
-
-        // Apply additional filtering if excluded files patterns are provided.
-        if ($excludedFiles !== null) {
-            // Exclude files matching the specified patterns.
-            $finder->notName($excludedFiles);
-        }
-
-        // Convert the Finder result to an array of SplFileInfo objects and return it.
-        return iterator_to_array($finder, false);
     }
 
     /**

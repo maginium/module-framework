@@ -401,22 +401,22 @@ interface FilesystemInterface
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string  $directory The path to the directory.
-     * @param  bool  $hidden Whether to include hidden files in the result.
+     * This method scans a specified directory for files matching a pattern,
+     * excluding specified directories and files as necessary.
      *
-     * @return SplFileInfo[] Returns an array of file info objects.
+     * @param  string       $directory The directory to search in.
+     * @param  string       $pattern The pattern for including files (default: '*.php').
+     * @param  array        $excludedDirectories An array of directory names to exclude (default: empty array).
+     * @param  array|null   $excludedFiles An optional array of file patterns to exclude (default: null).
+     *
+     * @return SplFileInfo[] An array of SplFileInfo objects representing the files that match the criteria.
      */
-    public function files(string $directory, bool $hidden = false): array;
-
-    /**
-     * Get all of the files from the given directory (recursive).
-     *
-     * @param  string  $directory The path to the directory.
-     * @param  bool  $hidden Whether to include hidden files in the result.
-     *
-     * @return SplFileInfo[] Returns an array of file info objects.
-     */
-    public function allFiles(string $directory, bool $hidden = false): array;
+    public function files(
+        string $directory,
+        string $pattern = '*.php',
+        array $excludedDirectories = [],
+        ?array $excludedFiles = [],
+    ): array;
 
     /**
      * Get all of the directories within a given directory.
@@ -693,26 +693,6 @@ interface FilesystemInterface
      * @return string|false The absolute path if it exists, or false if it does not.
      */
     public function realPath(string $path);
-
-    /**
-     * Retrieves an array of files from a directory with optional filtering and sorting.
-     *
-     * This method scans a specified directory for files matching a pattern,
-     * excluding specified directories and files as necessary.
-     *
-     * @param  string       $directory The directory to search in.
-     * @param  string       $name The pattern for including files (default: '*.php').
-     * @param  array        $excludedDirectories An array of directory names to exclude (default: empty array).
-     * @param  array|null   $excludedFiles An optional array of file patterns to exclude (default: null).
-     *
-     * @return SplFileInfo[] An array of SplFileInfo objects representing the files that match the criteria.
-     */
-    public function scanDirectory(
-        string $directory,
-        string $name = '*.php',
-        array $excludedDirectories = [],
-        ?array $excludedFiles = [],
-    ): array;
 
     /**
      * Create an instance of directory with read permissions.

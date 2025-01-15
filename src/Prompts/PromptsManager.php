@@ -38,34 +38,109 @@ use Maginium\Framework\Support\Collection;
  */
 class PromptsManager implements PromptsInterface
 {
+    /**
+     * Factory for creating confirm prompts.
+     *
+     * @var ConfirmPromptFactory
+     */
     protected ConfirmPromptFactory $confirmPromptFactory;
 
+    /**
+     * Factory for creating form builders.
+     *
+     * @var FormBuilderFactory
+     */
     protected FormBuilderFactory $formBuilderFactory;
 
+    /**
+     * Factory for creating multi-search prompts.
+     *
+     * @var MultiSearchPromptFactory
+     */
     protected MultiSearchPromptFactory $multiSearchPromptFactory;
 
+    /**
+     * Factory for creating multi-select prompts.
+     *
+     * @var MultiSelectPromptFactory
+     */
     protected MultiSelectPromptFactory $multiSelectPromptFactory;
 
+    /**
+     * Factory for creating note components.
+     *
+     * @var NoteFactory
+     */
     protected NoteFactory $noteFactory;
 
+    /**
+     * Factory for creating password prompts.
+     *
+     * @var PasswordPromptFactory
+     */
     protected PasswordPromptFactory $passwordPromptFactory;
 
+    /**
+     * Factory for creating pause prompts.
+     *
+     * @var PausePromptFactory
+     */
     protected PausePromptFactory $pausePromptFactory;
 
+    /**
+     * Factory for creating progress indicators.
+     *
+     * @var ProgressFactory
+     */
     protected ProgressFactory $progressFactory;
 
+    /**
+     * Factory for creating search prompts.
+     *
+     * @var SearchPromptFactory
+     */
     protected SearchPromptFactory $searchPromptFactory;
 
+    /**
+     * Factory for creating select prompts.
+     *
+     * @var SelectPromptFactory
+     */
     protected SelectPromptFactory $selectPromptFactory;
 
+    /**
+     * Factory for creating spinner components.
+     *
+     * @var SpinnerFactory
+     */
     protected SpinnerFactory $spinnerFactory;
 
+    /**
+     * Factory for creating suggest prompts.
+     *
+     * @var SuggestPromptFactory
+     */
     protected SuggestPromptFactory $suggestPromptFactory;
 
+    /**
+     * Factory for creating table components.
+     *
+     * @var TableFactory
+     */
     protected TableFactory $tableFactory;
 
+    /**
+     * Factory for creating textarea prompts.
+     *
+     * @var TextareaPromptFactory
+     */
     protected TextareaPromptFactory $textareaPromptFactory;
 
+    /**
+     * Factory for creating text prompts.
+     *
+     * @var TextPromptFactory
+     */
     protected TextPromptFactory $textPromptFactory;
 
     /**

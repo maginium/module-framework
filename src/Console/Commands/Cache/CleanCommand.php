@@ -43,7 +43,7 @@ class CleanCommand extends Command
      *
      * @return int The exit code indicating the success or failure of the cache cleaning execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Manage the specific module with a spinner

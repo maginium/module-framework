@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Dto\Exceptions;
 
 use Exception;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Framework\Dto\DataTransferObject;
 use Maginium\Framework\Dto\Validation\ValidationResult;
 
@@ -50,7 +50,7 @@ class ValidationException extends Exception
         // Create and return a new instance of the exception with the detailed validation error message
         return new self(
             __('Validation errors: %1', implode(PHP_EOL, $messages))->render(),
-            HttpStatusCode::BAD_REQUEST,
+            HttpStatusCodes::BAD_REQUEST,
         );
     }
 }

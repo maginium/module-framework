@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as CollectionBase;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Maginium\Framework\Database\Scopes\SoftDeleteScope;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
 
 /**
@@ -334,7 +335,7 @@ trait SoftDelete
         $query->update($columns);
 
         // Sync the model's original attributes with the updated values
-        $this->syncOriginalAttributes(array_keys($columns));
+        $this->syncOriginalAttributes(Arr::keys($columns));
 
         // Fire the 'trashed' model event
         $this->fireModelEvent('trashed', false);

@@ -9,7 +9,7 @@ use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\User\Api\Data\UserInterface;
 use Maginium\Foundation\Abstracts\Middleware\AbstractMiddleware;
-use Maginium\Foundation\Enums\UserType;
+use Maginium\Foundation\Enums\UserTypes;
 use Maginium\Framework\Request\Interfaces\RequestInterface;
 use Maginium\Framework\Support\Facades\Log;
 
@@ -55,7 +55,7 @@ class User extends AbstractMiddleware
     protected function before($request): void
     {
         // Initialize the user context as 'anonymous', in case no user session is found.
-        $userContext = ['identity' => UserType::GUEST];
+        $userContext = ['identity' => UserTypes::GUEST];
 
         // Check if there is an admin user in the session
         /** @var UserInterface $customer */
@@ -72,7 +72,7 @@ class User extends AbstractMiddleware
             // Set the user context to 'admin' and include the admin user ID for logging
             $userContext = [
                 'id' => $adminUser->getId(), // Admin user ID for tracing purposes
-                'identity' => UserType::ADMIN, // Identity type (admin)
+                'identity' => UserTypes::ADMIN, // Identity type (admin)
             ];
         }
         // If there is no admin user, check if a customer is logged in
@@ -84,7 +84,7 @@ class User extends AbstractMiddleware
             // Set the user context to 'customer' and include the customer ID for logging
             $userContext = [
                 'id' => $customer->getId(), // Customer ID for tracing purposes
-                'identity' => UserType::CUSTOMER, // Identity type (customer)
+                'identity' => UserTypes::CUSTOMER, // Identity type (customer)
             ];
         } else {
             // If no admin or customer is found, set the user as null (anonymous)

@@ -40,6 +40,19 @@ class LengthAwarePaginator extends BaseLengthAwarePaginator implements LengthAwa
     }
 
     /**
+     * Render the paginator using the given view.
+     *
+     * @param  string|null  $view
+     * @param  array  $data
+     *
+     * @return Htmlable
+     */
+    #[Override]
+    public function render($view = null, $data = []): void
+    {
+    }
+
+    /**
      * Get all of the items in the collection.
      *
      * @return array<TKey, TValue>
@@ -146,18 +159,5 @@ class LengthAwarePaginator extends BaseLengthAwarePaginator implements LengthAwa
                 PaginatorConstants::LABEL => __(PaginatorConstants::NEXT_LABEL),  // Label for the next page.
                 PaginatorConstants::ACTIVE => false,  // Not active, as it's always a link.
             ]);
-    }
-
-    /**
-     * Render the paginator using the given view.
-     *
-     * @param  string|null  $view
-     * @param  array  $data
-     *
-     * @return Htmlable
-     */
-    #[Override]
-    public function render($view = null, $data = []): void
-    {
     }
 }

@@ -12,7 +12,9 @@ use Maginium\Framework\Crud\Exceptions\OperatorNotSupported;
 use Maginium\Framework\Crud\Interfaces\FilterInterface;
 use Maginium\Framework\Database\Eloquent\Builder;
 use Maginium\Framework\Database\Eloquent\Model;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
+use Maginium\Framework\Support\Validator;
 
 /**
  * Class Resolve.
@@ -115,7 +117,7 @@ class Resolve
         }
 
         if (! in_array(key($values), $this->filterList->keys())) {
-            $this->validate(array_values($values)[0]);
+            $this->validate(Arr::values($values)[0]);
         }
     }
 
@@ -164,7 +166,7 @@ class Resolve
      */
     private function filterRelations(Builder $query, Closure $callback): void
     {
-        array_pop($this->fields);
+        Arr::pop($this->fields);
         $this->applyRelations($query, $callback);
     }
 
@@ -191,7 +193,7 @@ class Resolve
      */
     private function relation(Builder $query, Closure $callback): void
     {
-        $field = array_shift($this->fields);
+        $field = Arr::shift($this->fields);
         $query->whereHas($field, fn($subQuery) => $this->applyRelations($subQuery, $callback));
     }
 
@@ -238,10 +240,10 @@ class Resolve
      */
     private function restorePreviousModel(): void
     {
-        array_pop($this->fields);
+        Arr::pop($this->fields);
 
         if (! empty($this->previousModels)) {
-            $this->model = array_pop($this->previousModels);
+            $this->model = Arr::pop($this->previousModels);
         }
     }
 

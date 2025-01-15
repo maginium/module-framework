@@ -398,6 +398,18 @@ class Arr extends BaseArr
     }
 
     /**
+     * Compute the difference of array keys.
+     *
+     * @param array ...$arrays The arrays to compare against.
+     *
+     * @return array The array containing the values that are not present in the other arrays.
+     */
+    public static function diffKey(array ...$arrays): array
+    {
+        return array_diff_key(...$arrays);
+    }
+
+    /**
      * Fill an array with values.
      *
      * @param int $count The number of elements to insert.

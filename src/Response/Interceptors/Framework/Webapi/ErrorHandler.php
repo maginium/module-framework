@@ -9,7 +9,7 @@ use Magento\Framework\Webapi\ErrorProcessor;
 use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Framework\Webapi\Rest\Response as BaseResponse;
 use Magento\Framework\Webapi\Rest\Response\RendererFactory;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterface;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterfaceFactory;
@@ -83,7 +83,7 @@ class ErrorHandler extends BaseResponse
     // #[Override]
     // protected function _renderMessages(): static
     // {
-    //     $statusCode = HttpStatusCode::INTERNAL_SERVER_ERROR;
+    //     $statusCode = HttpStatusCodes::INTERNAL_SERVER_ERROR;
 
     //     /** @var Exception $exception */
     //     foreach ($this->getException() as $exception) {

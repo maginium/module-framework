@@ -42,7 +42,7 @@ class StaticDeployCommand extends Command
      *
      * @return int The exit code indicating the success or failure of the static content deployment.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Check if the '--force' option is provided

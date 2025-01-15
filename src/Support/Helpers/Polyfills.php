@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-use Maginium\Foundation\Enums\FileExtension;
+use Maginium\Foundation\Enums\FileExtensions;
+use Maginium\Foundation\Exceptions\NodeNotFoundException;
+use Maginium\Framework\Application\Application;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Path;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
 use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\PhpExecutableFinder;
 
 /*
  * URL constants as defined in the PHP Manual under "Constants usable with
@@ -383,7 +384,7 @@ if (! function_exists('join_paths')) {
 
         foreach ($paths as $path) {
             // Check if the path represents a file extension
-            $extension = FileExtension::getKey($path);
+            $extension = FileExtensions::getKey($path);
 
             if ($extension) {
                 // Directly concatenate if a file extension is found.
@@ -406,7 +407,19 @@ if (! function_exists('Maginium\Framework\Support\php_binary')) {
      */
     function php_binary()
     {
-        return (new PhpExecutableFinder)->find(false) ?: 'php';
+        return (new ExecutableFinder)->find('bin/magento') ?: Application::DEFAULT_PHP_BINARY;
+    }
+}
+
+if (! function_exists('Maginium\Framework\Support\magento_binary')) {
+    /**
+     * Determine the Magento Binary.
+     *
+     * @return string
+     */
+    function magento_binary()
+    {
+        return Application::DEFAULT_PHP_BINARY;
     }
 }
 
@@ -421,7 +434,72 @@ if (! function_exists('Maginium\Framework\Support\node_binary')) {
     function node_binary(): ?string
     {
         // Find the Node binary
-        return (new ExecutableFinder)->find('node');
+        if ($binary = (new ExecutableFinder)->find('node')) {
+            return $binary;
+        }
+
+        // If Node.js is not found, throw an exception with a clear error message
+        throw new NodeNotFoundException(
+            'Unable to automatically detect the Node.js path. Please specify the correct path in your configuration settings.',
+        );
+    }
+}
+
+if (! function_exists('Maginium\Framework\Support\tsx_binary')) {
+    /**
+     * Determine the TSX Binary.
+     *
+     * This function attempts to find the TSX binary using the ExecutableFinder.
+     *
+     * @return string The path to the TSX binary, or null if not found.
+     */
+    function tsx_binary(): ?string
+    {
+        return (new ExecutableFinder)->find('tsx') ?? base_path(join_paths('node_modules', '.bin', 'tsx'));
+    }
+}
+
+if (! function_exists('Maginium\Framework\Support\npm_binary')) {
+    /**
+     * Determine the NPM Binary.
+     *
+     * This function attempts to find the NPM binary using the ExecutableFinder.
+     *
+     * @return string The path to the NPM binary, or null if not found.
+     */
+    function npm_binary(): ?string
+    {
+        // Find the NPM binary
+        if ($binary = (new ExecutableFinder)->find('npm')) {
+            return $binary;
+        }
+
+        // If NPM is not found, throw an exception with a clear error message
+        throw new NodeNotFoundException(
+            'Unable to automatically detect the NPM path. Please specify the correct path in your configuration settings.',
+        );
+    }
+}
+
+if (! function_exists('Maginium\Framework\Support\yarn_binary')) {
+    /**
+     * Determine the Yarn Binary.
+     *
+     * This function attempts to find the Yarn binary using the ExecutableFinder.
+     *
+     * @return string The path to the Yarn binary, or null if not found.
+     */
+    function yarn_binary(): ?string
+    {
+        // Find the Yarn binary
+        if ($binary = (new ExecutableFinder)->find('yarn')) {
+            return $binary;
+        }
+
+        // If Yarn is not found, throw an exception with a clear error message
+        throw new NodeNotFoundException(
+            'Unable to automatically detect the Yarn path. Please specify the correct path in your configuration settings.',
+        );
     }
 }
 

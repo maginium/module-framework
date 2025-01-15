@@ -26,9 +26,7 @@ use Maginium\Framework\Support\Facade;
  * @method static bool makeDirectory(string $path) Create a directory.
  * @method static bool isDirectory(string $directory) Check if a directory exists.
  * @method static bool isFile(string $file) Check if a file exists.
- * @method static array allFiles(string $directory) Get all files in a directory.
- * @method static array allDirectories(string $directory) Get all directories in a directory.
- * @method static array files(string $directory, bool $recursive = false) Get all files in a directory, optionally recursively.
+ * @method static array files(string $directory,string $pattern = '*.php',array $excludedDirectories = [],?array $excludedFiles = []) Get all files in a directory, optionally recursively.
  * @method static array directories(string $directory, bool $recursive = false) Get all directories in a directory, optionally recursively.
  * @method static string path(string $path) Get the path to a file or directory.
  * @method static mixed mimeType(string $path) Get the MIME type of a file.

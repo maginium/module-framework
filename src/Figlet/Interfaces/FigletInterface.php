@@ -18,6 +18,18 @@ interface FigletInterface
     public const FIRST_ASCII_CHARACTER = 32;
 
     /**
+     * Renders the given text in Figlet format.
+     *
+     * This method loads the font using the font manager, generates the Figlet text,
+     * and applies any color settings (if defined).
+     *
+     * @param string $text The text to be rendered into Figlet format.
+     *
+     * @return string The Figlet-formatted text, potentially colorized.
+     */
+    public function render($text): string;
+
+    /**
      * Clears the internal cache by unsetting certain arrays and objects.
      *
      * Specifically, it clears the characters array and the font object.
@@ -35,18 +47,6 @@ interface FigletInterface
      * @return FigletManager Returns the current instance for method chaining.
      */
     public function write($text): self;
-
-    /**
-     * Renders the given text in Figlet format.
-     *
-     * This method loads the font using the font manager, generates the Figlet text,
-     * and applies any color settings (if defined).
-     *
-     * @param string $text The text to be rendered into Figlet format.
-     *
-     * @return string The Figlet-formatted text, potentially colorized.
-     */
-    public function render($text): string;
 
     /**
      * Sets the background color for the rendered Figlet text.

@@ -18,7 +18,9 @@ use Maginium\Framework\Crud\Sorts\Strategies\HasOneSortFactory;
 use Maginium\Framework\Crud\Sorts\Strategies\NullSortFactory;
 use Maginium\Framework\Database\Eloquent\Builder;
 use Maginium\Framework\Database\Eloquent\Model;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Str;
+use Maginium\Framework\Support\Validator;
 use ReflectionMethod;
 
 /**
@@ -335,7 +337,7 @@ class Sort
     private function realName(array $fields, string $field): string
     {
         // Search for the field in the list of valid fields and return the real name.
-        $real = array_search($field, $fields, true);
+        $real = Arr::search($field, $fields, true);
 
         // If the field is found, return it; otherwise, return the original field.
         return Validator::isInt($real) ? $field : $real;

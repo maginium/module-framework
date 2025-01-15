@@ -10,7 +10,7 @@ use Magento\Framework\Webapi\Exception;
 use Magento\Framework\Webapi\Rest\Request as MagentoRequest;
 use Magento\Webapi\Controller\Rest\Router;
 use Magento\Webapi\Controller\Rest\Router\Route;
-use Maginium\Foundation\Enums\HttpMethod;
+use Maginium\Foundation\Enums\HttpMethods;
 use Maginium\Framework\Cors\Interfaces\CorsCheckInterface;
 
 /**
@@ -61,7 +61,7 @@ class CorsRequestMatch
             $route = $next($request);
         } catch (Exception $e) {
             // Handle OPTIONS request separately for CORS preflight
-            if ($request->getHttpMethod() === HttpMethod::OPTIONS) {
+            if ($request->getHttpMethod() === HttpMethods::OPTIONS) {
                 return $this->createCorsRoute();
             }
 

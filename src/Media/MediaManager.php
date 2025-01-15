@@ -13,10 +13,10 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Foundation\Exceptions\NotFoundException;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
+use Maginium\Framework\Filesystem\Interfaces\FilesystemInterface;
 use Maginium\Framework\Media\Interfaces\MediaInterface;
 use Maginium\Framework\Resize\Resizer;
 use Maginium\Framework\Support\Facades\Config;
-use Maginium\Framework\Support\Facades\Filesystem;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Path;
@@ -52,6 +52,13 @@ class MediaManager implements MediaInterface
     protected WriteInterface $mediaDirectory;
 
     /**
+     * File system instance.
+     *
+     * @var FilesystemInterface
+     */
+    protected FilesystemInterface $filesystem;
+
+    /**
      * Base URL for accessing uploaded files.
      *
      * @var string
@@ -62,18 +69,20 @@ class MediaManager implements MediaInterface
      * MediaManager constructor.
      *
      * @param Repository $assetRepository The asset repository instance for URL management.
+     * @param FilesystemInterface $filesystem Filesystem instance for accessing the media directory.
      * @param UploaderFactory $uploaderFactory Factory for creating file upload handlers.
-     * @param Filesystem $filesystem Filesystem instance for accessing the media directory.
      *
      * @throws LocalizedException If the media directory is not writable.
      */
     public function __construct(
         Repository $assetRepository,
+        FilesystemInterface $filesystem,
         UploaderFactory $uploaderFactory,
-        Filesystem $filesystem,
     ) {
+        $this->filesystem = $filesystem;
         $this->assetRepository = $assetRepository;
         $this->uploaderFactory = $uploaderFactory;
+
         $this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
         $this->fileUrl = $this->mediaDirectory->getAbsolutePath();
 
@@ -135,7 +144,7 @@ class MediaManager implements MediaInterface
             $uploader->setAllowedExtensions(self::ALLOWED_EXTENSIONS);
 
             // Get the media directory path
-            $mediaDirectory = Filesystem::getDirectoryWrite(DirectoryList::MEDIA)->getAbsolutePath();
+            $mediaDirectory = $this->mediaDirectory->getAbsolutePath();
 
             // Save the uploaded image
             $image = $uploader->save($mediaDirectory);
@@ -270,11 +279,11 @@ class MediaManager implements MediaInterface
 
         // If absolute path is requested, return the absolute path, or null if the file doesn't exist.
         if ($absolute) {
-            return Filesystem::exists($absolutePath) ? $absolutePath : null;
+            return $this->filesystem->exists($absolutePath) ? $absolutePath : null;
         }
 
         // Otherwise, return the relative path if the file exists, or null if not.
-        return Filesystem::exists($absolutePath) ? $relativePath : null;
+        return $this->filesystem->exists($absolutePath) ? $relativePath : null;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Cache;
 
 use Magento\Framework\App\Filesystem\DirectoryList as DirsList;
+use Maginium\Framework\Cache\Concerns\HasLegacyCode;
 use Maginium\Framework\Cache\Enums\CacheDrivers;
 use Maginium\Framework\Cache\Interfaces\FactoryInterface;
 use Maginium\Framework\Cache\Interfaces\StoreInterface;
@@ -15,6 +16,7 @@ use Maginium\Framework\Cache\Stores\MongoDbStoreFactory;
 use Maginium\Framework\Cache\Stores\RedisStore;
 use Maginium\Framework\Cache\Stores\RedisStoreFactory;
 use Maginium\Framework\Config\Enums\ConfigDrivers;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\Facades\Log;
 use Maginium\Framework\Support\MultipleInstanceManager;
@@ -29,6 +31,8 @@ use Maginium\Framework\Support\Path;
  */
 class CacheManager extends MultipleInstanceManager implements FactoryInterface
 {
+    use HasLegacyCode;
+
     /**
      * Redis client instance for cache operations.
      *
@@ -260,7 +264,7 @@ class CacheManager extends MultipleInstanceManager implements FactoryInterface
             $config['servers'], // List of Memcached servers.
             $config['options'] ?? [], // Optional Memcached options.
             $config['persistent_id'] ?? null, // Persistent connection ID (optional).
-            array_filter($config['sasl'] ?? []), // SASL credentials (optional).
+            Arr::filter($config['sasl'] ?? []), // SASL credentials (optional).
         );
 
         // Create a MemcachedStore instance with the connected Memcached client and prefix.

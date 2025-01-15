@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Maginium\Framework\Actions\Concerns;
 
 use Magento\Framework\App\Area;
-use Magento\Store\Api\Data\StoreInterface;
 use Maginium\Customer\Models\Customer;
 use Maginium\Foundation\Exceptions\BadRequestException;
 use Maginium\Foundation\Exceptions\Exception;
@@ -22,6 +21,7 @@ use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
+use Maginium\Store\Interfaces\Data\StoreInterface;
 use Maginium\User\Models\User;
 
 /**
@@ -87,6 +87,24 @@ trait AsController
     public function query(string $key, $default = null): mixed
     {
         return Request::query($key, $default);
+    }
+
+    /**
+     * Retrieve all request parameters as a DataObject.
+     *
+     * This method extracts all parameters from the current HTTP request, formats them
+     * into a DataObject instance, and returns it. This allows for cleaner access and
+     * manipulation of request data within the application.
+     *
+     * @return DataObject The request parameters wrapped in a DataObject.
+     */
+    public function queries(): DataObject
+    {
+        // Fetch all parameters from the current request
+        $params = Request::queries();
+
+        // Convert the array of parameters into a DataObject instance for enhanced functionality
+        return DataObject::make($params);
     }
 
     /**
@@ -211,24 +229,6 @@ trait AsController
     public function header(string $key): mixed
     {
         return Request::header($key);
-    }
-
-    /**
-     * Retrieve all request parameters as a DataObject.
-     *
-     * This method extracts all parameters from the current HTTP request, formats them
-     * into a DataObject instance, and returns it. This allows for cleaner access and
-     * manipulation of request data within the application.
-     *
-     * @return DataObject The request parameters wrapped in a DataObject.
-     */
-    public function params(): DataObject
-    {
-        // Fetch all parameters from the current request
-        $params = Request::getParams();
-
-        // Convert the array of parameters into a DataObject instance for enhanced functionality
-        return DataObject::make($params);
     }
 
     /**

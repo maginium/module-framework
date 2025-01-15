@@ -11,4 +11,19 @@
 
     <!-- Defines a topic for the Dead Letter Queue for event messages -->
     <topic is_synchronous="false" name="event.messages.dlq" request="string" />
+
+    <!-- Defines a topic named "email.messages" with asynchronous processing -->
+    <topic is_synchronous="false" name="email.messages" request="Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface">
+        <!-- Specifies a handler named "email.message.handler" of type "Maginium\Framework\Mail\Consumers\QueuedEmailConsumer" with a method named "process". -->
+        <handler method="process" name="email.message.handler" type="Maginium\Framework\Mail\Consumers\QueuedEmailConsumer" />
+    </topic>
+
+    <!-- Defines a topic for the Dead Letter Queue for email messages -->
+    <topic is_synchronous="false" name="email.messages.dlq" request="Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface" />
+
+    <!-- Defines a topic named "email.messages.delay" with asynchronous processing -->
+    <topic is_synchronous="false" name="email.messages.delay" request="Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface">
+        <!-- Specifies a handler named "email.message.delay.handler" of type "Maginium\Framework\Mail\Consumers\DelayedEmailConsumer" with a method named "process". -->
+        <handler method="process" name="email.message.delay.handler" type="Maginium\Framework\Mail\Consumers\DelayedEmailConsumer" />
+    </topic>
 </config>

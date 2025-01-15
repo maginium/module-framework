@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use InvalidArgumentException;
 use Maginium\Framework\Container\Interfaces\ContainerInterface;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
 use ReflectionException;
 use ReflectionFunction;
@@ -59,7 +60,7 @@ class BoundMethod
         }
 
         // Otherwise, treat it as a bound method and call it with injected dependencies
-        return static::callBoundMethod($container, $callback, fn() => $callback(...array_values(static::getMethodDependencies($container, $callback, $parameters))));
+        return static::callBoundMethod($container, $callback, fn() => $callback(...Arr::values(array: static::getMethodDependencies($container, $callback, $parameters))));
     }
 
     /**
@@ -178,7 +179,7 @@ class BoundMethod
         }
 
         // Merge additional parameters passed in directly with the resolved dependencies
-        return array_merge($dependencies, array_values($parameters));
+        return Arr::merge($dependencies, Arr::values($parameters));
     }
 
     /**
@@ -234,7 +235,7 @@ class BoundMethod
         $pendingDependencies = [];
 
         // If the parameter is directly passed in the method parameters, use it
-        if (array_key_exists($paramName = $parameter->getName(), $parameters)) {
+        if (Arr::keyExists($paramName = $parameter->getName(), $parameters)) {
             $pendingDependencies[] = $parameters[$paramName];
             unset($parameters[$paramName]);
         }
@@ -245,13 +246,13 @@ class BoundMethod
         // If the parameter has a class type, resolve it from the container
         elseif (null !== ($className = Util::getParameterClassName($parameter))) {
             // Check if the parameter class is passed in the parameters
-            if (array_key_exists($className, $parameters)) {
+            if (Arr::keyExists($className, $parameters)) {
                 $pendingDependencies[] = $parameters[$className];
                 unset($parameters[$className]);
             } elseif ($parameter->isVariadic()) {
                 // If the parameter is variadic, resolve multiple dependencies
                 $variadicDependencies = $container->resolve($className);
-                $pendingDependencies = array_merge($pendingDependencies, is_array($variadicDependencies)
+                $pendingDependencies = Arr::merge($pendingDependencies, is_array($variadicDependencies)
                     ? $variadicDependencies
                     : [$variadicDependencies]);
             } else {
@@ -264,7 +265,7 @@ class BoundMethod
             $pendingDependencies[] = $parameter->getDefaultValue();
         }
         // If the parameter is required but no dependency can be found, throw an exception
-        elseif (! $parameter->isOptional() && ! array_key_exists($paramName, $parameters)) {
+        elseif (! $parameter->isOptional() && ! Arr::keyExists($paramName, $parameters)) {
             $message = "Unable to resolve dependency [{$parameter}] in class {$parameter->getDeclaringClass()->getName()}";
 
             throw new BindingResolutionException($message);
@@ -276,7 +277,7 @@ class BoundMethod
         }
 
         // Add the resolved dependencies to the list
-        $dependencies = array_merge($dependencies, $pendingDependencies);
+        $dependencies = Arr::merge($dependencies, $pendingDependencies);
     }
 
     /**

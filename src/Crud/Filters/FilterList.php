@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Filters;
 
 use Maginium\Framework\Crud\Interfaces\FilterInterface;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Reflection;
 
 /**
@@ -78,6 +79,6 @@ class FilterList
      */
     public function keys(): array
     {
-        return array_keys($this->filters);
+        return Arr::keys($this->filters);
     }
 }

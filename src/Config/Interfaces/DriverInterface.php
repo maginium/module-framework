@@ -15,6 +15,11 @@ namespace Maginium\Framework\Config\Interfaces;
 interface DriverInterface
 {
     /**
+     * Cache tag.
+     */
+    public const CACHE_TAG = 'CONFIG';
+
+    /**
      * Retrieves the value of a configuration variable, falling back to a default if not found.
      *
      * The method checks multiple sources in the following order:

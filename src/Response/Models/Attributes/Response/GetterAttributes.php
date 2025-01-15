@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Response\Models\Attributes\Response;
 
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Framework\Response\Helpers\StackTraceFormatter;
 use Maginium\Framework\Response\Interfaces\Data\ResponseInterface;
 use Maginium\Framework\Support\Validator;
@@ -119,7 +119,7 @@ trait GetterAttributes
     public function getStatusCode(): int
     {
         // Get the status code data from the response; return a default status code of 200 (OK) if not set.
-        return $this->getData(ResponseInterface::STATUS_CODE) ?? HttpStatusCode::OK;
+        return $this->getData(ResponseInterface::STATUS_CODE) ?? HttpStatusCodes::OK;
     }
 
     /**

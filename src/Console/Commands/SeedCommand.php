@@ -38,7 +38,7 @@ class SeedCommand extends Command
      *
      * @return int The exit code indicating the success or failure of the seeder execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Execute the setup:upgrade command with a spinner

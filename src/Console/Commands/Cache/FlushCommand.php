@@ -37,7 +37,7 @@ class FlushCommand extends Command
      *
      * @return int The exit code indicating the success or failure of the cache flushing execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Display a spinner before starting the cache flush process

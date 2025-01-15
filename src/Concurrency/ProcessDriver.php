@@ -7,6 +7,7 @@ namespace Maginium\Framework\Concurrency;
 use Closure;
 use Illuminate\Process\Factory as ProcessFactory;
 use Illuminate\Process\Pool;
+use Illuminate\Process\ProcessResult;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Application\Application;
 use Maginium\Framework\Concurrency\Interfaces\DriverInterface;
@@ -74,7 +75,11 @@ class ProcessDriver implements DriverInterface
         })->start()->wait(); // Start and wait for all processes to complete.
 
         // Process the results collected from the pool execution.
-        return $results->collect()->map(function($result) {
+        return $results->collect()->map(function(ProcessResult $result): mixed {
+            if ($result->failed()) {
+                throw new Exception('Concurrent process failed with exit code [' . $result->exitCode() . ']. Message: ' . $result->errorOutput());
+            }
+
             // Decode the output from each process.
             $result = Json::decode($result->output());
 

@@ -130,7 +130,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
     #[Override]
     public function toArray(array $keys = ['*'])
     {
-        //  Create a Collection from $this->getData());
+        // Create a Collection from $this->getData()
         $collection = collect($this->getData());
 
         // If no specific keys are provided or '*' is included, return the full data
@@ -138,10 +138,10 @@ class DataObject extends BaseDataObject implements DataObjectInterface
             return $collection->toArray();
         }
 
-        // Filter the data by keys
-        $collection->only($keys);
+        // Filter the data by keys and update the collection
+        $collection = $collection->only($keys);
 
-        // Otherwise, return only the specified keys from the data
+        // Return the filtered data as an array
         return $collection->toArray();
     }
 

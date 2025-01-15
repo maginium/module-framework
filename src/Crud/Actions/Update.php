@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Actions;
 
 use AllowDynamicProperties;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\CouldNotSaveException;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
@@ -104,7 +104,7 @@ class Update implements UpdateInterface
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
                 ->setPayload($filteredEntityData) // Set the payload
-                ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
+                ->setStatusCode(HttpStatusCodes::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('%1 model updated successfully.', $this->modelName)); // Set a success message with the model name
 
             // Return the formatted result as an associative array
@@ -117,7 +117,7 @@ class Update implements UpdateInterface
             throw LocalizedException::make(
                 __('An unexpected error occurred while updating a %1. %2.', $this->modelName, $e->getMessage()),
                 $e,
-                HttpStatusCode::INTERNAL_SERVER_ERROR,
+                HttpStatusCodes::INTERNAL_SERVER_ERROR,
             );
         }
     }

@@ -58,7 +58,7 @@ class ServiceCommand extends GeneratorCommand
      *
      * @return int The exit code indicating success or failure of the service execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Retrieve the user inputs for the module name, namespace, and service name

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Pusher\Services;
 
 use Maginium\Foundation\Abstracts\AbstractPubSubService;
-use Maginium\Foundation\Enums\ContentType;
+use Maginium\Foundation\Enums\ContentTypes;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Pusher\Interfaces\ClientInterface;
@@ -148,7 +148,7 @@ class PusherManager extends AbstractPubSubService implements PusherInterface
                 'X-Event-Name' => $topicName,
                 'X-Event-Token' => $messageId,
                 'X-Timestamp' => $timestamp,
-                'Content-Type' => ContentType::APPLICATION_JSON,
+                'Content-Type' => ContentTypes::APPLICATION_JSON,
                 'X-Event-Source' => Str::slug(Str::lower($storeName), '-'),
             ];
 

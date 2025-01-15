@@ -16,9 +16,8 @@ use Maginium\Framework\Support\Facade;
  * @method static $this setModuleName(string $name) Set the module name for the request. Parameters: - $name: The name of the module.
  * @method static string getActionName() Retrieve the action name from the request.
  * @method static $this setActionName(string $name) Set the action name for the request. Parameters: - $name: The name of the action.
- * @method static mixed getParam(string $key, mixed $defaultValue = null) Retrieve a request parameter by key. Parameters: - $key: The key of the parameter to retrieve. - $defaultValue: Default value to return if the parameter does not exist.
  * @method static $this setParams(array $params) Set multiple request parameters from a key-value array. Parameters: - $params: An array of key-value pairs representing parameters.
- * @method static array getParams() Retrieve all request parameters as an array.
+ * @method static array queries() Retrieve all request parameters as an array.
  * @method static ?string getCookie(?string $name, ?string $default) Retrieve a cookie value by name from the request.
  * @method static bool isSecure() Check if the request was delivered over HTTPS.
  * @method static string getOriginalPathInfo() Retrieve the original path info from the request.

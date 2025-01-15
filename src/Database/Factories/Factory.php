@@ -6,7 +6,7 @@ namespace Maginium\Framework\Database\Factories;
 
 use Faker\Generator;
 use Illuminate\Database\Eloquent\Factories\Factory as BaseFactory;
-use Maginium\Foundation\Enums\FileExtension;
+use Maginium\Foundation\Enums\FileExtensions;
 use Maginium\Framework\Component\Module;
 use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Database\Helpers\Faker;
@@ -277,15 +277,15 @@ abstract class Factory extends BaseFactory
 
         // Determine how to process the file based on its type
         switch ($type) {
-            case FileExtension::CSV:
+            case FileExtensions::CSV:
                 // Load and process CSV files
                 return $this->loadCsvFile($filePath);
 
-            case FileExtension::JSON:
+            case FileExtensions::JSON:
                 // Load and process JSON files
                 return $this->loadJsonFile($filePath);
 
-            case FileExtension::XML:
+            case FileExtensions::XML:
                 // Load and process XML files
                 return $this->loadXmlFile($filePath);
 

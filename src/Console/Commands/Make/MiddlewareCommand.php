@@ -58,7 +58,7 @@ class MiddlewareCommand extends GeneratorCommand
      *
      * @return int The exit code indicating success or failure of the middleware execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Retrieve the user inputs for the module name, namespace, and middleware name

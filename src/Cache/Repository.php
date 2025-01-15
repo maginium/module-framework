@@ -11,9 +11,8 @@ use DateTimeInterface;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
-use Maginium\Foundation\Enums\CacheTTL;
+use Maginium\Foundation\Enums\Durations;
 use Maginium\Framework\Cache\Enums\CacheEvents;
-use Maginium\Framework\Cache\Events\CacheEvent;
 use Maginium\Framework\Cache\Events\CacheHitFactory;
 use Maginium\Framework\Cache\Events\CacheMissedFactory;
 use Maginium\Framework\Cache\Events\ForgettingKeyFactory;
@@ -55,9 +54,9 @@ class Repository implements ArrayAccess, CacheInterface
      * Default time-to-live (TTL) for cache entries.
      *
      * Represents the default duration (in seconds) for which a cache item remains valid.
-     * The default value is set to one hour (CacheTTL::HOUR).
+     * The default value is set to one hour (Durations::HOUR).
      */
-    protected ?int $default = CacheTTL::HOUR;
+    protected ?int $default = Durations::HOUR;
 
     /**
      * Configuration options for the cache manager.
@@ -221,18 +220,18 @@ class Repository implements ArrayAccess, CacheInterface
         }
 
         // Trigger an event indicating cache retrieval process.
-        $this->triggerCacheEvent(CacheEvents::RETRIEVING, $key);
+        $this->dispatch(CacheEvents::RETRIEVING, $key);
 
         // Attempt to retrieve the value from the cache.
         $value = $this->store->get($this->itemKey($key));
 
         // Cache miss logic: handle default value resolution and event firing
         if ($value === null) {
-            $this->triggerCacheEvent(CacheEvents::MISSED, $key);
+            $this->dispatch(CacheEvents::MISSED, $key);
             $value = value($default);
         } else {
             // Cache hit logic: trigger event with cached value
-            $this->triggerCacheEvent(CacheEvents::HIT, $key, ['value' => $value]);
+            $this->dispatch(CacheEvents::HIT, $key, ['value' => $value]);
         }
 
         // Handle serialized closures or return the value directly.
@@ -352,7 +351,7 @@ class Repository implements ArrayAccess, CacheInterface
     public function many(array $keys): array
     {
         // Trigger an event indicating that multiple cache keys are being retrieved.
-        $this->triggerCacheEvent(eventType: CacheEvents::RETRIEVING_MANY, context: ['storeName' => $this->getName(), 'keys' => $keys]);
+        $this->dispatch(eventType: CacheEvents::RETRIEVING_MANY, context: ['storeName' => $this->getName(), 'keys' => $keys]);
 
         // Initialize an array to hold the results.
         $values = [];
@@ -460,7 +459,7 @@ class Repository implements ArrayAccess, CacheInterface
         }
 
         // Trigger an event indicating that a key is being written to the cache.
-        $this->triggerCacheEvent(CacheEvents::WRITING, $key, ['value' => $value, 'seconds' => $seconds]);
+        $this->dispatch(CacheEvents::WRITING, $key, ['value' => $value, 'seconds' => $seconds]);
 
         // Check if the value is not already a string
         if (! Validator::isString($value)) {
@@ -482,10 +481,10 @@ class Repository implements ArrayAccess, CacheInterface
         // Trigger appropriate events based on the result of the storage operation.
         if ($result) {
             // Success event.
-            $this->triggerCacheEvent(CacheEvents::WRITTEN, $key, ['seconds' => $seconds, 'value' => $value]);
+            $this->dispatch(CacheEvents::WRITTEN, $key, ['seconds' => $seconds, 'value' => $value]);
         } else {
             // Failure event.
-            $this->triggerCacheEvent(CacheEvents::WRITE_FAILED, $key, ['seconds' => $seconds, 'value' => $value]);
+            $this->dispatch(CacheEvents::WRITE_FAILED, $key, ['seconds' => $seconds, 'value' => $value]);
         }
 
         // Return the result of the storage operation.
@@ -538,7 +537,7 @@ class Repository implements ArrayAccess, CacheInterface
         }
 
         // Log the operation of writing multiple keys to the cache.
-        $this->triggerCacheEvent(eventType: CacheEvents::WRITING_MANY, context: [
+        $this->dispatch(eventType: CacheEvents::WRITING_MANY, context: [
             'seconds' => $seconds,
             'keys' => Arr::keys($values),
             'storeName' => $this->getName(),
@@ -558,9 +557,9 @@ class Repository implements ArrayAccess, CacheInterface
 
             // Check if the storage was successful and trigger appropriate events.
             if ($result) {
-                $this->triggerCacheEvent(CacheEvents::WRITTEN, $key, ['seconds' => $seconds, 'value' => $value]);
+                $this->dispatch(CacheEvents::WRITTEN, $key, ['seconds' => $seconds, 'value' => $value]);
             } else {
-                $this->triggerCacheEvent(CacheEvents::WRITE_FAILED, $key, ['seconds' => $seconds, 'value' => $value]);
+                $this->dispatch(CacheEvents::WRITE_FAILED, $key, ['seconds' => $seconds, 'value' => $value]);
 
                 // Mark as failed if any item fails to store.
                 $allStored = false;
@@ -649,7 +648,7 @@ class Repository implements ArrayAccess, CacheInterface
         }
 
         // Trigger an event to log that a key is being written to the cache.
-        $this->triggerCacheEvent(CacheEvents::WRITING, $key, ['storeName' => $this->getName(), 'value' => $value]);
+        $this->dispatch(CacheEvents::WRITING, $key, ['storeName' => $this->getName(), 'value' => $value]);
 
         // Store the item in the cache indefinitely using the store's save method.
         $result = $this->store->put($this->itemKey($key), $value);
@@ -657,10 +656,10 @@ class Repository implements ArrayAccess, CacheInterface
         // Trigger the success or failure event based on the result of the storage operation.
         if ($result) {
             // Event indicating the key was successfully written to the cache.
-            $this->triggerCacheEvent(CacheEvents::WRITTEN, $key, ['storeName' => $this->getName(), 'value' => $value]);
+            $this->dispatch(CacheEvents::WRITTEN, $key, ['storeName' => $this->getName(), 'value' => $value]);
         } else {
             // Event indicating the key write failed.
-            $this->triggerCacheEvent(CacheEvents::WRITE_FAILED, $key, ['storeName' => $this->getName(), 'value' => $value]);
+            $this->dispatch(CacheEvents::WRITE_FAILED, $key, ['storeName' => $this->getName(), 'value' => $value]);
         }
 
         // Return the result of the forever operation.
@@ -815,7 +814,7 @@ class Repository implements ArrayAccess, CacheInterface
         // If the cache is still fresh (expiry time is in the future), return the cached value.
         if ($expiryTime > Date::now()->getTimestamp()) {
             // Handle value if JSON
-            return $cachedvalue;
+            return $this->handleClosure($cachedvalue);
         }
 
         // Step 4: If the cache is stale, initiate a background refresh using a closure.
@@ -869,7 +868,7 @@ class Repository implements ArrayAccess, CacheInterface
     public function forget($key)
     {
         // Fire an event to notify that a key is being forgotten
-        $this->triggerCacheEvent(CacheEvents::FORGETTING, $key, [
+        $this->dispatch(CacheEvents::FORGETTING, $key, [
             'key' => $key,
             'storeName' => $this->getName(),
         ]);
@@ -880,13 +879,13 @@ class Repository implements ArrayAccess, CacheInterface
         // Trigger corresponding events based on the result
         if ($result) {
             // If removal was successful, fire a "forgotten" event
-            $this->triggerCacheEvent(CacheEvents::FORGOTTEN, $key, [
+            $this->dispatch(CacheEvents::FORGOTTEN, $key, [
                 'key' => $key,
                 'storeName' => $this->getName(),
             ]);
         } else {
             // If removal failed, fire a "forget failed" event
-            $this->triggerCacheEvent(CacheEvents::FORGET_FAILED, $key, [
+            $this->dispatch(CacheEvents::FORGET_FAILED, $key, [
                 'key' => $key,
                 'storeName' => $this->getName(),
             ]);
@@ -909,7 +908,7 @@ class Repository implements ArrayAccess, CacheInterface
         // Ensure $keyOrKeys is always an array, even if it's passed as a single string.
         $keys = Validator::isArray($keyOrKeys) ? $keyOrKeys : [$keyOrKeys];
 
-        // Use array_map to process each key and delete it.
+        // Use Arr::map to process each key and delete it.
         $deleted = Arr::map($keys, function($key) {
             return $this->store->forget($key); // Perform the delete operation
         });
@@ -1007,7 +1006,7 @@ class Repository implements ArrayAccess, CacheInterface
         // the default value for this cache value. This default could be a callback
         // so we will execute the value function which will resolve it if needed.
         if ($value === null) {
-            $this->triggerCacheEvent(CacheEvents::MISSED, $key, [
+            $this->dispatch(CacheEvents::MISSED, $key, [
                 'key' => $key,
                 'storeName' => $this->getName(),
             ]);
@@ -1018,7 +1017,7 @@ class Repository implements ArrayAccess, CacheInterface
         // If we found a valid value we will fire the "hit" event and return the value
         // back from this function. The "hit" event gives developers an opportunity
         // to listen for every possible cache "hit" throughout this application.
-        $this->triggerCacheEvent(CacheEvents::HIT, $key, ['value' => $value]);
+        $this->dispatch(CacheEvents::HIT, $key, ['value' => $value]);
 
         return $this->handleValue($value);
     }
@@ -1095,23 +1094,6 @@ class Repository implements ArrayAccess, CacheInterface
     }
 
     /**
-     * Fire an event for this cache instance.
-     *
-     * This method is responsible for dispatching events related to the cache operations.
-     * It can be used to notify other parts of the application about cache changes,
-     * such as when items are stored or removed.
-     *
-     * @param CacheEvent $event
-     *
-     * @return void
-     */
-    protected function event($event): void
-    {
-        // Dispatch the event using the events dispatcher
-        $this->events->dispatch($event->getName(), ['data' => $event]);
-    }
-
-    /**
      * Get the name of the cache store.
      *
      * This method retrieves the name of the cache store from the configuration.
@@ -1171,13 +1153,13 @@ class Repository implements ArrayAccess, CacheInterface
      *
      * This helper method standardizes the process of firing cache-related events.
      *
-     * @param CacheEvents $eventType The type of event to trigger (e.g., CacheEvents::HIT, CacheEvents::MISSED, etc.).
+     * @param string $eventType The type of event to trigger (e.g., CacheEvents::HIT, CacheEvents::MISSED, etc.).
      * @param mixed       $key       The cache key involved in the event, optional for some events.
      * @param array       $context   Contextual data such as `keys`, `value`, `seconds`, etc., required for specific events.
      *
      * @throws InvalidArgumentException If the provided event type is invalid.
      */
-    private function triggerCacheEvent(
+    protected function dispatch(
         string $eventType,
         mixed $key = null,
         array $context = [],
@@ -1221,8 +1203,16 @@ class Repository implements ArrayAccess, CacheInterface
             ],
         };
 
-        // Trigger the event using the factory
-        $this->event($eventFactory->create($eventData));
+        // Create event using the factory
+        $event = $eventFactory->create($eventData);
+
+        // Check if tags exists and not empty set the event tags
+        if (isset($context['tags']) && $context['tags']) {
+            $event->setTags($context['tags']);
+        }
+
+        // Dispatch the event using the events dispatcher
+        $this->events->dispatch($event->getName(), ['data' => $event]);
     }
 
     /**

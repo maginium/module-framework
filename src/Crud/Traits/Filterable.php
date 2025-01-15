@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Traits;
 
 use Exception;
-use Illuminate\Support\Arr;
 use Maginium\Framework\Crud\Filters\Resolve;
 use Maginium\Framework\Database\Eloquent\Builder;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Reflection;
@@ -84,7 +84,7 @@ trait Filterable
     public function scopeFilterBy(Builder $query, array|string $filters): Builder
     {
         // Store the filters (either from an array or passed as additional arguments)
-        $this->filters = Validator::isArray($filters) ? $filters : array_slice(func_get_args(), 1);
+        $this->filters = Validator::isArray($filters) ? $filters : Arr::slice(func_get_args(), 1);
 
         // Return the query builder instance for chaining
         return $query;
@@ -195,7 +195,7 @@ trait Filterable
     public function scopeFilterFields(Builder $query, array|string $fields): Builder
     {
         // Store the filter fields (either from an array or passed as additional arguments)
-        $this->filterFields = Validator::isArray($fields) ? $fields : array_slice(func_get_args(), 1);
+        $this->filterFields = Validator::isArray($fields) ? $fields : Arr::slice(func_get_args(), 1);
 
         // Return the query builder instance for chaining
         return $query;
@@ -266,7 +266,7 @@ trait Filterable
     private function getDefaultFields(): array
     {
         // Merge table columns and related model relations to form the default fields.
-        return array_merge($this->getTableColumns(), $this->relations());
+        return Arr::merge($this->getTableColumns(), $this->relations());
     }
 
     /**
@@ -293,7 +293,7 @@ trait Filterable
             // Iterate through the fields, applying renaming if necessary.
             foreach ($fields as $filterName) {
                 // Check if a filter name is renamed and apply the change.
-                if ($columnName = array_search($filterName, $this->renamedFilterFields)) {
+                if ($columnName = Arr::search($filterName, $this->renamedFilterFields)) {
                     $filterFields[$columnName] = $filterName;
                 } else {
                     $filterFields[] = $filterName;
@@ -312,7 +312,7 @@ trait Filterable
 
             // Iterate through the fields and apply renaming logic.
             foreach ($fields as $filterName) {
-                if (array_key_exists($filterName, $this->renamedFilterFields)) {
+                if (Arr::keyExists($filterName, $this->renamedFilterFields)) {
                     $filterFields[$filterName] = $this->renamedFilterFields[$filterName];
                 } else {
                     $filterFields[] = $filterName;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Support;
 
-use Maginium\Foundation\Enums\FileExtension;
+use Maginium\Foundation\Enums\FileExtensions;
 
 /**
  * Class Path
@@ -29,7 +29,7 @@ class Path
 
         foreach ($paths as $path) {
             // Check if the path represents a file extension
-            $extension = FileExtension::getKey($path);
+            $extension = FileExtensions::getKey($path);
 
             if ($extension) {
                 // Directly concatenate if a file extension is found.

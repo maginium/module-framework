@@ -73,7 +73,7 @@ class ColorThief implements ColorThiefInterface
         $hexColor = $this->colorHelper->rgbToHex($rgbColor);
 
         // Cache the result for future use
-        Cache::forever($cacheKey, $hexColor, [static::CACHE_TAG]);
+        Cache::tags([static::CACHE_TAG])->forever($cacheKey, $hexColor);
 
         return $hexColor;
     }
@@ -92,7 +92,7 @@ class ColorThief implements ColorThiefInterface
     public function getColorPalette($sourceImage, $colorCount = 10, $quality = 10, $area = null): array
     {
         // Generate a unique cache key based on the input parameters
-        $cacheKey = Cache::generateCacheKey("color_palette_{$sourceImage}_{$colorCount}_{$quality}");
+        $cacheKey = $this->generateCacheKey("color_palette_{$sourceImage}_{$colorCount}_{$quality}");
 
         // Check if the result is already cached
         if (Cache::has($cacheKey)) {
@@ -106,7 +106,7 @@ class ColorThief implements ColorThiefInterface
         $hexPalette = Arr::map($palette, fn($rgbColor) => $this->colorHelper->rgbToHex($rgbColor));
 
         // Cache the result for future use
-        Cache::forever($cacheKey, $hexPalette, [static::CACHE_TAG]);
+        Cache::tags([static::CACHE_TAG])->forever($cacheKey, $hexPalette);
 
         return $hexPalette;
     }
@@ -123,7 +123,7 @@ class ColorThief implements ColorThiefInterface
     public function adjustColorLightness(string $hexColor, int $adjustment): string
     {
         // Generate a unique cache key based on the input parameters
-        $cacheKey = Cache::generateCacheKey('adjust_lightness_' . $hexColor . "_{$adjustment}");
+        $cacheKey = $this->generateCacheKey('adjust_lightness_' . $hexColor . "_{$adjustment}");
 
         // Check if the result is already cached
         if (Cache::has($cacheKey)) {
@@ -144,7 +144,7 @@ class ColorThief implements ColorThiefInterface
         $adjustedHexColor = $this->colorHelper->rgbToHex($adjustedRgbColor);
 
         // Cache the result for future use
-        Cache::forever($cacheKey, $adjustedHexColor, [static::CACHE_TAG]);
+        Cache::tags([static::CACHE_TAG])->forever($cacheKey, $adjustedHexColor);
 
         return $adjustedHexColor;
     }
@@ -164,7 +164,7 @@ class ColorThief implements ColorThiefInterface
         $adjustment = (int)round(255 * ($percentage / 100));
 
         // Generate a unique cache key based on the input parameters
-        $cacheKey = Cache::generateCacheKey('darken_color_' . $hexColor . "_{$percentage}");
+        $cacheKey = $this->generateCacheKey('darken_color_' . $hexColor . "_{$percentage}");
 
         // Check if the result is already cached
         if (Cache::has($cacheKey)) {
@@ -185,7 +185,7 @@ class ColorThief implements ColorThiefInterface
         $darkenedHexColor = $this->colorHelper->rgbToHex($darkenedRgbColor);
 
         // Cache the result for future use
-        Cache::forever($cacheKey, $darkenedHexColor, [static::CACHE_TAG]);
+        Cache::tags([static::CACHE_TAG])->forever($cacheKey, $darkenedHexColor);
 
         return $darkenedHexColor;
     }
@@ -205,7 +205,7 @@ class ColorThief implements ColorThiefInterface
         $adjustment = (int)round(255 * ($percentage / 100));
 
         // Generate a unique cache key based on the input parameters
-        $cacheKey = Cache::generateCacheKey('lighten_color_' . $hexColor . "_{$percentage}");
+        $cacheKey = $this->generateCacheKey('lighten_color_' . $hexColor . "_{$percentage}");
 
         // Check if the result is already cached
         if (Cache::has($cacheKey)) {
@@ -226,7 +226,7 @@ class ColorThief implements ColorThiefInterface
         $lightenedHexColor = $this->colorHelper->rgbToHex($lightenedRgbColor);
 
         // Cache the result for future use
-        Cache::forever($cacheKey, $lightenedHexColor, [static::CACHE_TAG]);
+        Cache::tags([static::CACHE_TAG])->forever($cacheKey, $lightenedHexColor);
 
         return $lightenedHexColor;
     }

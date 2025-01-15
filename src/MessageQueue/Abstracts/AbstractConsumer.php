@@ -9,6 +9,7 @@ use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Json;
 use Override;
+use Validator;
 
 /**
  * Class AbstractConsumer.
@@ -57,30 +58,32 @@ abstract class AbstractConsumer extends ConsumerConfiguration
     /**
      * Process the incoming message from the queue.
      *
-     * @param string|null $messageBody The raw message body from the queue.
+     * @param mixed|null $messageBody The raw message body from the queue.
      *
      * @return string A message indicating the result of processing.
      */
-    public function process(?string $messageBody = null): string
+    public function process(mixed $messageBody = null): string
     {
-        // Validate that the message body exists
+        // Validate that the message body exists and return early if not.
         if ($messageBody === null) {
             return 'No message body provided.';
         }
 
         try {
-            // Decode the message body from JSON
-            $this->rawData = Json::decode($messageBody);
+            // Decode the message body if it's a string (JSON format), otherwise use it as-is.
+            $this->rawData = Validator::isString($messageBody)
+                ? Json::decode($messageBody) // Decode if string
+                : $messageBody; // Otherwise, use as-is
 
-            // Prepare the data: convert arrays to DataObject recursively
-            $this->preparedData = DataObject::make($this->rawData);
+            // Ensure that the raw data is converted to a DataObject (even if it's already an array).
+            $this->preparedData = Validator::isArray($this->rawData) ? DataObject::make((array)$this->rawData) : null;
 
-            // Call the handle method in the child class
+            // Call the handle method in the child class (specific logic implementation)
             $this->handle();
 
             return 'Message processed successfully.';
         } catch (Exception $e) {
-            // Handle exceptions and return an error message
+            // Handle exceptions and return an error message with the exception details
             return 'Error processing message: ' . $e->getMessage();
         }
     }

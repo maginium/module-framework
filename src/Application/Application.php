@@ -6,8 +6,12 @@ namespace Maginium\Framework\Application;
 
 use Illuminate\Support\ProcessUtils;
 use Magento\Framework\App\MaintenanceMode;
+use Maginium\Foundation\Enums\ExecutableTypes;
+use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Application\Interfaces\ApplicationInterface;
+use Maginium\Framework\Application\Traits\Binaryable;
 use Maginium\Framework\Container\ContainerManager;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Str;
 
 /**
@@ -18,6 +22,18 @@ use Maginium\Framework\Support\Str;
  */
 class Application extends ContainerManager implements ApplicationInterface
 {
+    use Binaryable;
+
+    /**
+     * The default path to the TS binary.
+     */
+    public const DEFAULT_TS_BINARY = 'tsx';
+
+    /**
+     * The default path to the PHP binary.
+     */
+    public const DEFAULT_PHP_BINARY = 'php';
+
     /**
      * The default path to the Magento binary.
      */
@@ -47,6 +63,38 @@ class Application extends ContainerManager implements ApplicationInterface
     /**
      * Format the given command as a fully-qualified executable command.
      *
+     * @param  string|array  $string The command string to format (e.g., the command to run).
+     * @param  string  $executionType The type of executable (node, tsx, yarn, npm, php).
+     *
+     * @throws InvalidArgumentException if the execution type is not supported.
+     *
+     * @return string The formatted command string.
+     */
+    public static function formatExecutableCommandString(string|array $string, string $executionType): string
+    {
+        // If the command is an array, format it into a string
+        // If the command is an array, wrap each part in single quotes and join into a string
+        $commandString = is_array($string)
+        ? implode(' ', Arr::map($string, fn($part) => ProcessUtils::escapeArgument($part)))
+        : ProcessUtils::escapeArgument($string);
+
+        // Determine the executable based on the provided execution type using match
+        $executable = match ($executionType) {
+            ExecutableTypes::TSX => static::tsxBinary(),
+            ExecutableTypes::YARN => static::yarnBinary(),
+            ExecutableTypes::NODE => static::nodeBinary(),
+            ExecutableTypes::PHP => static::formatCommandString($commandString),
+            ExecutableTypes::NPM => Str::format('%s %s, %s',  static::npmBinary(), 'run', '--'),
+            default => throw new InvalidArgumentException("Unsupported execution type: {$executionType}"),
+        };
+
+        // Format and return the final command string
+        return Str::format('%s %s', $executable, $commandString);
+    }
+
+    /**
+     * Format the given command as a fully-qualified executable command.
+     *
      * @param  string  $string
      *
      * @return string
@@ -54,33 +102,6 @@ class Application extends ContainerManager implements ApplicationInterface
     public static function formatCommandString($string): string
     {
         return Str::format('%s %s %s', static::phpBinary(), static::magentoBinary(), $string);
-    }
-
-    /**
-     * Get the PHP binary path.
-     *
-     * This method utilizes the PhpExecutableFinder to locate the PHP binary
-     * available in the system.
-     *
-     * @return string The path to the PHP binary.
-     */
-    public static function phpBinary(): string
-    {
-        // Use PhpExecutableFinder to locate the PHP binary or default to the constant value.
-        return ProcessUtils::escapeArgument(php_binary());
-    }
-
-    /**
-     * Get the Magento binary path.
-     *
-     * This method checks if the `MAGENTO_BINARY` constant is defined. If not, it defaults to `DEFAULT_MAGENTO_BINARY`.
-     *
-     * @return string The path to the Magento binary.
-     */
-    public static function magentoBinary(): string
-    {
-        // Return the defined MAGENTO_BINARY constant or default to the constant value.
-        return ProcessUtils::escapeArgument(defined('MAGENTO_BINARY') ? MAGENTO_BINARY : self::DEFAULT_MAGENTO_BINARY);
     }
 
     /**

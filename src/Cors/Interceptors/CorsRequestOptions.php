@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Cors\Interceptors;
 
 use Magento\Framework\Webapi\Rest\Request as MagentoRequest;
-use Maginium\Foundation\Enums\HttpMethod;
+use Maginium\Foundation\Enums\HttpMethods;
 use Maginium\Foundation\Exceptions\InputException;
 
 /**
@@ -29,7 +29,7 @@ class CorsRequestOptions
     public function aroundGetHttpMethod(MagentoRequest $subject): string
     {
         // Check if the request's HTTP method is allowed
-        if (! in_array($subject->getMethod(), HttpMethod::getValues(), true)) {
+        if (! in_array($subject->getMethod(), HttpMethods::getValues(), true)) {
             // If not allowed, throw an exception with an appropriate message
             InputException::make(__('Invalid HTTP method.'));
         }

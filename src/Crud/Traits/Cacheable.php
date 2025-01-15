@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Traits;
 
 use Closure;
-use Laravel\SerializableClosure\SerializableClosure as BaseSerializableClosure;
-use Maginium\Foundation\Enums\CacheTTL;
+use Maginium\Foundation\Enums\Durations;
+use Maginium\Framework\Serializer\Interfaces\SerializableClosureInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Cache;
 use Maginium\Framework\Support\Facades\Event;
@@ -44,7 +44,7 @@ trait Cacheable
      *
      * @var int|null Cache expiration time; `null` means default configuration.
      */
-    protected ?int $cacheLifetime = CacheTTL::HOUR;
+    protected ?int $cacheLifetime = Durations::HOUR;
 
     /**
      * Set the cache lifetime.
@@ -168,14 +168,14 @@ trait Cacheable
         $lifetime = $this->getCacheLifetime();
 
         // Construct the value as SerializableClosure
-        $callback = fn(): BaseSerializableClosure => SerializableClosure::make($closure);
+        $callback = fn(): SerializableClosureInterface => SerializableClosure::make($closure);
 
         // Set default tags if none are provided, including the new `ENTITY_CACHE_TAG`
         $tags ??= [self::CACHE_TAG, self::ENTITY_CACHE_TAG, $repositoryId];
 
         // If the lifetime is indefinite (-1), use rememberForever.
         if ($lifetime === -1) {
-            return Cache::tags($tags)->rememberForever("{$class}@{$method}.{$this->generateCacheHash($args)}", $callback);
+            return Cache::tags($tags)->rememberForever("{$class}@{$method}.{$this->generateCacheHash($args)}", $closure);
         }
 
         // Split the total lifetime into fresh and stale periods.

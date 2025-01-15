@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Serializer\Interfaces;
 
 use Closure;
-use Laravel\SerializableClosure\SerializableClosure as BaseSerializableClosure;
+use Laravel\SerializableClosure\UnsignedSerializableClosure;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 
 /**
@@ -18,15 +18,51 @@ use Maginium\Foundation\Exceptions\InvalidArgumentException;
 interface SerializableClosureInterface
 {
     /**
+     * Create a new unsigned serializable closure instance.
+     *
+     * @param  Closure  $closure
+     *
+     * @return UnsignedSerializableClosure
+     */
+    public static function unsigned(Closure $closure): UnsignedSerializableClosure;
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  string|null  $secret
+     *
+     * @return void
+     */
+    public static function setSecretKey($secret): void;
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  Closure|null  $transformer
+     *
+     * @return void
+     */
+    public static function transformUseVariablesUsing($transformer): void;
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  Closure|null  $resolver
+     *
+     * @return void
+     */
+    public static function resolveUseVariablesUsing($resolver): void;
+
+    /**
      * Static method to create a SerializableClosure for the given closure.
      *
      * @param  Closure  $closure  Closure to be serialized.
      *
      * @throws InvalidArgumentException If the provided data is not a callable.
      *
-     * @return BaseSerializableClosure The serializer instance.
+     * @return SerializableClosureInterface The serializer instance.
      */
-    public function make(Closure $closure): BaseSerializableClosure;
+    public function make(Closure $closure): self;
 
     /**
      * Serialize a closure into a string format.
@@ -63,4 +99,11 @@ interface SerializableClosureInterface
      * @return bool Returns true if the value is a serialized closure, false otherwise.
      */
     public function isSerializedClosure(string|Closure $value): bool;
+
+    /**
+     * Gets the closure.
+     *
+     * @return callable
+     */
+    public function getClosure(): callable;
 }

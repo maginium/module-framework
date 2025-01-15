@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Actions;
 
 use AllowDynamicProperties;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Foundation\Exceptions\NoSuchEntityException;
@@ -96,14 +96,14 @@ class GetList implements GetListInterface
                 throw LocalizedException::make(
                     __('No %1 records found. Please verify the request and try again.', Str::plural($this->modelName)),
                     null,
-                    HttpStatusCode::NOT_FOUND,
+                    HttpStatusCodes::NOT_FOUND,
                 );
             }
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
                 ->setPayload(data: $models->all()) // Set the payload
-                ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
+                ->setStatusCode(HttpStatusCodes::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('Successfully retrieved the %1 list.', Str::plural($this->modelName))) // Set a success message with the model name
                 ->setMeta($models->meta()); // Set meta information (e.g., total count, pagination info)
 
@@ -117,7 +117,7 @@ class GetList implements GetListInterface
             throw LocalizedException::make(
                 __('An unexpected error occurred while retrieving the %1 list. Please contact support if the problem persists.', Str::plural($this->modelName)),
                 $e,
-                HttpStatusCode::INTERNAL_SERVER_ERROR,
+                HttpStatusCodes::INTERNAL_SERVER_ERROR,
             );
         }
     }

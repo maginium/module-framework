@@ -81,7 +81,7 @@ class Repository extends AbstractRepository
 
             // If no results are found, throw a NoSuchEntityException exception.
             if (! $result) {
-                throw NoSuchEntityException::make('No records found for the given criteria.');
+                throw NoSuchEntityException::make(__('No records found for the given criteria.'));
             }
 
             // Return the paginated results.
@@ -123,7 +123,7 @@ class Repository extends AbstractRepository
             // Check if the result is null, meaning the model was not found.
             if (! $result) {
                 // Throw a NoSuchEntityException exception if no model is found.
-                throw NoSuchEntityException::make('Model with ID %1 not found.', $id);
+                throw NoSuchEntityException::make(__('Model with ID %1 not found.', $id));
             }
 
             // Return the found model.

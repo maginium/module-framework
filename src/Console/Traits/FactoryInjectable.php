@@ -21,20 +21,22 @@ use Illuminate\Console\Events\ScheduledTaskSkippedFactory;
 use Illuminate\Console\Events\ScheduledTaskStarting;
 use Illuminate\Console\Events\ScheduledTaskStartingFactory;
 use Maginium\Framework\Support\Facades\Container;
+use Symfony\Component\Process\ProcessFactory;
 
 /**
- * Trait InjectingFactories.
+ * Trait FactoryInjectable.
  *
  * This trait provides methods for injecting various factories into the class.
  * These factories include those for Cron expressions, time zones, background task events,
  * and task events (started, finished, failed, skipped). This ensures that scheduled tasks
  * and associated configurations can be generated and handled properly.
  */
-trait InjectingFactories
+trait FactoryInjectable
 {
     /**
      * Inject the necessary factories for task scheduling, document handling, and event creation.
      *
+     * @param ProcessFactory $processFactory The factory for creating ProcessFactory instances.
      * @param DOMDocumentFactory $domDocumentFactory The factory for creating DOMDocument instances.
      * @param DateTimeZoneFactory $dateTimeZoneFactory The factory used to create timezone objects.
      * @param CronExpressionFactory $cronExpressionFactory The factory used to create Cron expressions.
@@ -45,6 +47,7 @@ trait InjectingFactories
      * @param ScheduledBackgroundTaskFinishedFactory $scheduledBackgroundTaskFinishedFactory The factory for the task finished event.
      */
     public function __construct(
+        ProcessFactory $processFactory,
         DOMDocumentFactory $domDocumentFactory,
         DateTimeZoneFactory $dateTimeZoneFactory,
         CronExpressionFactory $cronExpressionFactory,

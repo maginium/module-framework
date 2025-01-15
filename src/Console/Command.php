@@ -22,7 +22,7 @@ use Maginium\Framework\Application\Interfaces\ApplicationInterface;
 use Maginium\Framework\Console\Exceptions\InvalidModeException;
 use Maginium\Framework\Console\Interfaces\Isolatable;
 use Maginium\Framework\Console\Traits\ConfiguresPrompts;
-use Maginium\Framework\Console\Traits\InjectingFactories;
+use Maginium\Framework\Console\Traits\FactoryInjectable;
 use Maginium\Framework\Console\Traits\InteractsWithIO;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Php;
@@ -54,10 +54,10 @@ abstract class Command extends SymfonyCommand
     use CallsCommands;
     // Configures prompt settings and behavior.
     use ConfiguresPrompts;
+    // Manages factories injection.
+    use FactoryInjectable;
     // Manages command parameters.
     use HasParameters;
-    // Manages factories injection.
-    use InjectingFactories;
     // Facilitates input and output interactions.
     use InteractsWithIO;
     // Manages system signals.

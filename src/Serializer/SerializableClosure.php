@@ -6,9 +6,13 @@ namespace Maginium\Framework\Serializer;
 
 use Closure;
 use Laravel\SerializableClosure\SerializableClosure as BaseSerializableClosure;
-use Laravel\SerializableClosure\SerializableClosureFactory;
+use Laravel\SerializableClosure\Serializers\Native;
+use Laravel\SerializableClosure\Serializers\Signed;
+use Laravel\SerializableClosure\Signers\Hmac;
+use Laravel\SerializableClosure\UnsignedSerializableClosure;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Serializer\Interfaces\SerializableClosureInterface;
+use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Serializer;
 use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Validator;
@@ -20,21 +24,70 @@ use ReflectionMethod;
  * This class provides methods to serialize and unserialize closures
  * using the Laravel SerializableClosure library.
  */
-class SerializableClosure implements SerializableClosureInterface
+class SerializableClosure extends BaseSerializableClosure implements SerializableClosureInterface
 {
     /**
-     * @var SerializableClosureFactory The factory for creating SerializableClosure instances.
+     * Creates a new serializable closure instance.
+     *
+     * @param  Closure  $closure
+     *
+     * @return void
      */
-    private SerializableClosureFactory $factory;
+    public function __construct(?Closure $closure = null)
+    {
+        if ($closure) {
+            parent::__construct($closure);
+        }
+    }
 
     /**
-     * SerializableClosure constructor.
+     * Create a new unsigned serializable closure instance.
      *
-     * @param  SerializableClosureFactory  $factory  The factory for creating SerializableClosure instances.
+     * @param  Closure  $closure
+     *
+     * @return UnsignedSerializableClosure
      */
-    public function __construct(SerializableClosureFactory $factory)
+    public static function unsigned(Closure $closure): UnsignedSerializableClosure
     {
-        $this->factory = $factory;
+        return new UnsignedSerializableClosure($closure);
+    }
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  string|null  $secret
+     *
+     * @return void
+     */
+    public static function setSecretKey($secret): void
+    {
+        Signed::$signer = $secret
+            ? new Hmac($secret)
+            : null;
+    }
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  Closure|null  $transformer
+     *
+     * @return void
+     */
+    public static function transformUseVariablesUsing($transformer): void
+    {
+        Native::$transformUseVariables = $transformer;
+    }
+
+    /**
+     * Sets the serializable closure secret key.
+     *
+     * @param  Closure|null  $resolver
+     *
+     * @return void
+     */
+    public static function resolveUseVariablesUsing($resolver): void
+    {
+        Native::$resolveUseVariables = $resolver;
     }
 
     /**
@@ -44,16 +97,16 @@ class SerializableClosure implements SerializableClosureInterface
      *
      * @throws InvalidArgumentException If the provided data is not a callable.
      *
-     * @return BaseSerializableClosure The serializer instance.
+     * @return SerializableClosureInterface The serializer instance.
      */
-    public function make(Closure $closure): BaseSerializableClosure
+    public function make(Closure $closure): SerializableClosureInterface
     {
         if (! is_callable($closure)) {
             throw InvalidArgumentException::make('The provided argument is not a valid closure.');
         }
 
         // Use the factory to create a SerializableClosure instance
-        return $this->factory->create(compact('closure'));
+        return Container::make(static::class, compact('closure'));
     }
 
     /**
@@ -72,10 +125,12 @@ class SerializableClosure implements SerializableClosureInterface
         }
 
         // Create a SerializableClosure instance using the factory
-        $serializableClosure = $this->make($closure);
+        if (! $closure instanceof SerializableClosureInterface) {
+            $closure = $this->make($closure);
+        }
 
         // Use PHP's serialize function to serialize the SerializableClosure instance
-        return Serializer::serialize($serializableClosure);
+        return Serializer::serialize($closure);
     }
 
     /**
@@ -93,12 +148,22 @@ class SerializableClosure implements SerializableClosureInterface
         $unserialized = Serializer::unserialize($string, true);
 
         // Check if it's a valid SerializableClosure
-        if (! $unserialized instanceof BaseSerializableClosure) {
+        if (! $unserialized instanceof SerializableClosureInterface) {
             throw InvalidArgumentException::make('The provided string could not be unserialized into a valid closure.');
         }
 
         // Return the unserialized closure
         return $unserialized->getClosure();
+    }
+
+    /**
+     * Gets the closure.
+     *
+     * @return callable
+     */
+    public function getClosure(): callable
+    {
+        return $this->serializable->getClosure();
     }
 
     /**
@@ -121,10 +186,10 @@ class SerializableClosure implements SerializableClosureInterface
             $reflection = new ReflectionMethod($value, '__invoke');
 
             // Check if the return type of the closure matches the current class
-            return $reflection->getReturnType()?->getName() === BaseSerializableClosure::class;
+            return $reflection->getReturnType()?->getName() === SerializableClosureInterface::class;
         }
 
         // If the value is a string, check if it contains the class name of SerializableClosure
-        return Validator::isString($value) && Str::contains($value, BaseSerializableClosure::class);
+        return Validator::isString($value) && Str::contains($value, static::class);
     }
 }

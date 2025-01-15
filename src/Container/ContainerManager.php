@@ -13,6 +13,7 @@ use Magento\Framework\ObjectManagerInterface;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Container\Interfaces\ContainerInterface;
 use Maginium\Framework\Container\Interfaces\ContextualAttributeInterface;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Php;
 use ReflectionAttribute;
 use ReflectionFunction;
@@ -286,7 +287,7 @@ class ContainerManager implements ContainerInterface
 
         // If the class was pushed to the stack, pop it off after the call
         if ($pushedToBuildStack) {
-            array_pop($this->buildStack);
+            Arr::pop($this->buildStack);
         }
 
         // Return the result of the callback call
@@ -377,7 +378,7 @@ class ContainerManager implements ContainerInterface
         foreach ($callbacksPerType as $type => $callbacks) {
             // If the type matches or the object is an instance of the type, merge callbacks
             if ($type === $abstract || $object instanceof $type) {
-                $results = array_merge($results, $callbacks);
+                $results = Arr::merge($results, $callbacks);
             }
         }
 

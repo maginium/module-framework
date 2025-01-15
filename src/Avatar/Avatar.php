@@ -12,7 +12,7 @@ use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Interfaces\ImageInterface;
 use Intervention\Image\Typography\FontFactory;
-use Maginium\Foundation\Enums\FileExtension;
+use Maginium\Foundation\Enums\FileExtensions;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Avatar\Generators\DefaultGenerator;
 use Maginium\Framework\Avatar\Interfaces\AvatarInterface;
@@ -408,7 +408,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         }
 
         // Define the full path for the avatar PNG image, using the avatar's name
-        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtension::PNG);
+        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtensions::PNG);
 
         // Convert the image to PNG format and save it to the defined file path if it doesn't exist
         $this->save($filePath);
@@ -439,7 +439,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         }
 
         // Define the full path for the avatar JPG image, using the avatar's name
-        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtension::JPG);
+        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtensions::JPG);
 
         // Convert the image to JPG format and save it to the defined file path if it doesn't exist
         $this->save($filePath, 85); // Using quality 85 for JPG
@@ -470,7 +470,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         }
 
         // Define the full path for the avatar WebP image, using the avatar's name
-        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtension::WEBP);
+        $filePath = Path::join($this->mediaDir, Str::snake($this->name), FileExtensions::WEBP);
 
         // Convert the image to WebP format and save it to the defined file path if it doesn't exist
         $this->save($filePath, 90); // Using quality 90 for WebP

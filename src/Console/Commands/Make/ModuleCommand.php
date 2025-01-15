@@ -51,7 +51,7 @@ class ModuleCommand extends GeneratorCommand
      *
      * @return int The exit code indicating the success or failure of the command.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Retrieve arguments from the user input

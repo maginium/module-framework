@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Traits;
 
-use Maginium\Foundation\Enums\DataType;
+use Maginium\Foundation\Enums\DataTypes;
 use Maginium\Framework\Database\Enums\Searcher;
 use Maginium\Framework\Database\Enums\SearcherEngines;
 use Maginium\Framework\Support\Php;
@@ -42,7 +42,7 @@ trait Searchable
     /**
      * Constant for the default key type when not determined.
      */
-    public const DEFAULT_KEY_TYPE = DataType::INT;
+    public const DEFAULT_KEY_TYPE = DataTypes::INT;
 
     /**
      * Retrieve the index name for the model.
@@ -163,11 +163,11 @@ trait Searchable
             $keyType = gettype($key);
 
             // Return the key type if it's either integer or string, otherwise default to 'int'
-            return $keyType === DataType::INTEGER || $keyType === DataType::STRING ? $keyType : self::DEFAULT_KEY_TYPE;
+            return $keyType === DataTypes::INTEGER || $keyType === DataTypes::STRING ? $keyType : self::DEFAULT_KEY_TYPE;
         }
 
         // Fallback to default 'int' if the key method is not callable
-        return DataType::INT;
+        return DataTypes::INT;
     }
 
     /**

@@ -118,7 +118,7 @@ class Index extends MagentoIndex
      */
     private function getParamStore()
     {
-        return Request::getParam('store') ?: 'all';
+        return Request::query('store') ?: 'all';
     }
 
     /**
@@ -130,7 +130,7 @@ class Index extends MagentoIndex
             return;
         }
 
-        $schemaTypeCode = Request::getParam(
+        $schemaTypeCode = Request::query(
             'type',
             $this->getDefaultSchemaTypeCode(),
         );

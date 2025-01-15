@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Enum\Exceptions;
 
 use InvalidArgumentException;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Framework\Enum\Enum;
 use Maginium\Framework\Support\Php;
 use Throwable;
@@ -47,6 +47,6 @@ class InvalidEnumKeyException extends InvalidArgumentException
         );
 
         // Create and return a new instance of the exception with the appropriate message
-        return new self($message->render(), HttpStatusCode::BAD_REQUEST);
+        return new self($message->render(), HttpStatusCodes::BAD_REQUEST);
     }
 }

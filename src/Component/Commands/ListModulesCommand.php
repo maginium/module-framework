@@ -59,7 +59,7 @@ class ListModulesCommand extends ModuleCommand
      *
      * @return int The exit code indicating the success or failure of the command execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Fetch modules based on the 'module' argument, if provided

@@ -143,6 +143,21 @@ trait InteractsWithQuery
     }
 
     /**
+     * Retrieve all request parameters as a DataObject.
+     *
+     * This method extracts all parameters from the current HTTP request, formats them
+     * into a DataObject instance, and returns it. This allows for cleaner access and
+     * manipulation of request data within the application.
+     *
+     * @return array The request parameters array.
+     */
+    public function queries(): array
+    {
+        // Fetch all parameters from the current request
+        return $this->getParams();
+    }
+
+    /**
      * Set a query string parameter for the current request.
      * This method allows setting a value for a specific query parameter key.
      *

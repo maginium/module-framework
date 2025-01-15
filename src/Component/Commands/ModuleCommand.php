@@ -65,7 +65,7 @@ abstract class ModuleCommand extends Command
      *
      * @return int The exit code of the command execution (self::SUCCESS or self::FAILURE).
      */
-    protected function handle(): int
+    public function handle(): int
     {
         try {
             // Step 1: Simulate loading state with spinner

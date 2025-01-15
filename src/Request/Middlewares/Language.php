@@ -72,7 +72,7 @@ class Language extends AbstractHeaderMiddleware
 
         // Set the language code to the request and application locales
         Request::setLanguage($languageCode);
-        Locale::setLocale($languageCode);
+        Locales::setLocale($languageCode);
 
         // Add the language information to the log context for debugging purposes
         Log::withContext(['localization' => ['language-code' => $languageCode]]);

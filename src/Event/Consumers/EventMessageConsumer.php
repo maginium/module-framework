@@ -15,7 +15,7 @@ class EventMessageConsumer extends ConsumerConfiguration
     /**
      * Process incoming message.
      */
-    public function process(?string $messageBody = null): string
+    public function process(mixed $messageBody = null): string
     {
         $decodedMessage = Json::decode($messageBody);
 

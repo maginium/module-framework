@@ -109,36 +109,6 @@ class FigletManager implements FigletInterface
     }
 
     /**
-     * Clears the internal cache by unsetting certain arrays and objects.
-     *
-     * Specifically, it clears the characters array and the font object.
-     */
-    public function clear(): void
-    {
-        // Unset characters and font to free memory
-        unset($this->characters, $this->font);
-    }
-
-    /**
-     * Writes the rendered Figlet text to the output.
-     *
-     * This method echoes the generated Figlet text followed by a newline.
-     * It acts as a wrapper around the `render()` method for directly outputting the text.
-     *
-     * @param string $text The text to be rendered into Figlet format.
-     *
-     * @return FigletManager Returns the current instance for method chaining.
-     */
-    public function write($text): FigletInterface
-    {
-        // Render the Figlet text and echo it with a newline
-        echo $this->render($text) . PHP_EOL;
-
-        // Return the current instance for method chaining
-        return $this;
-    }
-
-    /**
      * Renders the given text in Figlet format.
      *
      * This method loads the font using the font manager, generates the Figlet text,
@@ -166,6 +136,36 @@ class FigletManager implements FigletInterface
 
         // Return the generated Figlet text
         return $figletText;
+    }
+
+    /**
+     * Clears the internal cache by unsetting certain arrays and objects.
+     *
+     * Specifically, it clears the characters array and the font object.
+     */
+    public function clear(): void
+    {
+        // Unset characters and font to free memory
+        unset($this->characters, $this->font);
+    }
+
+    /**
+     * Writes the rendered Figlet text to the output.
+     *
+     * This method echoes the generated Figlet text followed by a newline.
+     * It acts as a wrapper around the `render()` method for directly outputting the text.
+     *
+     * @param string $text The text to be rendered into Figlet format.
+     *
+     * @return FigletManager Returns the current instance for method chaining.
+     */
+    public function write($text): FigletInterface
+    {
+        // Render the Figlet text and echo it with a newline
+        echo $this->render($text) . PHP_EOL;
+
+        // Return the current instance for method chaining
+        return $this;
     }
 
     /**

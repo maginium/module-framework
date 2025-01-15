@@ -86,7 +86,7 @@ class Data
     public static function formatMessage(string $level, string $message, ?string $className, array $options = []): string
     {
         // Generate a unique request ID if not provided.
-        $options['reqId'] ??= Request::getParam(self::REQUEST_ID_HEADER) ?? Uuid::generate();
+        $options['reqId'] ??= Request::query(self::REQUEST_ID_HEADER) ?? Uuid::generate();
 
         // Ensure options have default values if not provided.
         $options['ip'] ??= null;

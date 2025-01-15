@@ -403,7 +403,7 @@ abstract class EavAttribute implements ScopedAttributeInterface
             // Step 8: Prepare localized values for each store view
             foreach ($storeIds as $storeId) {
                 // Get the locale code for the current store
-                $localeCode = Locale::getLocale();
+                $localeCode = Locales::getLocale();
 
                 // Set the translator to the correct locale
                 Translator::setLocale($localeCode);

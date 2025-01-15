@@ -32,7 +32,7 @@ class AboutCommand extends Command
      *
      * @return int The exit code indicating success or failure of the migration execution.
      */
-    protected function handle(): int
+    public function handle(): int
     {
         // Get all commands from the console application
         $commands = $this->getApplication()->all();

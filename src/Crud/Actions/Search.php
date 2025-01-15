@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Actions;
 
 use AllowDynamicProperties;
-use Maginium\Foundation\Enums\HttpStatusCode;
-use Maginium\Foundation\Enums\SortOrder;
+use Maginium\Foundation\Enums\HttpStatusCodes;
+use Maginium\Foundation\Enums\SortOrders;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Foundation\Exceptions\NoSuchEntityException;
@@ -112,14 +112,14 @@ class Search implements SearchInterface
                 throw LocalizedException::make(
                     __('No %1 were found matching the search term "%2". Please try using different search criteria.', Str::plural($this->modelName), $searchTerm),
                     null,
-                    HttpStatusCode::NOT_FOUND,
+                    HttpStatusCodes::NOT_FOUND,
                 );
             }
 
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
                 ->setPayload($models->all()) // Set the payload
-                ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
+                ->setStatusCode(HttpStatusCodes::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('Successfully retrieved %1 search results.', Str::plural($this->modelName))) // Set a success message with the model name
                 ->setMeta($searchResults->meta()); // Set meta information (e.g., total count, pagination info)
 
@@ -133,7 +133,7 @@ class Search implements SearchInterface
             throw LocalizedException::make(
                 __('An unexpected error occurred while searching for %1. Please try again later.', Str::plural($this->modelName)),
                 $e,
-                HttpStatusCode::INTERNAL_SERVER_ERROR,
+                HttpStatusCodes::INTERNAL_SERVER_ERROR,
             );
         }
     }
@@ -182,7 +182,7 @@ class Search implements SearchInterface
     {
         // If no sorting is provided, use 'id' in ascending order as the default sort
         if (empty($sorts)) {
-            return [Criteria::DEFAULT_KEY => SortOrder::ASC];
+            return [Criteria::DEFAULT_KEY => SortOrders::ASC];
         }
 
         // Return the sorting order provided by the user

@@ -22,6 +22,7 @@ use Maginium\Framework\Dto\Reflection\DataTransferObjectProperty;
 use Maginium\Framework\Dto\Traits\InteractWithData;
 use Maginium\Framework\Enum\Enum;
 use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Json;
 use Maginium\Framework\Support\Facades\Request;
@@ -44,21 +45,9 @@ use stdClass;
  * @template T
  */
 #[CastWith(DataTransferObjectCaster::class)]
-abstract class DataTransferObject implements Arrayable, Jsonable
+abstract class DataTransferObject extends DataObject implements Arrayable, Jsonable
 {
     use InteractWithData;
-
-    /**
-     * @var array<string> The keys to include when converting the DTO to an array.
-     */
-    protected static array $_originData = [];
-
-    /**
-     * Setter/Getter underscore transformation cache.
-     *
-     * @var array
-     */
-    protected static $_underscoreCache = [];
 
     /**
      * @var array<string> The keys to exclude when converting the DTO to an array.
@@ -80,6 +69,8 @@ abstract class DataTransferObject implements Arrayable, Jsonable
      */
     public function __construct(array $parameters = [])
     {
+        parent::__construct($parameters);
+
         // Initialize class reflection using the container
         // Replacing direct instantiation of DataTransferObjectClass with Container::make
         $class = Container::make(DataTransferObjectClass::class, ['dataTransferObject' => $this]);
@@ -143,9 +134,6 @@ abstract class DataTransferObject implements Arrayable, Jsonable
             // Decode content or fetch from the body if it's a Request
             $data = Json::decode($data->getContent());
         }
-
-        // Return a new instance of the DTO with the processed data
-        static::$_originData = $data;
 
         // Assuming a constructor accepts the $data
         return static::make();
@@ -296,31 +284,34 @@ abstract class DataTransferObject implements Arrayable, Jsonable
     }
 
     /**
-     * Return the original DTO data as an array with exclusions and inclusions.
+     * Convert array of object data to an array with keys requested in $keys array.
      *
-     * This method collects all properties and respects the exclusions and inclusions.
+     * @param array $keys Array of required keys
      *
-     * @return array The final transformed data as an array.
+     * @return array Filtered array
      */
-    public function toArray(): array
+    public function toArray(array $keys = [])
     {
         // Get all properties using the all() method
         $data = $this->all();
 
-        // Filter properties based on "only" and "except" keys
-        return Arr::only($data, $this->onlyKeys) // Apply the "only" filter
-        // Apply the "except" filter
-            + Arr::except($data, $this->exceptKeys);
-    }
+        // Determine the keys to include:
+        // If $this->onlyKeys is empty or '*', include all keys.
+        $onlyKeys = (empty($this->onlyKeys) || $this->onlyKeys === '*')
+            ? Arr::keys($data)
+            : $this->onlyKeys;
 
-    /**
-     * Converts the Dto to a JSON string representation.
-     *
-     * @return string A JSON string representation of the Dto.
-     */
-    public function toString(): string
-    {
-        return Json::encode($this->toArray());
+        // If $keys is provided, take the intersection with $onlyKeys
+        if (! empty($keys)) {
+            $onlyKeys = Arr::intersect($onlyKeys, $keys);
+        }
+
+        // Filter properties based on "only" and "except" keys
+        return Arr::filter(
+            $data,
+            fn($value, $key) => in_array($key, $onlyKeys) && ! in_array($key, $this->exceptKeys),
+            ARRAY_FILTER_USE_BOTH,
+        );
     }
 
     /**
@@ -533,58 +524,16 @@ abstract class DataTransferObject implements Arrayable, Jsonable
     }
 
     /**
-     * Converts field names for setters and getters to underscore format.
+     * Set/Get attribute wrapper.
      *
-     * Converts camelCase property names to snake_case (underscore) format, ensuring consistency in method naming conventions.
-     * Uses a cache to avoid redundant conversions, improving performance for repeated calls.
+     * @param string $method
+     * @param array $args
      *
-     * Example: setMyField() -> my_field
+     * @throws \Magento\Framework\Exception\LocalizedException
      *
-     * @param string $name The method name (e.g., "setMyField")
-     *
-     * @return string The converted name in snake_case (e.g., "my_field")
+     * @return mixed
      */
-    private function _underscore(string $name): string
-    {
-        // Check if the result is already cached
-        if (isset(self::$_underscoreCache[$name])) {
-            return self::$_underscoreCache[$name];
-        }
-
-        // Convert the property name from camelCase to snake_case
-        $result = mb_strtolower(
-            trim(
-                preg_replace(
-                    '/([A-Z]|[0-9]+)/',
-                    '_$1',
-                    lcfirst(
-                        mb_substr($name, 3), // Remove the first 3 characters (e.g., 'set' or 'get')
-                    ),
-                ),
-                '_', // Remove any leading/trailing underscores
-            ),
-        );
-
-        // Cache the result for future use
-        self::$_underscoreCache[$name] = $result;
-
-        return $result;
-    }
-
-    /**
-     * Magic method to handle dynamic getter, setter, unset, and has method calls.
-     *
-     * This method intercepts method calls like setFoo(), getFoo(), unsFoo(), and hasFoo(), and dynamically handles them.
-     * It ensures that the correct property is accessed, modified, or checked based on the method called.
-     *
-     * @param string $method The name of the method being called (e.g., 'getMyField')
-     * @param array $args The arguments passed to the method (if any)
-     *
-     * @throws LocalizedException If the method is invalid or not supported
-     *
-     * @return mixed The value returned by the method, or the property being set
-     */
-    public function __call(string $method, array $args)
+    public function __call($method, $args)
     {
         // Determine the type of method by its first three characters (get, set, uns, has)
         switch (mb_substr($method, 0, 3)) {

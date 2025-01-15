@@ -12,6 +12,7 @@ use Maginium\Framework\Crud\Helpers\Relation;
 use Maginium\Framework\Crud\Sorts\Sort;
 use Maginium\Framework\Database\Eloquent\Builder;
 use Maginium\Framework\Database\Eloquent\Model;
+use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Request;
 use Maginium\Framework\Support\Str;
@@ -131,7 +132,7 @@ trait Sortable
     public function scopeSortFields(Builder $query, array|string $fields): Builder
     {
         // Assign the provided fields to the sortFields property.
-        $this->sortFields = Validator::isArray($fields) ? $fields : array_slice(func_get_args(), 1);
+        $this->sortFields = Validator::isArray($fields) ? $fields : Arr::slice(func_get_args(), 1);
 
         // Return the query builder instance after setting the sort fields.
         return $query;
@@ -177,7 +178,7 @@ trait Sortable
     private function availableSort(): array
     {
         // Return either the predefined sort fields or dynamic fields from the model's columns and relations.
-        return $this->sortFields ?? array_merge($this->getTableColumns(), Relation::getRelations($this));
+        return $this->sortFields ?? Arr::merge($this->getTableColumns(), Relation::getRelations($this));
     }
 
     /**

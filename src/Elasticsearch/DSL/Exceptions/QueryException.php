@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Elasticsearch\DSL\Exceptions;
 
 use Magento\Framework\Phrase;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Throwable;
 
@@ -53,7 +53,7 @@ class QueryException extends LocalizedException
         parent::__construct(
             $message, // The error message
             $cause,   // The cause of the error
-            $statusCode ?? HttpStatusCode::INTERNAL_SERVER_ERROR, // Default to 500 if no statusCode provided
+            $statusCode ?? HttpStatusCodes::INTERNAL_SERVER_ERROR, // Default to 500 if no statusCode provided
             $code,    // The error code
             $context,   // Additional context
         );

@@ -8,12 +8,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Framework\Config\Config;
-use Maginium\Framework\Config\Helpers\Cache as CacheManager;
 use Maginium\Framework\Config\Interfaces\DriverInterface;
 use Maginium\Framework\Config\Traits\Scopeable;
 use Maginium\Framework\Log\Interfaces\LoggerInterface;
+use Maginium\Framework\Support\Facades\Cache;
 use Maginium\Framework\Support\Facades\Crypt;
 use Maginium\Framework\Support\Str;
+use Maginium\Store\Interfaces\Data\StoreInterface;
+use Maginium\Store\Models\Store;
 
 /**
  * Class ScopeConfig.
@@ -25,14 +27,14 @@ class ScopeConfig extends Config implements DriverInterface
     use Scopeable;
 
     /**
+     * Cache type identifier.
+     */
+    public const TYPE_IDENTIFIER = 'scope_config';
+
+    /**
      * Logger instance for logging messages and debugging.
      */
     private LoggerInterface $logger;
-
-    /**
-     * @var CacheManager Cache management for saving and retrieving configuration data.
-     */
-    private CacheManager $cacheManager;
 
     /**
      * @var ScopeConfigInterface Interface for retrieving configuration values scoped to a store.
@@ -43,17 +45,14 @@ class ScopeConfig extends Config implements DriverInterface
      * ScopeConfig constructor.
      *
      * @param  LoggerInterface  $logger  Logs system events and errors.
-     * @param  CacheManager  $cacheManager  Cache manager for configuration values.
      * @param  ScopeConfigInterface  $scopeConfig  Scope-specific configuration service.
      */
     public function __construct(
         LoggerInterface $logger,
-        CacheManager $cacheManager,
         ScopeConfigInterface $scopeConfig,
     ) {
         $this->logger = $logger;
         $this->scopeConfig = $scopeConfig;
-        $this->cacheManager = $cacheManager;
 
         // Set Log class name
         $logger->setClassName(static::class);
@@ -74,11 +73,11 @@ class ScopeConfig extends Config implements DriverInterface
             $formattedPath = $this->formatConfigPath($path);
 
             // Generate a unique cache key based on the configuration path and scope ID.
-            $cacheKey = $this->cacheManager->generateCacheKey($formattedPath, $this->getScopeId());
+            $cacheKey = $this->generateCacheKey($formattedPath, $this->getScopeId());
 
             // Check if the configuration value is already cached and return it if found.
-            if ($this->cacheManager->has($cacheKey)) {
-                return $this->cacheManager->load($cacheKey);
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
             }
 
             // Retrieve the configuration value using the scoped configuration service.
@@ -91,6 +90,9 @@ class ScopeConfig extends Config implements DriverInterface
             if (empty($value)) {
                 return $default ?? null;
             }
+
+            // Save the encrypted value in the cache for future retrieval.
+            Cache::tags([static::CACHE_TAG])->put($cacheKey, $value);
 
             // Return the configuration value or the default if the value is null.
             return $value ?? $default;
@@ -117,11 +119,11 @@ class ScopeConfig extends Config implements DriverInterface
     {
         try {
             // Generate a unique cache key based on the configuration path and scope ID.
-            $cacheKey = $this->cacheManager->generateCacheKey($path, $this->getScopeId());
+            $cacheKey = $this->generateCacheKey($path, $this->getScopeId());
 
             // Check if the encrypted value is cached and decrypt it if found.
-            if ($this->cacheManager->has($cacheKey)) {
-                $encryptedValue = $this->cacheManager->load($cacheKey);
+            if (Cache::has($cacheKey)) {
+                $encryptedValue = Cache::get($cacheKey);
 
                 // Decrypt the cached encrypted value and return it.
                 return Crypt::decrypt($encryptedValue);
@@ -134,7 +136,7 @@ class ScopeConfig extends Config implements DriverInterface
             $decryptedValue = Crypt::decrypt($encryptedValue);
 
             // Save the encrypted value in the cache for future retrieval.
-            $this->cacheManager->save($cacheKey, $encryptedValue);
+            Cache::tags([static::CACHE_TAG])->put($cacheKey, $encryptedValue);
 
             // Return the decrypted value.
             return $decryptedValue;
@@ -145,6 +147,28 @@ class ScopeConfig extends Config implements DriverInterface
             // Throw a localized exception to inform the caller of the failure.
             throw LocalizedException::make(__('Error retrieving encrypted configuration variable.'));
         }
+    }
+
+    /**
+     * Generate cache key for configuration value.
+     *
+     * @param  string  $path  The key of the configuration variable.
+     * @param  int|string|null  $storeId  The store ID to retrieve the configuration for. Default is null.
+     *
+     * @return string The generated cache key.
+     */
+    private function generateCacheKey(string $path, int|string|null $storeId = null): string
+    {
+        // Replace null store ID with the default store ID (0)
+        $storeId ??= StoreInterface::DEFAULT_STORE_ID;
+
+        // Replace forward slashes with underscores in the path
+        $path = Str::replace(SP, '_', $path);
+
+        // Construct the cache key
+        $cacheKey = self::TYPE_IDENTIFIER . '_' . $path . '_' . $storeId;
+
+        return $cacheKey;
     }
 
     /**

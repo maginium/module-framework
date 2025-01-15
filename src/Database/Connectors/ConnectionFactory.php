@@ -11,6 +11,7 @@ use Maginium\Framework\Database\Connections\Connection;
 use Maginium\Framework\Database\Connections\MySqlConnectionFactory;
 use Maginium\Framework\Database\Connections\PostgresConnectionFactory;
 use Maginium\Framework\Database\Interfaces\ConnectionInterface;
+use Maginium\Framework\Support\Arr;
 
 /**
  * Class ConnectionFactory.
@@ -157,7 +158,7 @@ class ConnectionFactory extends BaseConnectionFactory
         ];
 
         // Check if a factory exists for the given driver and use it
-        if (array_key_exists($driver, $factories)) {
+        if (Arr::keyExists($driver, $factories)) {
             return $factories[$driver]();
         }
 

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Crud\Traits;
 
+use Maginium\Framework\Support\Arr;
+use Maginium\Framework\Support\Validator;
+
 trait getColumns
 {
     /**
@@ -35,7 +38,7 @@ trait getColumns
         // Merge the original columns and the qualified columns to return both.
         // This ensures that the method returns the full set of columns,
         // both unqualified and qualified, for later use.
-        return array_merge($this->columns, $qualifiedColumns);
+        return Arr::merge($this->columns, $qualifiedColumns);
     }
 
     /**
@@ -52,11 +55,11 @@ trait getColumns
     private function realName(array $fields, string $field): string
     {
         // Search for the field in the list of available fields
-        // `array_search` returns the key if found or false if not found.
-        $real = array_search($field, $fields, true);
+        // `Arr::search` returns the key if found or false if not found.
+        $real = Arr::search($field, $fields, true);
 
-        // If the field is found, `array_search` returns the field name as key
-        // If not found, `array_search` returns false, so return the original field name
+        // If the field is found, `Arr::search` returns the field name as key
+        // If not found, `Arr::search` returns false, so return the original field name
         return Validator::isInt($real) ? $field : $real;
     }
 }

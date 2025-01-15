@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Concerns\Customer;
 
 use Maginium\Customer\Interfaces\Data\CustomerInterface;
-use Maginium\Foundation\Enums\Gender;
+use Maginium\Foundation\Enums\Genders;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Support\Str;
 
@@ -26,7 +26,7 @@ trait HasGender
      *
      * This method retrieves the gender value associated with the customer. If no gender is set,
      * it will return null. The method translates the stored gender code to its corresponding label
-     * using the `Gender::getValue` method.
+     * using the `Genders::getValue` method.
      *
      * @return string|null The translated gender value or null if not set.
      */
@@ -37,7 +37,7 @@ trait HasGender
 
         // Check if gender is not null and valid
         if ($gender !== null) {
-            $value = Gender::getKey($gender);
+            $value = Genders::getKey($gender);
 
             // Return the translated gender value in lowercase, if available
             return $value ? Str::lower($value) : null;
@@ -63,13 +63,13 @@ trait HasGender
     public function setGender($gender): self
     {
         // Validate if the provided gender exists in the gender types.
-        if (! Gender::hasValue($gender)) {
+        if (! Genders::hasValue($gender)) {
             // Throw an exception if the gender is not valid.
             throw InvalidArgumentException::make('Invalid gender value.');
         }
 
         // Set the gender value to the instance.
-        $this->setData(CustomerInterface::GENDER, Gender::getKey($gender));
+        $this->setData(CustomerInterface::GENDER, Genders::getKey($gender));
 
         // Return the current instance to allow method chaining.
         return $this;
@@ -84,7 +84,7 @@ trait HasGender
      */
     public function isMale(): bool
     {
-        return $this->getGender() === Gender::MALE();
+        return $this->getGender() === Genders::MALE();
     }
 
     /**
@@ -96,7 +96,7 @@ trait HasGender
      */
     public function isFemale(): bool
     {
-        return $this->getGender() === Gender::FEMALE();
+        return $this->getGender() === Genders::FEMALE();
     }
 
     /**
@@ -108,7 +108,7 @@ trait HasGender
      */
     public function isOther(): bool
     {
-        return $this->getGender() === Gender::OTHER();
+        return $this->getGender() === Genders::OTHER();
     }
 
     /**
@@ -122,7 +122,7 @@ trait HasGender
     public function setGenderMale(): self
     {
         // Set the gender to 'male'.
-        return $this->setGender(Gender::MALE()->value);
+        return $this->setGender(Genders::MALE()->value);
     }
 
     /**
@@ -136,7 +136,7 @@ trait HasGender
     public function setGenderFemale(): self
     {
         // Set the gender to 'female'.
-        return $this->setGender(Gender::FEMALE()->value);
+        return $this->setGender(Genders::FEMALE()->value);
     }
 
     /**
@@ -150,6 +150,6 @@ trait HasGender
     public function setGenderOther(): self
     {
         // Set the gender to 'other'.
-        return $this->setGender(Gender::OTHER()->value);
+        return $this->setGender(Genders::OTHER()->value);
     }
 }

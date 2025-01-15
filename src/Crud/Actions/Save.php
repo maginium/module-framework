@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Actions;
 
 use AllowDynamicProperties;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\CouldNotSaveException;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
@@ -104,7 +104,7 @@ class Save implements CreateInterface
                 throw CouldNotSaveException::make(
                     __('Unable to save the %1 model. No data found after saving.', $this->modelName),
                     null,
-                    HttpStatusCode::UNPROCESSABLE_ENTITY,
+                    HttpStatusCodes::UNPROCESSABLE_ENTITY,
                 );
             }
 
@@ -114,7 +114,7 @@ class Save implements CreateInterface
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
                 ->setPayload($filteredEntityData) // Set the payload
-                ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
+                ->setStatusCode(HttpStatusCodes::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('%1 model saved successfully.', Str::plural($this->modelName))); // Set a success message with the model name
 
             // Return the formatted result as an associative array
@@ -127,7 +127,7 @@ class Save implements CreateInterface
             throw LocalizedException::make(
                 __('An unexpected error occurred while saving a %1. %2.', Str::plural($this->modelName), $e->getMessage()),
                 $e,
-                HttpStatusCode::INTERNAL_SERVER_ERROR,
+                HttpStatusCodes::INTERNAL_SERVER_ERROR,
             );
         }
     }

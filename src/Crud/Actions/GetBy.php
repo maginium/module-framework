@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Maginium\Framework\Crud\Actions;
 
 use AllowDynamicProperties;
-use Maginium\Foundation\Enums\HttpStatusCode;
+use Maginium\Foundation\Enums\HttpStatusCodes;
 use Maginium\Foundation\Exceptions\Exception;
 use Maginium\Foundation\Exceptions\LocalizedException;
 use Maginium\Foundation\Exceptions\NoSuchEntityException;
@@ -91,7 +91,7 @@ class GetBy implements GetByInterface
                 throw LocalizedException::make(
                     __('No %1 found with the given %2: "%3". Please verify the provided attribute.', $this->modelName, $code, $value),
                     null,
-                    HttpStatusCode::NOT_FOUND,
+                    HttpStatusCodes::NOT_FOUND,
                 );
             }
 
@@ -101,7 +101,7 @@ class GetBy implements GetByInterface
             // Prepare the response with the payload, status code, success message, and meta information
             $response = $this->response()
                 ->setPayload($filteredEntityData) // Set the payload
-                ->setStatusCode(HttpStatusCode::OK) // Set HTTP status code to 200 (OK)
+                ->setStatusCode(HttpStatusCodes::OK) // Set HTTP status code to 200 (OK)
                 ->setMessage(__('Successfully retrieved %1 data by %2.', $this->modelName, $code)); // Set a success message with the model name
 
             // Return the formatted result as an associative array
@@ -114,7 +114,7 @@ class GetBy implements GetByInterface
             throw LocalizedException::make(
                 __('An error occurred while retrieving the %1 by %2: "%3". Please try again later.', $this->modelName, $code, $value),
                 $e,
-                HttpStatusCode::INTERNAL_SERVER_ERROR,
+                HttpStatusCodes::INTERNAL_SERVER_ERROR,
             );
         }
     }
