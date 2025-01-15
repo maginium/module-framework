@@ -5,4 +5,16 @@
         <!-- Connection details for the event publisher, using the 'amqp' connection to the 'event.messages'. -->
         <connection exchange="event.messages" name="amqp" />
     </publisher>
+
+    <!-- Publisher for publishing email-related messages to the 'email.messages' topic via the 'email.messages'. -->
+    <publisher topic="email.messages">
+        <!-- Connection details for the email publisher, using the 'amqp' connection to the 'email.messages'. -->
+        <connection exchange="email.messages" name="amqp" />
+    </publisher>
+
+    <!-- Publisher for publishing email-related messages to the 'email.messages.delay' topic via the 'email.messages.delay'. -->
+    <publisher topic="email.messages.delay">
+        <!-- Connection details for the email publisher, using the 'amqp' connection to the 'email.messages.delay'. -->
+        <connection exchange="email.messages.delay" name="amqp" />
+    </publisher>
 </config>

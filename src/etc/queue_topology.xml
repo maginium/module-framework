@@ -27,4 +27,40 @@
             </arguments>
         </binding>
     </exchange>
+
+    <!-- Defines the Email Messages Exchange and Queue, similar to the event messages queue. -->
+    <exchange connection="amqp" name="email.messages" type="topic">
+        <!-- Binds the "email.messages" topic to the email.messages queue, for routing email-related messages. -->
+        <binding destination="email.messages" destinationType="queue" id="email.messages" topic="email.messages">
+            <arguments>
+                <!-- Specifies the dead-letter exchange for email messages in case of failure or rejection. -->
+                <argument xsi:type="string" name="x-dead-letter-exchange">email.messages.dlq</argument>
+                <!-- Specifies the dead-letter routing key for email messages, ensuring they go to the dlq queue. -->
+                <argument xsi:type="string" name="x-dead-letter-routing-key">email.messages.dlq</argument>
+            </arguments>
+        </binding>
+    </exchange>
+
+    <!-- Defines the Email Messages Exchange and Queue, similar to the event messages queue. -->
+    <exchange connection="amqp" name="email.messages.delay" type="topic">
+        <!-- Specifies the underlying type of the delayed exchange as "topic" -->
+        <arguments>
+            <argument xsi:type="string" name="x-delayed-type">direct</argument>
+        </arguments>
+    </exchange>
+
+    <!-- Defines the Delay Queue for Email Messages, allowing delayed processing before retrying. -->
+    <exchange connection="amqp" name="email.messages.dlq" type="topic">
+        <!-- Binds the "email.messages.dlq" topic to the email.messages.dlq queue, enabling delayed message routing. -->
+        <binding destination="email.messages.dlq" destinationType="queue" id="email.messages.dlq" topic="email.messages.dlq">
+            <arguments>
+                <!-- Sets a Time-To-Live (TTL) for the message in the dlq queue, here it is 5 minutes (300000 ms). -->
+                <argument xsi:type="number" name="x-message-ttl">300000</argument>
+                <!-- Specifies the dead-letter exchange for delayed email messages to be routed back to the main queue. -->
+                <argument xsi:type="string" name="x-dead-letter-exchange">email.messages</argument>
+                <!-- Specifies the dead-letter routing key for delayed email messages, enabling retry to the main queue. -->
+                <argument xsi:type="string" name="x-dead-letter-routing-key">email.messages</argument>
+            </arguments>
+        </binding>
+    </exchange>
 </config>

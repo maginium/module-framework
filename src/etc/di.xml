@@ -42,7 +42,9 @@
     <preference for="Maginium\Framework\Locale\Interfaces\TranslationInterface" type="Maginium\Framework\Locale\TranslatorManager" />
 
     <!-- Cache and Redis -->
+    <!-- <preference for="Magento\Framework\App\CacheInterface" type="Maginium\Framework\Cache\CacheManager\Proxy" /> -->
     <preference for="Illuminate\Contracts\Cache\Repository" type="Maginium\Framework\Cache\Repository" />
+    <preference for="Magento\Framework\Cache\FrontendInterface" type="Maginium\Framework\Cache\CacheManager" />
     <preference for="Illuminate\Contracts\Cache\Factory" type="Maginium\Framework\Cache\Interfaces\FactoryInterface" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
     <preference for="Maginium\Framework\Cache\Interfaces\FactoryInterface" type="Maginium\Framework\Cache\CacheManager" />
@@ -160,6 +162,10 @@
     <preference for="Maginium\Framework\Event\Interfaces\EventInterface" type="Maginium\Framework\Event\EventManager" />
     <preference for="Magento\Framework\MessageQueue\Publisher" type="Maginium\Framework\MessageQueue\PublisherManager" />
     <preference for="Maginium\Framework\MessageQueue\Interfaces\PublisherInterface" type="Maginium\Framework\MessageQueue\PublisherManager" />
+    <preference
+        for="Magento\Framework\Communication\Config\Reader\XmlReader\Converter"
+        type="Maginium\Framework\MessageQueue\Models\Config\XmlReader\Converter"
+    />
 
     <!-- Config Module -->
     <preference for="Maginium\Framework\Config\Interfaces\ConfigInterface" type="Maginium\Framework\Config\Config" />
@@ -193,6 +199,45 @@
     <!-- Pusher -->
     <preference for="Maginium\Framework\Pusher\Interfaces\ClientInterface" type="Maginium\Framework\Pusher\Client" />
     <preference for="Maginium\Framework\Pusher\Interfaces\PusherInterface" type="Maginium\Framework\Pusher\PusherManager" />
+
+    <!-- Mail -->
+    <preference for="Magento\Framework\Mail\EmailMessage" type="Maginium\Framework\Mail\Models\EmailMessage" />
+    <preference for="Maginium\Framework\Mail\Interfaces\RendererInterface" type="Maginium\Framework\Mail\Renderer" />
+    <preference for="Maginium\Framework\Mail\Interfaces\MailableInterface" type="Maginium\Framework\Mail\Mailable" />
+    <preference for="Magento\Framework\Mail\MessageInterface" type="Maginium\Framework\Mail\Interfaces\MessageInterface" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\HeaderInterface" type="Maginium\Framework\Mail\Models\Header" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\AddressInterface" type="Maginium\Framework\Mail\Models\Address" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\MetadataInterface" type="Maginium\Framework\Mail\Models\Metadata" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface" type="Maginium\Framework\Mail\Models\Envelope" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\AttachmentInterface" type="Maginium\Framework\Mail\Models\Attachment" />
+    <preference for="Magento\Framework\App\TemplateTypesInterface" type="Maginium\Framework\Mail\Interfaces\TemplateTypesInterface" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\TemplateDataInterface" type="Maginium\Framework\Mail\Models\TemplateData" />
+    <preference for="Maginium\Framework\Mail\Interfaces\Data\EmailMessageInterface" type="Maginium\Framework\Mail\Models\EmailMessage" />
+    <preference for="Magento\Framework\Mail\EmailMessageInterface" type="Maginium\Framework\Mail\Interfaces\Data\EmailMessageInterface" />
+    <preference for="Maginium\Framework\Mail\Interfaces\TransportBuilderInterface" type="Maginium\Framework\Mail\Models\TransportBuilder" />
+    <preference for="Magento\Email\Model\Template\Config\SchemaLocator" type="Maginium\Framework\Mail\Models\Template\Config\SchemaLocator" />
+    <preference
+        for="Magento\Email\Block\Adminhtml\Template\Grid\Filter\Type"
+        type="Maginium\Framework\Mail\Block\Adminhtml\Template\Grid\Filter\Type"
+    />
+    <preference
+        for="Magento\Email\Block\Adminhtml\Template\Grid\Renderer\Type"
+        type="Maginium\Framework\Mail\Block\Adminhtml\Template\Grid\Renderer\Type"
+    />
+    <type name="Magento\Config\Model\Config\Source\Email\Template">
+        <plugin
+            disabled="false"
+            name="email_template_config"
+            sortOrder="20"
+            type="Maginium\Framework\Mail\Interceptors\Framework\Mail\Model\Config\Source\Template"
+        />
+    </type>
+    <type name="Magento\Email\Model\Template\Filter">
+        <plugin name="template_filter_interceptor" sortOrder="10" type="Maginium\Framework\Mail\Interceptors\Model\Template\Filter" />
+    </type>
+    <type name="Magento\Email\Model\AbstractTemplate">
+        <plugin name="abstract_template_interceptor" sortOrder="10" type="Maginium\Framework\Mail\Interceptors\Model\AbstractTemplate" />
+    </type>
 
     <!-- Console -->
     <preference for="Illuminate\Console\Command" type="Maginium\Framework\Console\Command" />
@@ -263,6 +308,9 @@
                     xsi:type="object"
                     name="schedule_clear_cache_command"
                 >Maginium\Framework\Console\Commands\Schedule\ScheduleClearCacheCommand</item>
+
+                <!-- Email -->
+                <item xsi:type="object" name="react_email_serve">Maginium\Framework\Mail\Commands\ReactEmailBuild</item>
             </argument>
         </arguments>
     </type>

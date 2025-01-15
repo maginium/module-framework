@@ -5,8 +5,8 @@ declare(strict_types=1);
 /**
  * Mail.
  *
- * @see \Mailer
+ * @see \Mail
  */
-class Mail extends \Maginium\Framework\Support\Facades\Mailer
+class Mail extends \Maginium\Framework\Support\Facades\Mail
 {
 }

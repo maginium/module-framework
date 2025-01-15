@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- Define the 'emailTemplateType' complex type that represents an email template configuration -->
+    <xs:complexType name="emailTemplateType">
+        <!-- 'id' attribute is required and must be of type string, representing the template identifier -->
+        <xs:attribute name="id" type="xs:string" use="required" />
+
+        <!-- 'label' attribute is required and must be of type string, representing the template label -->
+        <xs:attribute name="label" type="xs:string" use="required" />
+
+        <!-- 'file' attribute is required and must be of type string, representing the file path of the template -->
+        <xs:attribute name="file" type="xs:string" use="required" />
+
+        <!-- 'type' attribute is required and specifies the format type of the email template -->
+        <xs:attribute name="type" type="emailTemplateFormatType" use="required" />
+
+        <!-- 'module' attribute is required and specifies the module associated with the email template -->
+        <xs:attribute name="module" type="xs:string" use="required" />
+
+        <!-- 'area' attribute is required and specifies the area in which the email template is used (frontend or adminhtml) -->
+        <xs:attribute name="area" type="areaType" use="required" />
+    </xs:complexType>
+
+    <!-- Define a simple type 'emailTemplateFormatType' to restrict values to 'html', 'text', or 'react' -->
+    <xs:simpleType name="emailTemplateFormatType">
+        <xs:restriction base="xs:string">
+            <!-- Enumerate allowed values for the email template format type -->
+            <!-- 'html' for HTML formatted emails -->
+            <xs:enumeration value="html" />
+
+            <!-- 'text' for plain text formatted emails -->
+            <xs:enumeration value="text" />
+
+            <!-- 'react' for React-based email templates -->
+            <xs:enumeration value="react" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Define a simple type 'areaType' for restricting values to 'frontend' or 'adminhtml' -->
+    <xs:simpleType name="areaType">
+        <xs:restriction base="xs:string">
+            <!-- Enumerate allowed values for the area in which the template is used -->
+
+            <!-- 'frontend' for the customer-facing part of the application -->
+            <xs:enumeration value="frontend" />
+
+            <!-- 'adminhtml' for the backend admin area -->
+            <xs:enumeration value="adminhtml" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Define the 'config' element that contains multiple 'template' elements -->
+    <xs:element name="config">
+        <xs:complexType>
+            <xs:sequence>
+                <!-- Define the 'template' element which is of type 'emailTemplateType' -->
+                <xs:element name="template" type="emailTemplateType" minOccurs="1" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

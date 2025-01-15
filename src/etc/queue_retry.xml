@@ -5,4 +5,7 @@
 >
     <!-- Retry limit configuration for event message topic -->
     <topic name="event.messages" retryLimit="3" />
+
+    <!-- Retry limit configuration for email message topic -->
+    <topic name="email.messages" retryLimit="3" />
 </config>

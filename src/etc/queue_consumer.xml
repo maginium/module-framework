@@ -12,4 +12,30 @@
         queue="event.messages"
         sleep="5"
     />
+
+    <!-- Consumer for processing email-related messages from the 'email.messages' with 'amqp' connection -->
+    <consumer
+        connection="amqp"
+        consumerInstance="Magento\Framework\MessageQueue\Consumer"
+        handler="Maginium\Framework\Mail\Consumers\QueuedEmailConsumer::process"
+        maxIdleTime="60"
+        maxMessages="100"
+        name="email.message.consumer"
+        onlySpawnWhenMessageAvailable="1"
+        queue="email.messages"
+        sleep="5"
+    />
+
+    <!-- Consumer for processing email-related messages from the 'email.messages' with 'amqp' connection -->
+    <consumer
+        connection="amqp"
+        consumerInstance="Magento\Framework\MessageQueue\Consumer"
+        handler="Maginium\Framework\Mail\Consumers\DelayedEmailConsumer::process"
+        maxIdleTime="60"
+        maxMessages="100"
+        name="email.message.delay.consumer"
+        onlySpawnWhenMessageAvailable="1"
+        queue="email.messages.delay"
+        sleep="5"
+    />
 </config>

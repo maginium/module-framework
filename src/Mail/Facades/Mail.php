@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Support\Facades;
+namespace Maginium\Framework\Mail\Facade;
 
-use DateInterval;
-use DateTimeInterface;
-use Maginium\Framework\Mailer\Interfaces\Data\EnvelopeInterface;
-use Maginium\Framework\Mailer\Interfaces\Data\EnvelopeInterfaceFactory;
-use Maginium\Framework\Mailer\Mailer as MailerManager;
+use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
+use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterfaceFactory;
 use Maginium\Framework\Support\Facade;
 
 /**
- * Facade for interacting with the Mailer service.
+ * Facade for interacting with the Mail service.
  *
- * This facade provides a simplified interface for dispatching emails using the Mailer service.
+ * This facade provides a simplified interface for dispatching emails using the Mail service.
  *
  * @method static EnvelopeInterface store(int $storeId) Set the store ID for the email configuration.
  * @method static EnvelopeInterface to(string $email, string $name = '') Set the recipient's email and optional name.
@@ -26,18 +23,20 @@ use Maginium\Framework\Support\Facade;
  * @method static EnvelopeInterface template(string $templateId) Set the template ID for the email.
  * @method static EnvelopeInterface withData(array $data) Set template variables for the email.
  * @method static EnvelopeInterface metadata(array $metadata) Set additional metadata for the email.
+ * @method static EnvelopeInterface headers(array $headers) Set additional headers for the email.
  * @method static EnvelopeInterface attachment(string $filePath, string $fileName) Add an attachment to the email.
  * @method static bool hasCc(string $address, ?string $name = null) Check if the email has the specified CC recipient.
  * @method static bool hasBcc(string $address, ?string $name = null) Check if the email has the specified BCC recipient.
  * @method static bool hasSubject(string $subject) Check if the email has the specified subject.
- * @method static bool hasMetadata(string $key, string $value) Check if the email has the specified metadata.
+ * @method static bool hasHeader(string $key) Check if the email has the specified header.
+ * @method static bool hasMetadata(string $key) Check if the email has the specified metadata.
  * @method static void send() Send the email using the provided Envelope.
  * @method static void queue() Send the email using the provided Envelope.
- * @method static void later(DateTimeInterface|DateInterval|int $delay = null) Deliver the queued message after a delay.
+ * @method static void later(\DateTimeInterface|\DateInterval|int $delay = null) Deliver the queued message after a delay.
  *
- * @see MailerManager
+ * @see EnvelopeInterface
  */
-class Mailer extends Facade
+class Mail extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -46,7 +45,6 @@ class Mailer extends Facade
      */
     protected static function getAccessor(): string
     {
-        // return MailerManager::class;
         return EnvelopeInterfaceFactory::class;
     }
 
