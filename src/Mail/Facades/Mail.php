@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Mail\Facade;
+namespace Maginium\Framework\Mail\Facades;
 
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterfaceFactory;
+use Maginium\Framework\Mail\Interfaces\FactoryInterface;
 use Maginium\Framework\Support\Facade;
 
 /**
@@ -13,18 +12,18 @@ use Maginium\Framework\Support\Facade;
  *
  * This facade provides a simplified interface for dispatching emails using the Mail service.
  *
- * @method static EnvelopeInterface store(int $storeId) Set the store ID for the email configuration.
- * @method static EnvelopeInterface to(string $email, string $name = '') Set the recipient's email and optional name.
- * @method static EnvelopeInterface from(string $email, string $name = '') Set the sender's email and optional name.
- * @method static EnvelopeInterface replyTo(string $email, string $name = '') Set the reply-to email address and optional name.
- * @method static EnvelopeInterface cc(string $email, string $name = '') Add a recipient to the CC list.
- * @method static EnvelopeInterface bcc(string $email, string $name = '') Add a recipient to the BCC list.
- * @method static EnvelopeInterface subject(string $subject) Set the subject of the email.
- * @method static EnvelopeInterface template(string $templateId) Set the template ID for the email.
- * @method static EnvelopeInterface withData(array $data) Set template variables for the email.
- * @method static EnvelopeInterface metadata(array $metadata) Set additional metadata for the email.
- * @method static EnvelopeInterface headers(array $headers) Set additional headers for the email.
- * @method static EnvelopeInterface attachment(string $filePath, string $fileName) Add an attachment to the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface store(int $storeId) Set the store ID for the email configuration.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface to(string $email, string $name = '') Set the recipient's email and optional name.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface from(string $email, string $name = '') Set the sender's email and optional name.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface replyTo(string $email, string $name = '') Set the reply-to email address and optional name.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface cc(string $email, string $name = '') Add a recipient to the CC list.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface bcc(string $email, string $name = '') Add a recipient to the BCC list.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface subject(string $subject) Set the subject of the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface template(string $templateId) Set the template ID for the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface withData(array $data) Set template variables for the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface metadata(array $metadata) Set additional metadata for the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface headers(array $headers) Set additional headers for the email.
+ * @method static \Maginium\Framework\Mail\Interfaces\MailerInterface attachment(string $filePath, string $fileName) Add an attachment to the email.
  * @method static bool hasCc(string $address, ?string $name = null) Check if the email has the specified CC recipient.
  * @method static bool hasBcc(string $address, ?string $name = null) Check if the email has the specified BCC recipient.
  * @method static bool hasSubject(string $subject) Check if the email has the specified subject.
@@ -34,7 +33,7 @@ use Maginium\Framework\Support\Facade;
  * @method static void queue() Send the email using the provided Envelope.
  * @method static void later(\DateTimeInterface|\DateInterval|int $delay = null) Deliver the queued message after a delay.
  *
- * @see EnvelopeInterface
+ * @see FactoryInterface
  */
 class Mail extends Facade
 {
@@ -45,23 +44,6 @@ class Mail extends Facade
      */
     protected static function getAccessor(): string
     {
-        return EnvelopeInterfaceFactory::class;
-    }
-
-    /**
-     * Proxy method calls to the envelope.
-     *
-     * @param string $method The method name being called.
-     * @param string[] $args The arguments passed to the method.
-     *
-     * @return mixed The result of the method call.
-     */
-    public static function __callStatic($method, $args)
-    {
-        // Resolve the envelope instance
-        $envelope = static::getFacadeRoot()->create();
-
-        // Call the method on the envelope instance
-        return call_user_func_array([$envelope, $method], $args);
+        return FactoryInterface::class;
     }
 }

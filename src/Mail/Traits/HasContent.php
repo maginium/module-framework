@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Mail\Traits;
 
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 
 /**
  * Trait HasContent.
@@ -22,9 +22,9 @@ trait HasContent
      *
      * @param int $storeId The store ID.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function store(int $storeId): EnvelopeInterface
+    public function store(int $storeId): MailerInterface
     {
         // Set the store ID in the internal data store.
         return $this->setStoreId($storeId);
@@ -37,7 +37,7 @@ trait HasContent
      */
     public function getStoreId(): ?int
     {
-        return $this->getData(EnvelopeInterface::STORE_ID);
+        return $this->getData(MailerInterface::STORE_ID);
     }
 
     /**
@@ -45,11 +45,11 @@ trait HasContent
      *
      * @param int|null $storeId The ID of the store.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setStoreId(?int $storeId): EnvelopeInterface
+    public function setStoreId(?int $storeId): MailerInterface
     {
-        $this->setData(EnvelopeInterface::STORE_ID, $storeId);
+        $this->setData(MailerInterface::STORE_ID, $storeId);
 
         return $this;
     }
@@ -61,9 +61,9 @@ trait HasContent
      *
      * @param string $subject Subject line of the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function subject(string $subject): EnvelopeInterface
+    public function subject(string $subject): MailerInterface
     {
         // Set the subject of the email in the internal data store.
         return $this->setSubject($subject);
@@ -76,7 +76,7 @@ trait HasContent
      */
     public function getSubject(): ?string
     {
-        return $this->getData(EnvelopeInterface::SUBJECT);
+        return $this->getData(MailerInterface::SUBJECT);
     }
 
     /**
@@ -84,11 +84,11 @@ trait HasContent
      *
      * @param string|null $subject The email subject.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setSubject(?string $subject): EnvelopeInterface
+    public function setSubject(?string $subject): MailerInterface
     {
-        $this->setData(EnvelopeInterface::SUBJECT, $subject);
+        $this->setData(MailerInterface::SUBJECT, $subject);
 
         return $this;
     }
@@ -100,9 +100,9 @@ trait HasContent
      *
      * @param string $templateId Template identifier.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function template(string $templateId): EnvelopeInterface
+    public function template(string $templateId): MailerInterface
     {
         // Return the current instance to allow method chaining.
         return $this->setTemplateId($templateId);
@@ -115,7 +115,7 @@ trait HasContent
      */
     public function getTemplateId(): ?string
     {
-        return $this->getData(EnvelopeInterface::TEMPLATE_ID);
+        return $this->getData(MailerInterface::TEMPLATE_ID);
     }
 
     /**
@@ -123,11 +123,11 @@ trait HasContent
      *
      * @param string|null $templateId The template ID.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setTemplateId(?string $templateId): EnvelopeInterface
+    public function setTemplateId(?string $templateId): MailerInterface
     {
-        $this->setData(EnvelopeInterface::TEMPLATE_ID, $templateId);
+        $this->setData(MailerInterface::TEMPLATE_ID, $templateId);
 
         return $this;
     }
@@ -144,6 +144,6 @@ trait HasContent
     public function hasSubject(string $subject): bool
     {
         // Check if the message's subject matches the given subject.
-        return $this->getData(EnvelopeInterface::SUBJECT) === $subject;
+        return $this->getData(MailerInterface::SUBJECT) === $subject;
     }
 }

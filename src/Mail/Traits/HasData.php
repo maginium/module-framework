@@ -6,8 +6,8 @@ namespace Maginium\Framework\Mail\Traits;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
 use Maginium\Framework\Mail\Interfaces\Data\TemplateDataInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Support\DataObject;
 
 /**
@@ -28,9 +28,9 @@ trait HasData
      *
      * @param TemplateDataInterface[] $data Key-value pairs for template variables.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function withData(array $data): EnvelopeInterface
+    public function withData(array $data): MailerInterface
     {
         // Return the current instance to allow method chaining.
         return $this->setTemplateData($data);
@@ -44,7 +44,7 @@ trait HasData
     public function getTemplateData(): ?array
     {
         // Call denormalizeTemplateData to return key-value pairs
-        return $this->getData(EnvelopeInterface::TEMPLATE_DATA);
+        return $this->getData(MailerInterface::TEMPLATE_DATA);
     }
 
     /**
@@ -52,14 +52,14 @@ trait HasData
      *
      * @param TemplateDataInterface[]|null $templateData An array of templateData key-value pairs.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setTemplateData(?array $templateData): EnvelopeInterface
+    public function setTemplateData(?array $templateData): MailerInterface
     {
         // Normalize the templateData.
         $templateData = $this->normalizeTemplateData($templateData);
 
-        $this->setData(EnvelopeInterface::TEMPLATE_DATA, $templateData);
+        $this->setData(MailerInterface::TEMPLATE_DATA, $templateData);
 
         return $this;
     }

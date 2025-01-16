@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Mail\Consumers;
 
-use Exception;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\MessageQueue\Abstracts\AbstractConsumer;
 use Maginium\Framework\Support\Facades\Publisher;
 
@@ -38,9 +39,12 @@ class DelayedEmailConsumer extends AbstractConsumer
     protected function handle(): void
     {
         try {
-            file_put_contents(BP . '/var/log/DelayedEmailConsumer.log', print_r('DelayedEmailConsumer', true) . "\n", FILE_APPEND);
+            // Create an envelope using the factory
+            $envelope = $this->getRawData();
 
-            Publisher::dispatch('email.messages', $this->getRawData());
+            file_put_contents(BP . '/var/log/DelayedEmailConsumer.log', print_r('DelayedEmailConsumer' . json_encode($envelope), true) . "\n", FILE_APPEND);
+
+            Publisher::dispatch(MailerInterface::QUEUE_NAME, $envelope);
         } catch (Exception $e) {
             // Handle any exceptions that may occur during processing.
             throw new Exception('Error processing message: ' . $e->getMessage());

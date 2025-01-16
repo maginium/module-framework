@@ -6,7 +6,6 @@ namespace Maginium\Framework\Mail\Models;
 
 use Maginium\Framework\Database\ObjectModel;
 use Maginium\Framework\Mail\Interfaces\Data\AddressInterface;
-use Maginium\Framework\Support\DataObject;
 
 /**
  * Class Address.

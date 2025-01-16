@@ -2,33 +2,38 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Mail\Models;
+namespace Maginium\Framework\Mail;
 
+use Carbon\CarbonInterval;
 use DateInterval;
 use DateTimeInterface;
 use Maginium\Foundation\Enums\Durations;
-use Maginium\Foundation\Exceptions\RuntimeException;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\MailException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Framework\Database\ObjectModel;
 use Maginium\Framework\Mail\Interfaces\Data\AddressInterfaceFactory;
 use Maginium\Framework\Mail\Interfaces\Data\AttachmentInterfaceFactory;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
 use Maginium\Framework\Mail\Interfaces\Data\HeaderInterfaceFactory;
 use Maginium\Framework\Mail\Interfaces\Data\MetadataInterfaceFactory;
 use Maginium\Framework\Mail\Interfaces\Data\TemplateDataInterfaceFactory;
-use Maginium\Framework\Mail\Interfaces\MailableInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
+use Maginium\Framework\Mail\Interfaces\TransportBuilderInterface;
 use Maginium\Framework\Mail\Traits\HasAttachment;
 use Maginium\Framework\Mail\Traits\HasContent;
 use Maginium\Framework\Mail\Traits\HasData;
 use Maginium\Framework\Mail\Traits\HasHeaders;
 use Maginium\Framework\Mail\Traits\HasMetadata;
 use Maginium\Framework\Mail\Traits\HasRecipient;
-use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Facades\Date;
+use Maginium\Framework\Support\Facades\Log;
+use Maginium\Framework\Support\Facades\Publisher;
 
 /**
  * MailData class for managing email data with support for
  * multiple recipients, templates, attachments, and headers.
  */
-class Envelope extends ObjectModel implements EnvelopeInterface
+class Mailer extends ObjectModel implements MailerInterface
 {
     // Trait for handling email attachments
     use HasAttachment;
@@ -44,9 +49,9 @@ class Envelope extends ObjectModel implements EnvelopeInterface
     use HasRecipient;
 
     /**
-     * @var MailableInterface Service responsible for sending the email.
+     * @var TransportBuilderInterface Service responsible for sending the email.
      */
-    private MailableInterface $mailable;
+    private TransportBuilderInterface $transport;
 
     /**
      * @var AddressInterfaceFactory Factory for creating Address instances.
@@ -78,7 +83,7 @@ class Envelope extends ObjectModel implements EnvelopeInterface
      *
      * Initializes the email message object with the necessary dependencies.
      *
-     * @param MailableInterface $mailable Service responsible for sending the email.
+     * @param TransportBuilderInterface $transport Service responsible for sending the email.
      * @param HeaderInterfaceFactory $headerFactory Factory for creating Header instances.
      * @param AddressInterfaceFactory $addressFactory Factory for creating Address instances.
      * @param MetadataInterfaceFactory $metadataFactory Factory for creating Metadata instances.
@@ -86,14 +91,14 @@ class Envelope extends ObjectModel implements EnvelopeInterface
      * @param TemplateDataInterfaceFactory $templateDataFactory Factory for creating Template Data instances.
      */
     public function __construct(
-        MailableInterface $mailable,
+        TransportBuilderInterface $transport,
         HeaderInterfaceFactory $headerFactory,
         AddressInterfaceFactory $addressFactory,
         MetadataInterfaceFactory $metadataFactory,
         AttachmentInterfaceFactory $attachmentFactory,
         TemplateDataInterfaceFactory $templateDataFactory,
     ) {
-        $this->mailable = $mailable;
+        $this->transport = $transport;
         $this->headerFactory = $headerFactory;
         $this->addressFactory = $addressFactory;
         $this->metadataFactory = $metadataFactory;
@@ -102,17 +107,24 @@ class Envelope extends ObjectModel implements EnvelopeInterface
     }
 
     /**
-     * Send the email immediately.
+     * Sends an email using the specified mailer envelope.
      *
-     * This method triggers the immediate sending of the email by invoking the
-     * `handleTransport` method with the `send` operation.
+     * This method dispatches the email defined by the provided envelope to the configured
+     * transport layer for delivery. Inline translations are temporarily suspended to ensure
+     * proper email content generation. Errors during the process are logged and exceptions are re-thrown.
+     *
+     * @param MailerInterface|null $envelope The envelope containing the email details to be sent.
+     *
+     * @throws NoSuchEntityException If the email template cannot be found.
+     * @throws MailException If an error occurs during the email sending process.
+     * @throws Exception For any unexpected errors during execution.
      *
      * @return void
      */
-    public function send(): void
+    public function send(?MailerInterface $envelope = null): void
     {
         // Call the transport handler to initiate the send operation
-        $this->handleTransport(__FUNCTION__);
+        $this->transport->send($envelope ?? $this);
     }
 
     /**
@@ -127,7 +139,7 @@ class Envelope extends ObjectModel implements EnvelopeInterface
     public function queue(): void
     {
         // Call the transport handler to initiate the queue operation
-        $this->handleTransport(__FUNCTION__);
+        $this->processQueue(self::QUEUE_NAME);
     }
 
     /**
@@ -146,45 +158,72 @@ class Envelope extends ObjectModel implements EnvelopeInterface
     public function later(DateTimeInterface|DateInterval|int $delay = Durations::HOUR): void
     {
         // Pass the method name and the delay parameter to the transport handler
-        $this->handleTransport(__FUNCTION__, $delay);
+        $this->processQueue(self::DELAY_QUEUE_NAME, $delay);
     }
 
     /**
-     * Handles the transport sender logic with envelope validation.
+     * Internal method to process and queue emails.
      *
-     * This private method abstracts the logic for handling different transport actions
-     * like sending or queuing the email. It validates that the mailable object has the
-     * correct method for the given action (send, queue, or later). If the method is not found,
-     * it throws a `RuntimeException`. It also ensures that the delay logic is applied correctly
-     * when queuing or delaying the email.
+     * Adds delay headers if applicable and dispatches the email to the specified queue.
      *
-     * @param string $method The method to call on the mailable object (e.g., "queue", "send").
-     *                       This is determined dynamically based on the calling method.
-     * @param mixed|null $delay The optional delay for queueing the email. Defaults to `null`.
+     * @param string $queueName Queue name for dispatching the email.
+     * @param DateTimeInterface|DateInterval|int|null $delay Optional delay in milliseconds.
      *
-     * @throws RuntimeException If the specified method does not exist on the mailable object.
-     *                          Or if the mailable envelope has not been properly initialized.
-     *
-     * @return void
+     * @throws MailException If queuing fails.
      */
-    private function handleTransport(string $method, $delay = null): void
-    {
-        // Ensure the method exists on the mailable object
-        if (! Reflection::methodExists($this->mailable, $method)) {
-            // If the method does not exist, throw an exception with a helpful message
-            throw new RuntimeException(__("Method {$method} not found on the mailable object."));
+    private function processQueue(
+        string $queueName,
+        DateTimeInterface|DateInterval|int|null $delay = null,
+    ): void {
+        $headers = [];
+
+        // Add delay headers if a delay is provided
+        if ($delay !== null) {
+            $milliseconds = $this->convertDelayToMilliseconds($delay);
+            $headers['x-delay'] = $milliseconds;
         }
 
-        // Apply the method on the mailable object based on the requested action (queue, send, or later)
-        if ($method === 'queue') {
-            // If the action is "queue", pass the current instance to the mailable's `queue` method
-            $this->mailable->queue($this);
-        } elseif ($method === 'later') {
-            // If the action is "later", pass the current instance and delay to the mailable's `later` method
-            $this->mailable->later($this, $delay);
-        } else {
-            // For all other methods (e.g., send), directly call the method on the mailable object
-            $this->mailable->{$method}($this);
+        try {
+            // Dispatch email
+            Publisher::dispatch($queueName, $this, $headers);
+        } catch (Exception $e) {
+            Log::error('Error queuing email: ' . $e->getMessage());
+
+            throw new MailException(__('Error queuing email: %1', $e->getMessage()), $e);
         }
+    }
+
+    /**
+     * Convert the delay to milliseconds using Carbon.
+     *
+     * @param DateTimeInterface|DateInterval|int $delay The delay value.
+     *
+     * @return int The delay in milliseconds.
+     */
+    private function convertDelayToMilliseconds(DateTimeInterface|DateInterval|int $delay): int
+    {
+        // If delay is an integer, it's already in milliseconds
+        if (is_int($delay)) {
+            return $delay;
+        }
+
+        // If delay is a DateTimeInterface (Carbon instance or similar), calculate the difference in milliseconds from now
+        if ($delay instanceof DateTimeInterface) {
+            // Use Carbon to handle DateTime and calculate the difference in milliseconds
+            $now = Date::now();
+
+            return $now->diffInMilliseconds(Date::instance($delay)); // Returns the difference in milliseconds
+        }
+
+        // If delay is a DateInterval, convert it to milliseconds (assuming it's a future interval)
+        if ($delay instanceof DateInterval) {
+            // Use CarbonInterval to handle DateInterval
+            $interval = CarbonInterval::instance($delay);
+
+            return (int)$interval->totalMinutes * 60 * 1000; // Convert interval to milliseconds
+        }
+
+        // Default return (if no valid delay provided, return 0)
+        return 0;
     }
 }

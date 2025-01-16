@@ -6,8 +6,8 @@ namespace Maginium\Framework\Mail\Traits;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
 use Maginium\Framework\Mail\Interfaces\Data\HeaderInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Support\DataObject;
 
 /**
@@ -27,9 +27,9 @@ trait HasHeaders
      *
      * @param array $headers Additional headers for the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function headers(array $headers): EnvelopeInterface
+    public function headers(array $headers): MailerInterface
     {
         // Set the email headers in the internal data store.
         return $this->setHeaders($headers);
@@ -43,7 +43,7 @@ trait HasHeaders
     public function getHeaders(): ?array
     {
         // Call denormalizeHeaders to return key-value pairs
-        return $this->getData(EnvelopeInterface::HEADERS);
+        return $this->getData(MailerInterface::HEADERS);
     }
 
     /**
@@ -51,14 +51,14 @@ trait HasHeaders
      *
      * @param HeaderInterface[]|null $headers An array of header key-value pairs.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setHeaders(?array $headers): EnvelopeInterface
+    public function setHeaders(?array $headers): MailerInterface
     {
         // Normalize the headers.
         $headers = $this->normalizeHeaders($headers);
 
-        $this->setData(EnvelopeInterface::HEADERS, $headers);
+        $this->setData(MailerInterface::HEADERS, $headers);
 
         return $this;
     }
@@ -76,7 +76,7 @@ trait HasHeaders
     public function hasHeader(string $key, string $value): bool
     {
         // Retrieve the headers from the message.
-        $headers = $this->getData(EnvelopeInterface::HEADERS);
+        $headers = $this->getData(MailerInterface::HEADERS);
 
         // Check if the key exists and the value matches.
         return isset($headers[$key]) && (string)$headers[$key] === $value;

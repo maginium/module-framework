@@ -8,7 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Framework\Mail\Helpers\Data as DataHelper;
 use Maginium\Framework\Mail\Interfaces\Data\AddressInterface;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\DataObject;
 use Maginium\Framework\Support\Facades\Config;
@@ -46,9 +46,9 @@ trait HasRecipient
      * @param string $email Recipient's email address.
      * @param string $name Recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function to(string $email, string $name = ''): EnvelopeInterface
+    public function to(string $email, string $name = ''): MailerInterface
     {
         // Create an Address object for the recipient.
         $toAddress = $this->createAddressObject($email, $name);
@@ -64,7 +64,7 @@ trait HasRecipient
      */
     public function getTo(): ?AddressInterface
     {
-        return $this->getData(EnvelopeInterface::TO);
+        return $this->getData(MailerInterface::TO);
     }
 
     /**
@@ -72,15 +72,15 @@ trait HasRecipient
      *
      * @param AddressInterface $to Array of recipient address objects.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setTo(AddressInterface $to): EnvelopeInterface
+    public function setTo(AddressInterface $to): MailerInterface
     {
         // Create an Address object for the recipient.
         $toAddress = $this->createAddressObject($to);
 
         // Set the recipient email address in the internal data store.
-        $this->setData(EnvelopeInterface::TO, $toAddress);
+        $this->setData(MailerInterface::TO, $toAddress);
 
         // Return the current instance to allow method chaining.
         return $this;
@@ -96,7 +96,7 @@ trait HasRecipient
         // Create a default from address using the method for getting the default value.
         $defaultFrom = $this->createAddressObject($this->getDefaultFrom());
 
-        return $this->getData(EnvelopeInterface::FROM) ?? $defaultFrom;
+        return $this->getData(MailerInterface::FROM) ?? $defaultFrom;
     }
 
     /**
@@ -104,15 +104,15 @@ trait HasRecipient
      *
      * @param AddressInterface $from Array of sender address objects.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setFrom(AddressInterface $from): EnvelopeInterface
+    public function setFrom(AddressInterface $from): MailerInterface
     {
         // Create an Address object for the sender.
         $fromAddress = $this->createAddressObject($from);
 
         // Set the sender email address in the internal data store.
-        $this->setData(EnvelopeInterface::FROM, $fromAddress);
+        $this->setData(MailerInterface::FROM, $fromAddress);
 
         // Return the current instance to allow method chaining.
         return $this;
@@ -127,15 +127,15 @@ trait HasRecipient
      * @param string $email Sender's email address.
      * @param string $name Sender's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function from(string $email, string $name = ''): EnvelopeInterface
+    public function from(string $email, string $name = ''): MailerInterface
     {
         // Create an Address object for the sender.
         $fromAddress = $this->createAddressObject($email, $name);
 
         // Set the sender email address in the internal data store.
-        $this->setData(EnvelopeInterface::FROM, $fromAddress);
+        $this->setData(MailerInterface::FROM, $fromAddress);
 
         // Return the current instance to allow method chaining.
         return $this;
@@ -149,9 +149,9 @@ trait HasRecipient
      * @param string $email Reply-to email address.
      * @param string $name Optional reply-to name.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function replyTo(string $email, string $name = ''): EnvelopeInterface
+    public function replyTo(string $email, string $name = ''): MailerInterface
     {
         // Create an Address object for the reply-to address.
         $replyToAddress = $this->createAddressObject($email, $name);
@@ -174,7 +174,7 @@ trait HasRecipient
         $defaultReplyTo = $this->createAddressObject($this->getDefaultReplyTo());
 
         // Return the custom reply-to address if set, otherwise return the default reply-to address.
-        return $this->getData(EnvelopeInterface::REPLY_TO) ?? $defaultReplyTo;
+        return $this->getData(MailerInterface::REPLY_TO) ?? $defaultReplyTo;
     }
 
     /**
@@ -182,15 +182,15 @@ trait HasRecipient
      *
      * @param AddressInterface $replyTo The reply-to address object.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setReplyTo(AddressInterface $replyTo): EnvelopeInterface
+    public function setReplyTo(AddressInterface $replyTo): MailerInterface
     {
         // Create an Address object for the reply-to address.
         $replyToAddress = $this->createAddressObject($replyTo);
 
         // Set the reply-to address in the internal data store.
-        $this->setData(EnvelopeInterface::REPLY_TO, $replyToAddress);
+        $this->setData(MailerInterface::REPLY_TO, $replyToAddress);
 
         // Return the current instance to allow method chaining.
         return $this;
@@ -205,9 +205,9 @@ trait HasRecipient
      * @param string $email CC recipient's email address.
      * @param string $name CC recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function cc(string $email, string $name = ''): EnvelopeInterface
+    public function cc(string $email, string $name = ''): MailerInterface
     {
         return $this->setCc($email, $name);
     }
@@ -222,7 +222,7 @@ trait HasRecipient
     public function getCc(): ?array
     {
         // Get the current CC data
-        $ccData = $this->getData(EnvelopeInterface::CC);
+        $ccData = $this->getData(MailerInterface::CC);
 
         // If CC data is set and not empty, return it as an array
         if (! Validator::isEmpty($ccData)) {
@@ -247,23 +247,23 @@ trait HasRecipient
      *
      * @throws InvalidArgumentException If a recipient array is missing the required "email" key.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setCc(array|string $email, string $name = ''): EnvelopeInterface
+    public function setCc(array|string $email, string $name = ''): MailerInterface
     {
         // Process multiple recipients if an array is provided
         if (Validator::isArray($email)) {
             foreach ($email as $recipient) {
                 $normalizedRecipient = $this->normalizeRecipient($recipient);
                 $this->addRecipient(
-                    EnvelopeInterface::CC,
+                    MailerInterface::CC,
                     $normalizedRecipient[AddressInterface::EMAIL],
                     $normalizedRecipient[AddressInterface::NAME] ?? '',
                 );
             }
         } else {
             // Handle a single email address
-            $this->addRecipient(EnvelopeInterface::CC, $email, $name);
+            $this->addRecipient(MailerInterface::CC, $email, $name);
         }
 
         return $this;
@@ -278,9 +278,9 @@ trait HasRecipient
      * @param string $email BCC recipient's email address.
      * @param string $name BCC recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function bcc(string $email, string $name = ''): EnvelopeInterface
+    public function bcc(string $email, string $name = ''): MailerInterface
     {
         return $this->setBcc($email, $name);
     }
@@ -295,7 +295,7 @@ trait HasRecipient
     public function getBcc(): ?array
     {
         // Get the current BCC data
-        $bccData = $this->getData(EnvelopeInterface::BCC);
+        $bccData = $this->getData(MailerInterface::BCC);
 
         // If BCC data is set and not empty, return it as an array
         if (! Validator::isEmpty($bccData)) {
@@ -320,23 +320,23 @@ trait HasRecipient
      *
      * @throws InvalidArgumentException If a recipient array is missing the required "email" key.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setBcc(array|string $email, string $name = ''): EnvelopeInterface
+    public function setBcc(array|string $email, string $name = ''): MailerInterface
     {
         // Process multiple recipients if an array is provided
         if (Validator::isArray($email)) {
             foreach ($email as $recipient) {
                 $normalizedRecipient = $this->normalizeRecipient($recipient);
                 $this->addRecipient(
-                    EnvelopeInterface::BCC,
+                    MailerInterface::BCC,
                     $normalizedRecipient[AddressInterface::EMAIL],
                     $normalizedRecipient[AddressInterface::NAME] ?? '',
                 );
             }
         } else {
             // Handle a single email address
-            $this->addRecipient(EnvelopeInterface::BCC, $email, $name);
+            $this->addRecipient(MailerInterface::BCC, $email, $name);
         }
 
         return $this;
@@ -356,7 +356,7 @@ trait HasRecipient
     public function hasCc(string $address, ?string $name = null): bool
     {
         // Check the "cc" recipients for the specified address and name.
-        return $this->hasRecipient($this->getData(EnvelopeInterface::CC), $address, $name);
+        return $this->hasRecipient($this->getData(MailerInterface::CC), $address, $name);
     }
 
     /**
@@ -373,7 +373,7 @@ trait HasRecipient
     public function hasBcc(string $address, ?string $name = null): bool
     {
         // Check the "bcc" recipients for the specified address and name.
-        return $this->hasRecipient($this->getData(EnvelopeInterface::BCC), $address, $name);
+        return $this->hasRecipient($this->getData(MailerInterface::BCC), $address, $name);
     }
 
     /**

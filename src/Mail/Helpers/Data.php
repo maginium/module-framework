@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Mail\Helpers;
 
-use Magento\Email\Model\TemplateFactory;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Translate\Inline\StateInterface;
 use Maginium\Foundation\Enums\Orientations;
-use Maginium\Framework\Mail\Models\TransportBuilder;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\Facades\Config;
+use Maginium\Framework\Support\Facades\Media;
+use Maginium\Framework\Support\Path;
 use Maginium\Framework\Support\Php;
 use Maginium\Framework\Support\Str;
 
@@ -177,51 +175,11 @@ class Data
     public const CONFIG_PATH_DEFAULT_REPLY_TO_NAME = 'trans_email/ident_support/name';
 
     /**
-     * @var TransportBuilder
-     */
-    protected $transportBuilder;
-
-    /**
-     * @var StateInterface
-     */
-    protected $inlineTranslation;
-
-    /**
-     * @var TemplateFactory
-     */
-    protected $templateFactory;
-
-    /**
-     * @var DirectoryList
-     */
-    protected $directoryList;
-
-    /**
-     * EmailSender constructor.
-     *
-     * @param DirectoryList $directoryList
-     * @param TemplateFactory $templateFactory
-     * @param StateInterface $inlineTranslation
-     * @param TransportBuilder $transportBuilder
-     */
-    public function __construct(
-        DirectoryList $directoryList,
-        TemplateFactory $templateFactory,
-        StateInterface $inlineTranslation,
-        TransportBuilder $transportBuilder,
-    ) {
-        $this->directoryList = $directoryList;
-        $this->templateFactory = $templateFactory;
-        $this->transportBuilder = $transportBuilder;
-        $this->inlineTranslation = $inlineTranslation;
-    }
-
-    /**
      * Get Email Sender Name from configuration.
      *
      * @return string
      */
-    public function getFromName()
+    public static function getFromName()
     {
         return Config::getString(self::XML_PATH_EMAIL_SENDER_NAME);
     }
@@ -231,7 +189,7 @@ class Data
      *
      * @return string
      */
-    public function getFromEmail()
+    public static function getFromEmail()
     {
         return Config::getString(self::XML_PATH_EMAIL_SENDER_EMAIL);
     }
@@ -241,7 +199,7 @@ class Data
      *
      * @return string
      */
-    public function getPageOrientation()
+    public static function getPageOrientation()
     {
         return Config::getString(self::XML_PATH_PAGE_ORIENTATION);
     }
@@ -251,7 +209,7 @@ class Data
      *
      * @return string
      */
-    public function getFontTitle()
+    public static function getFontTitle()
     {
         return Config::getString(self::XML_PATH_FONT_TITLE);
     }
@@ -261,7 +219,7 @@ class Data
      *
      * @return string
      */
-    public function getFontColor()
+    public static function getFontColor()
     {
         return Config::getString(self::XML_PATH_FONT_COLOR);
     }
@@ -271,7 +229,7 @@ class Data
      *
      * @return string
      */
-    public function getBgColor()
+    public static function getBgColor()
     {
         return Config::getString(self::XML_PATH_BG_COLOR);
     }
@@ -281,7 +239,7 @@ class Data
      *
      * @return bool
      */
-    public function getUseCustomFont(): bool
+    public static function getUseCustomFont(): bool
     {
         return Config::getBool(self::FONT_SETTING_USE_CUSTOM_FONT);
     }
@@ -291,7 +249,7 @@ class Data
      *
      * @return string
      */
-    public function getFontFamily(): string
+    public static function getFontFamily(): string
     {
         return Config::getString(self::FONT_SETTING_FONT_FAMILY);
     }
@@ -301,7 +259,7 @@ class Data
      *
      * @return string|null
      */
-    public function getFontFamilyCharacterSet(): ?string
+    public static function getFontFamilyCharacterSet(): ?string
     {
         return Config::getString(self::FONT_SETTING_FONT_FAMILY_CHARACTERSET);
     }
@@ -311,7 +269,7 @@ class Data
      *
      * @return string|null
      */
-    public function getFontFamilyFallback(): ?string
+    public static function getFontFamilyFallback(): ?string
     {
         $fontFamilyFallback = Config::getString(self::FONT_SETTING_FONT_FAMILY_FALLBACK);
 
@@ -330,7 +288,7 @@ class Data
      *
      * @return string
      */
-    public function getNormalFontName(): string
+    public static function getNormalFontName(): string
     {
         return Config::getString(self::FONT_SETTING_NORMAL_FONT_NAME);
     }
@@ -340,9 +298,9 @@ class Data
      *
      * @return string
      */
-    public function getNormalTtfFilePath(): string
+    public static function getNormalTtfFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_NORMAL_TTF_FILE);
+        return static::getFontPath(self::FONT_SETTING_NORMAL_TTF_FILE);
     }
 
     /**
@@ -350,9 +308,9 @@ class Data
      *
      * @return string
      */
-    public function getNormalEotFilePath(): string
+    public static function getNormalEotFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_NORMAL_EOT_FILE);
+        return static::getFontPath(self::FONT_SETTING_NORMAL_EOT_FILE);
     }
 
     /**
@@ -360,9 +318,9 @@ class Data
      *
      * @return string
      */
-    public function getNormalWoffFilePath(): string
+    public static function getNormalWoffFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_NORMAL_WOFF_FILE);
+        return static::getFontPath(self::FONT_SETTING_NORMAL_WOFF_FILE);
     }
 
     /**
@@ -370,9 +328,9 @@ class Data
      *
      * @return string
      */
-    public function getNormalWoffTwoFilePath(): string
+    public static function getNormalWoffTwoFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_NORMAL_WOFF_TWO_FILE);
+        return static::getFontPath(self::FONT_SETTING_NORMAL_WOFF_TWO_FILE);
     }
 
     /**
@@ -380,7 +338,7 @@ class Data
      *
      * @return string
      */
-    public function getMediumFontName(): string
+    public static function getMediumFontName(): string
     {
         return Config::getString(self::FONT_SETTING_MEDIUM_FONT_NAME);
     }
@@ -390,9 +348,9 @@ class Data
      *
      * @return string
      */
-    public function getMediumTtfFilePath(): string
+    public static function getMediumTtfFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_MEDIUM_TTF_FILE);
+        return static::getFontPath(self::FONT_SETTING_MEDIUM_TTF_FILE);
     }
 
     /**
@@ -400,9 +358,9 @@ class Data
      *
      * @return string
      */
-    public function getMediumEotFilePath(): string
+    public static function getMediumEotFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_MEDIUM_EOT_FILE);
+        return static::getFontPath(self::FONT_SETTING_MEDIUM_EOT_FILE);
     }
 
     /**
@@ -410,9 +368,9 @@ class Data
      *
      * @return string
      */
-    public function getMediumWoffFilePath(): string
+    public static function getMediumWoffFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_MEDIUM_WOFF_FILE);
+        return static::getFontPath(self::FONT_SETTING_MEDIUM_WOFF_FILE);
     }
 
     /**
@@ -420,9 +378,9 @@ class Data
      *
      * @return string
      */
-    public function getMediumWoffTwoFilePath(): string
+    public static function getMediumWoffTwoFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_MEDIUM_WOFF_TWO_FILE);
+        return static::getFontPath(self::FONT_SETTING_MEDIUM_WOFF_TWO_FILE);
     }
 
     /**
@@ -430,7 +388,7 @@ class Data
      *
      * @return string
      */
-    public function getBoldFontName(): string
+    public static function getBoldFontName(): string
     {
         return Config::getString(self::FONT_SETTING_BOLD_FONT_NAME);
     }
@@ -440,9 +398,9 @@ class Data
      *
      * @return string
      */
-    public function getBoldTtfFilePath(): string
+    public static function getBoldTtfFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_BOLD_TTF_FILE);
+        return static::getFontPath(self::FONT_SETTING_BOLD_TTF_FILE);
     }
 
     /**
@@ -450,9 +408,9 @@ class Data
      *
      * @return string
      */
-    public function getBoldEotFilePath(): string
+    public static function getBoldEotFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_BOLD_EOT_FILE);
+        return static::getFontPath(self::FONT_SETTING_BOLD_EOT_FILE);
     }
 
     /**
@@ -460,9 +418,9 @@ class Data
      *
      * @return string
      */
-    public function getBoldWoffFilePath(): string
+    public static function getBoldWoffFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_BOLD_WOFF_FILE);
+        return static::getFontPath(self::FONT_SETTING_BOLD_WOFF_FILE);
     }
 
     /**
@@ -470,9 +428,9 @@ class Data
      *
      * @return string
      */
-    public function getBoldWoffTwoFilePath(): string
+    public static function getBoldWoffTwoFilePath(): string
     {
-        return $this->getFontFilePath(self::FONT_SETTING_BOLD_WOFF_TWO_FILE);
+        return static::getFontPath(self::FONT_SETTING_BOLD_WOFF_TWO_FILE);
     }
 
     /**
@@ -483,16 +441,16 @@ class Data
      *
      * @return array Array containing default or common variables
      */
-    public function getCommonVariables(): array
+    public static function getCommonVariables(): array
     {
         // Fetch font color from configuration; default to black (#000) if not configured
-        $fontColor = $this->getFontColor();
+        $fontColor = static::getFontColor();
 
         // Fetch background color from configuration; default to white (#fff) if not configured
-        $backgroundColor = $this->getBackgroundColor();
+        $backgroundColor = static::getBackgroundColor();
 
         // Fetch page orientation from configuration
-        $pageOrientation = $this->getPageOrientation();
+        $pageOrientation = static::getPageOrientation();
 
         // Determine if the page orientation is landscape
         $isLandscape = $pageOrientation === Orientations::LANDSCAPE;
@@ -506,7 +464,7 @@ class Data
                 'font' => $fontColor, // Color of the font, defaulting to black if not configured
                 'background' => $backgroundColor, // Background color, defaulting to white if not configured
             ],
-            'font' => $this->getCustomFonts(),
+            'font' => static::getCustomFonts(),
         ];
 
         return $variables;
@@ -517,18 +475,18 @@ class Data
      *
      * @return array
      */
-    public function getCustomFonts(): array
+    public static function getCustomFonts(): array
     {
-        $useCustomFont = $this->getUseCustomFont();
-        $googleFontFamilyName = $this->getFontFamily();
-        $googleFontChara = $this->getFontFamilyCharacterSet();
-        $fontFamilyFallback = $this->getFontFamilyFallback();
+        $useCustomFont = static::getUseCustomFont();
+        $googleFontFamilyName = static::getFontFamily();
+        $googleFontChara = static::getFontFamilyCharacterSet();
+        $fontFamilyFallback = static::getFontFamilyFallback();
 
         // If using custom fonts
         if ($useCustomFont) {
-            $fontNameNormal = $this->getFontName($this->getNormalFontName(), $fontFamilyFallback);
-            $fontNameMedium = $this->getFontName($this->getMediumFontName(), $fontFamilyFallback);
-            $fontNameBold = $this->getFontName($this->getBoldFontName(), $fontFamilyFallback);
+            $fontNameNormal = static::getFontName(static::getNormalFontName(), $fontFamilyFallback);
+            $fontNameMedium = static::getFontName(static::getMediumFontName(), $fontFamilyFallback);
+            $fontNameBold = static::getFontName(static::getBoldFontName(), $fontFamilyFallback);
 
             return [
                 // Custom font flag
@@ -540,22 +498,22 @@ class Data
                 'font_name_b' => $fontNameBold,
 
                 // Font paths for normal style
-                'font_path_n_ttf' => $this->getFontPath($this->getNormalTtfFilePath()),
-                'font_path_n_eot' => $this->getFontPath($this->getNormalEotFilePath()),
-                'font_path_n_woff' => $this->getFontPath($this->getNormalWoffFilePath()),
-                'font_path_n_woff_two' => $this->getFontPath($this->getNormalWoffTwoFilePath()),
+                'font_path_n_ttf' => static::getFontPath(static::getNormalTtfFilePath()),
+                'font_path_n_eot' => static::getFontPath(static::getNormalEotFilePath()),
+                'font_path_n_woff' => static::getFontPath(static::getNormalWoffFilePath()),
+                'font_path_n_woff_two' => static::getFontPath(static::getNormalWoffTwoFilePath()),
 
                 // Font paths for medium style
-                'font_path_m_ttf' => $this->getFontPath($this->getMediumTtfFilePath()),
-                'font_path_m_eot' => $this->getFontPath($this->getMediumEotFilePath()),
-                'font_path_m_woff' => $this->getFontPath($this->getMediumWoffFilePath()),
-                'font_path_m_woff_two' => $this->getFontPath($this->getMediumWoffTwoFilePath()),
+                'font_path_m_ttf' => static::getFontPath(static::getMediumTtfFilePath()),
+                'font_path_m_eot' => static::getFontPath(static::getMediumEotFilePath()),
+                'font_path_m_woff' => static::getFontPath(static::getMediumWoffFilePath()),
+                'font_path_m_woff_two' => static::getFontPath(static::getMediumWoffTwoFilePath()),
 
                 // Font paths for bold style
-                'font_path_b_ttf' => $this->getFontPath($this->getBoldTtfFilePath()),
-                'font_path_b_eot' => $this->getFontPath($this->getBoldEotFilePath()),
-                'font_path_b_woff' => $this->getFontPath($this->getBoldWoffFilePath()),
-                'font_path_b_woff_two' => $this->getFontPath($this->getBoldWoffTwoFilePath()),
+                'font_path_b_ttf' => static::getFontPath(static::getBoldTtfFilePath()),
+                'font_path_b_eot' => static::getFontPath(static::getBoldEotFilePath()),
+                'font_path_b_woff' => static::getFontPath(static::getBoldWoffFilePath()),
+                'font_path_b_woff_two' => static::getFontPath(static::getBoldWoffTwoFilePath()),
             ];
         }
 
@@ -573,27 +531,11 @@ class Data
     }
 
     /**
-     * Get font file path with media URL.
-     *
-     * @param string $configPath Configuration path for font file.
-     *
-     * @return string
-     */
-    private function getFontFilePath(string $configPath): string
-    {
-        return $this->directoryList->getPath(DirectoryList::MEDIA)
-        . DIRECTORY_SEPARATOR
-        . self::FONTS_DIRECTORY
-        . DIRECTORY_SEPARATOR
-        . Config::getString($configPath);
-    }
-
-    /**
      * Get background color from configuration.
      *
      * @return string
      */
-    private function getBackgroundColor(): string
+    private static function getBackgroundColor(): string
     {
         return Config::getString(self::XML_PATH_BG_COLOR, '#fff');
     }
@@ -606,7 +548,7 @@ class Data
      *
      * @return string
      */
-    private function getFontName(string $configPath, ?string $fontFamilyFallback): string
+    private static function getFontName(string $configPath, ?string $fontFamilyFallback): string
     {
         $fontName = Config::getString($configPath);
 
@@ -614,14 +556,14 @@ class Data
     }
 
     /**
-     * Get font path with media URL.
+     * Get font file path with media URL.
      *
      * @param string $configPath Configuration path for font file.
      *
      * @return string
      */
-    private function getFontPath(string $configPath): string
+    private static function getFontPath(string $configPath): string
     {
-        return $this->directoryList->getPath(DirectoryList::MEDIA) . DIRECTORY_SEPARATOR . self::FONTS_DIRECTORY . DIRECTORY_SEPARATOR . Config::getString($configPath);
+        return Media::absolutePath(Path::join(self::FONTS_DIRECTORY,  Config::getString($configPath)));
     }
 }

@@ -9,7 +9,7 @@ use Magento\Email\Model\Template\Config;
 use Magento\Email\Model\Template\Filter;
 use Maginium\Framework\Mail\Interfaces\TemplateTypesInterface;
 use Maginium\Framework\Support\DataObject;
-use Maginium\Framework\Support\Facade\Renderer;
+use Maginium\Framework\Support\Facades\Renderer;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Str;
 
@@ -35,7 +35,7 @@ class TemplateFilter
      *
      * Holds the template object that will be used in processing.
      */
-    protected AbstractTemplate $abstractTemplate;
+    protected ?AbstractTemplate $abstractTemplate;
 
     /**
      * Constructor to inject dependencies.
@@ -146,7 +146,7 @@ class TemplateFilter
     {
         // Define patterns to check for React usage
         $patterns = [
-            '/<\w+.*?>.*<\/\w+>/s', // JSX-like tags
+            '/<([A-Z][A-Za-z0-9]*)\s.*?<\/\1>/s', // JSX-like tags (capitalized, typically React components)
             '/import\s+.*\s+from\s+[\'"]react[\'"];?/i', // React import
             '/@react-email\/components/i', // React email components
         ];

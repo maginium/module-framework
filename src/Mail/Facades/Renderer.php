@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Mail\Facade;
+namespace Maginium\Framework\Mail\Facades;
 
 use Maginium\Framework\Mail\Interfaces\RendererInterface;
 use Maginium\Framework\Support\DataObject;

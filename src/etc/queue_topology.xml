@@ -42,11 +42,21 @@
     </exchange>
 
     <!-- Defines the Email Messages Exchange and Queue, similar to the event messages queue. -->
-    <exchange connection="amqp" name="email.messages.delay" type="topic">
-        <!-- Specifies the underlying type of the delayed exchange as "topic" -->
+    <exchange connection="amqp" name="email.messages.delay" type="x-delayed-message">
+        <!-- Specifies the dead-letter exchange for email messages in case of failure or rejection. -->
         <arguments>
-            <argument xsi:type="string" name="x-delayed-type">direct</argument>
+            <argument xsi:type="string" name="x-delayed-type">fanout</argument>
         </arguments>
+
+        <!-- Binds the "email.messages.delay" topic to the email.messages.delay queue, for routing email-related messages. -->
+        <binding destination="email.messages.delay" destinationType="queue" id="email.messages.delay" topic="email.messages.delay">
+            <arguments>
+                <!-- Specifies the dead-letter exchange for email messages in case of failure or rejection. -->
+                <argument xsi:type="string" name="x-dead-letter-exchange">email.messages.dlq</argument>
+                <!-- Specifies the dead-letter routing key for email messages, ensuring they go to the dlq queue. -->
+                <argument xsi:type="string" name="x-dead-letter-routing-key">email.messages.dlq</argument>
+            </arguments>
+        </binding>
     </exchange>
 
     <!-- Defines the Delay Queue for Email Messages, allowing delayed processing before retrying. -->

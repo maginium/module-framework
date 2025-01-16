@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Mail\Interfaces\Data;
+namespace Maginium\Framework\Mail\Interfaces;
 
 use DateInterval;
 use DateTimeInterface;
+use Maginium\Foundation\Exceptions\Exception;
+use Maginium\Foundation\Exceptions\MailException;
+use Maginium\Foundation\Exceptions\NoSuchEntityException;
+use Maginium\Framework\Mail\Interfaces\Data\AddressInterface;
+use Maginium\Framework\Mail\Interfaces\Data\AttachmentInterface;
 
 /**
  * Interface for the Envelope class representing email data and functionality.
@@ -13,7 +18,7 @@ use DateTimeInterface;
  * This interface defines the methods to manage email properties such as recipients, sender,
  * subject, template data, attachments, CC, BCC, and headers.
  */
-interface EnvelopeInterface
+interface MailerInterface
 {
     /**
      * Key representing the recipient's email address and name.
@@ -81,13 +86,29 @@ interface EnvelopeInterface
     public const REPLY_TO = 'reply_to';
 
     /**
+     * Queue name.
+     * This constant is used to identify the message queue for email messages.
+     *
+     * @var string
+     */
+    public const QUEUE_NAME = 'email.messages';
+
+    /**
+     * Delay queue name.
+     * This constant is used to identify the message queue for email messages.
+     *
+     * @var string
+     */
+    public const DELAY_QUEUE_NAME = 'email.messages.delay';
+
+    /**
      * Set the store ID.
      *
      * This method sets the store ID for the current email configuration.
      *
      * @param int $storeId The store ID.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function store(int $storeId): self;
 
@@ -97,7 +118,7 @@ interface EnvelopeInterface
      * @param  AttachmentInterface|array|string  $file The file to attach, either as a string path, an array, or an AttachmentInterface.
      * @param  array  $options Additional options for the attachment (e.g., as, mime).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function attach(array|string|AttachmentInterface $file, array $options = []): self;
 
@@ -110,7 +131,7 @@ interface EnvelopeInterface
      * @param string $email Recipient's email address.
      * @param string $name Recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function to(string $email, string $name = ''): self;
 
@@ -126,7 +147,7 @@ interface EnvelopeInterface
      *
      * @param AddressInterface $to Array of recipient address objects.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setTo(AddressInterface $to): self;
 
@@ -142,7 +163,7 @@ interface EnvelopeInterface
      *
      * @param AddressInterface $from Array of sender address objects.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setFrom(AddressInterface $from): self;
 
@@ -155,7 +176,7 @@ interface EnvelopeInterface
      * @param string $email Sender's email address.
      * @param string $name Sender's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function from(string $email, string $name = ''): self;
 
@@ -167,7 +188,7 @@ interface EnvelopeInterface
      * @param string $email Reply-to email address.
      * @param string $name Optional reply-to name.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function replyTo(string $email, string $name = ''): self;
 
@@ -186,7 +207,7 @@ interface EnvelopeInterface
      *
      * @param AddressInterface $replyTo The reply-to address object.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setReplyTo(AddressInterface $replyTo): self;
 
@@ -199,7 +220,7 @@ interface EnvelopeInterface
      * @param string $email CC recipient's email address.
      * @param string $name CC recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function cc(string $email, string $name = ''): self;
 
@@ -218,7 +239,7 @@ interface EnvelopeInterface
      * @param array|string $email CC recipient's email address(es).
      * @param string $name CC recipient's name (optional for single email).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setCc(array|string $email, string $name = ''): self;
 
@@ -231,7 +252,7 @@ interface EnvelopeInterface
      * @param string $email BCC recipient's email address.
      * @param string $name BCC recipient's name (optional).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function bcc(string $email, string $name = ''): self;
 
@@ -252,7 +273,7 @@ interface EnvelopeInterface
      * @param array|string $email BCC recipient's email address(es).
      * @param string $name BCC recipient's name (optional, for single email).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setBcc(array|string $email, string $name = ''): self;
 
@@ -263,7 +284,7 @@ interface EnvelopeInterface
      *
      * @param HeaderInterface[] $headers Additional headers for the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function headers(array $headers): self;
 
@@ -279,7 +300,7 @@ interface EnvelopeInterface
      *
      * @param HeaderInterface[]|null $headers An array of header key-value pairs.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setHeaders(?array $headers): self;
 
@@ -290,7 +311,7 @@ interface EnvelopeInterface
      *
      * @param MetadataInterface[] $metadata Additional metadata for the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function metadata(array $metadata): self;
 
@@ -306,7 +327,7 @@ interface EnvelopeInterface
      *
      * @param MetadataInterface[]|null $metadata An array of metadata key-value pairs.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setMetadata(?array $metadata): self;
 
@@ -322,7 +343,7 @@ interface EnvelopeInterface
      *
      * @param int|null $storeId The ID of the store.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setStoreId(?int $storeId): self;
 
@@ -333,7 +354,7 @@ interface EnvelopeInterface
      *
      * @param string $subject Subject line of the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function subject(string $subject): self;
 
@@ -349,7 +370,7 @@ interface EnvelopeInterface
      *
      * @param string|null $subject The email subject.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setSubject(?string $subject): self;
 
@@ -360,7 +381,7 @@ interface EnvelopeInterface
      *
      * @param string $templateId Template identifier.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function template(string $templateId): self;
 
@@ -376,7 +397,7 @@ interface EnvelopeInterface
      *
      * @param string|null $templateId The template ID.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setTemplateId(?string $templateId): self;
 
@@ -388,7 +409,7 @@ interface EnvelopeInterface
      *
      * @param TemplateDataInterface[] $data Key-value pairs for template variables.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function withData(array $data): self;
 
@@ -404,16 +425,26 @@ interface EnvelopeInterface
      *
      * @param TemplateDataInterface[]|null $data An array of template variables and values.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
     public function setTemplateData(?array $data): self;
 
     /**
-     * Send the email immediately.
+     * Sends an email using the specified mailer envelope.
+     *
+     * This method dispatches the email defined by the provided envelope to the configured
+     * transport layer for delivery. Inline translations are temporarily suspended to ensure
+     * proper email content generation. Errors during the process are logged and exceptions are re-thrown.
+     *
+     * @param MailerInterface|null $envelope The envelope containing the email details to be sent.
+     *
+     * @throws NoSuchEntityException If the email template cannot be found.
+     * @throws MailException If an error occurs during the email sending process.
+     * @throws Exception For any unexpected errors during execution.
      *
      * @return void
      */
-    public function send(): void;
+    public function send(?self $envelope = null): void;
 
     /**
      * Queue the email for sending.

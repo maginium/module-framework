@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Mail\Traits;
 
+use Magento\Framework\Mail\Message;
 use Maginium\Framework\Mail\Interfaces\Data\AttachmentInterface;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 
 /**
  * Trait HasAttachment.
@@ -24,9 +25,9 @@ trait HasAttachment
      * @param  array|string|AttachmentInterface  $file The file to attach, either as a string path, an array, or an AttachmentInterface.
      * @param  array  $options Additional options for the attachment (e.g., as, mime).
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function attach(array|string|AttachmentInterface $file, array $options = []): EnvelopeInterface
+    public function attach(array|string|AttachmentInterface $file, array $options = []): MailerInterface
     {
         if ($file instanceof AttachmentInterface) {
             return $file->attachTo($this, $options);

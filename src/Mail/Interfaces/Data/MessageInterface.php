@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Maginium\Framework\Mail\Interfaces;
+namespace Maginium\Framework\Mail\Interfaces\Data;
 
-use Magento\Framework\Mail\MessageInterface as BaseMessageInterface;
+use Magento\Framework\Mail\MailMessageInterface;
 
 /**
  * Interface MessageInterface.
  */
-interface MessageInterface extends BaseMessageInterface
+interface MessageInterface extends MailMessageInterface
 {
 }

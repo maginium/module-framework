@@ -6,8 +6,8 @@ namespace Maginium\Framework\Mail\Traits;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Maginium\Foundation\Exceptions\InvalidArgumentException;
-use Maginium\Framework\Mail\Interfaces\Data\EnvelopeInterface;
 use Maginium\Framework\Mail\Interfaces\Data\MetadataInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Support\DataObject;
 
 /**
@@ -27,9 +27,9 @@ trait HasMetadata
      *
      * @param array $metadata Additional metadata for the email.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function metadata(array $metadata): EnvelopeInterface
+    public function metadata(array $metadata): MailerInterface
     {
         // Set the email metadata in the internal data store.
         return $this->setMetadata($metadata);
@@ -43,7 +43,7 @@ trait HasMetadata
     public function getMetadata(): ?array
     {
         // Call denormalizeMetadata to return key-value pairs
-        return $this->getData(EnvelopeInterface::METADATA);
+        return $this->getData(MailerInterface::METADATA);
     }
 
     /**
@@ -51,14 +51,14 @@ trait HasMetadata
      *
      * @param MetadataInterface[]|null $metadata An array of metadata key-value pairs.
      *
-     * @return EnvelopeInterface Returns the current instance for method chaining.
+     * @return MailerInterface Returns the current instance for method chaining.
      */
-    public function setMetadata(?array $metadata): EnvelopeInterface
+    public function setMetadata(?array $metadata): MailerInterface
     {
         // Normalize the metadata.
         $metadata = $this->normalizeMetadata($metadata);
 
-        $this->setData(EnvelopeInterface::METADATA, $metadata);
+        $this->setData(MailerInterface::METADATA, $metadata);
 
         return $this;
     }
@@ -76,7 +76,7 @@ trait HasMetadata
     public function hasMetadata(string $key, string $value): bool
     {
         // Retrieve the metadata from the message.
-        $metadata = $this->getData(EnvelopeInterface::METADATA);
+        $metadata = $this->getData(MailerInterface::METADATA);
 
         // Check if the key exists and the value matches.
         return isset($metadata[$key]) && (string)$metadata[$key] === $value;

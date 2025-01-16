@@ -22,7 +22,7 @@ class SchemaLocator extends BaseSchemaLocator implements SchemaLocatorInterface
      * @var string|null
      * Stores the path to the custom email template XSD schema.
      */
-    protected $schemaPath = null;
+    protected $schema = null;
 
     /**
      * SchemaLocator constructor.
@@ -40,7 +40,7 @@ class SchemaLocator extends BaseSchemaLocator implements SchemaLocatorInterface
         $moduleDir = $moduleReader->getModuleDir(Dir::MODULE_ETC_DIR, 'Maginium_Framework');
 
         // Construct the full path to the XSD schema file for email templates
-        $this->schemaPath = Path::join($moduleDir, 'xsds', 'email_templates.xsd');
+        $this->schema = Path::join($moduleDir, 'xsds', 'email_templates.xsd');
     }
 
     /**
@@ -52,7 +52,7 @@ class SchemaLocator extends BaseSchemaLocator implements SchemaLocatorInterface
      */
     public function getSchema(): string
     {
-        return $this->schemaPath;
+        return $this->schema;
     }
 
     /**
@@ -64,6 +64,6 @@ class SchemaLocator extends BaseSchemaLocator implements SchemaLocatorInterface
      */
     public function getPerFileSchema(): string
     {
-        return $this->schemaPath;
+        return $this->schema;
     }
 }
