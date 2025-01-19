@@ -52,11 +52,11 @@ class EnvConfigLoader
 
                 // Ensure that essential environment variables are set and available.
                 $dotenv->required([
-                    'APP_ENV',      // Application environment (e.g., 'development', 'production').
-                    'DB_DATABASE',  // Database name.
-                    'DB_USERNAME',  // Database username.
-                    'DB_PASSWORD',  // Database password.
-                    'APP_KEY',      // Application key for encryption.
+                    'APP_ENV', // Application environment (e.g., 'development', 'production').
+                    'DB_NAME', // Database name.
+                    'DB_USERNAME', // Database username.
+                    'DB_PASSWORD', // Database password.
+                    'APP_KEY', // Application key for encryption.
                 ]);
 
                 // Load additional environment-specific variables.

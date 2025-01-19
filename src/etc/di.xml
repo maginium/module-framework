@@ -44,7 +44,6 @@
     <!-- Cache and Redis -->
     <!-- <preference for="Magento\Framework\App\CacheInterface" type="Maginium\Framework\Cache\CacheManager\Proxy" /> -->
     <preference for="Illuminate\Contracts\Cache\Repository" type="Maginium\Framework\Cache\Repository" />
-    <preference for="Magento\Framework\Cache\FrontendInterface" type="Maginium\Framework\Cache\CacheManager" />
     <preference for="Illuminate\Contracts\Cache\Factory" type="Maginium\Framework\Cache\Interfaces\FactoryInterface" />
     <preference for="Maginium\Framework\Redis\Interfaces\RedisInterface" type="Maginium\Framework\Redis\RedisManager" />
     <preference for="Maginium\Framework\Cache\Interfaces\FactoryInterface" type="Maginium\Framework\Cache\CacheManager" />
@@ -259,7 +258,7 @@
     <preference for="Maginium\Framework\Console\Interfaces\EventMutexInterface" type="Maginium\Framework\Console\Scheduling\CacheEventMutex" />
 
     <!-- Commands Plugin Configuration -->
-    <type name="Magento\Framework\Console\CommandList">
+    <type name="Magento\Framework\Console\CommandListInterface">
         <arguments>
             <argument xsi:type="array" name="commands">
                 <!-- Register the custom command for invoking serialized closures. -->
