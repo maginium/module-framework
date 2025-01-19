@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Maginium\Framework\Concurrency\Facades;
 
 use Maginium\Framework\Concurrency\ConcurrencyManager;
+use Maginium\Framework\Concurrency\Interfaces\DriverInterface;
 use Maginium\Framework\Support\Facade;
 
 /**
- * @method static mixed driver(string|null $name = null)
+ * @method static DriverInterface driver(string|null $name = null)
  * @method static \Maginium\Framework\Concurrency\ProcessDriver createProcessDriver(array $config)
  * @method static \Maginium\Framework\Concurrency\ForkDriver createForkDriver(array $config)
  * @method static \Maginium\Framework\Concurrency\SyncDriver createSyncDriver(array $config)

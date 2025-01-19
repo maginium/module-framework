@@ -190,6 +190,8 @@ abstract class Lock implements LockInterface
         $this->sleepMilliseconds = $milliseconds;
 
         // Return the current instance for chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

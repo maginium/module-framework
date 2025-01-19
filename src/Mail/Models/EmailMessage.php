@@ -35,6 +35,8 @@ class EmailMessage extends BaseEmailMessage implements EmailMessageInterface
         $this->zendMessage->getHeaders()->addHeaderLine($key, $value);
 
         // Return the current object instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

@@ -95,6 +95,7 @@ class ContainerManager implements ContainerInterface
      */
     public function getInstance(): ContainerInterface
     {
+        // Return the current instance to allow method chaining
         return $this;
     }
 

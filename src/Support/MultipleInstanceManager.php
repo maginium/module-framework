@@ -109,6 +109,7 @@ abstract class MultipleInstanceManager
             }
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -147,6 +148,7 @@ abstract class MultipleInstanceManager
         // Bind the Closure to this instance, allowing access to protected members.
         $this->customCreators[$name] = $callback->bindTo($this, $this);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

@@ -69,6 +69,12 @@ interface MailerInterface
     public const STORE_ID = 'store_id';
 
     /**
+     * Key representing the attachments associated with the email.
+     * This is used to set or retrieve the attachments context for the email.
+     */
+    public const ATTACHMENTS = 'attachments';
+
+    /**
      * Key representing the CC (carbon copy) recipients for the email.
      * This is used to set or retrieve the list of additional recipients to be copied on the email.
      */
@@ -102,6 +108,16 @@ interface MailerInterface
     public const DELAY_QUEUE_NAME = 'email.messages.delay';
 
     /**
+     * XML path constant for determining if mail content should be rendered right-to-left.
+     *
+     * This constant defines the XML path used to retrieve the configuration value for enabling
+     * right-to-left rendering of email content, typically used for languages like Arabic or Hebrew.
+     *
+     * @var string
+     */
+    public const XML_PATH_MAILER_IS_RTL = 'mail/general/is_rtl';
+
+    /**
      * Set the store ID.
      *
      * This method sets the store ID for the current email configuration.
@@ -121,6 +137,33 @@ interface MailerInterface
      * @return MailerInterface Returns the current instance for method chaining.
      */
     public function attach(array|string|AttachmentInterface $file, array $options = []): self;
+
+    /**
+     * Attach in-memory data as an attachment.
+     *
+     * @param  string  $data
+     * @param  string  $name
+     * @param  array  $options
+     *
+     * @return MailerInterface
+     */
+    public function attachData(string $data, string $name, array $options = []): self;
+
+    /**
+     * Retrieve the list of attachments for the email.
+     *
+     * @return AttachmentInterface[]|null
+     */
+    public function getAttachments(): ?array;
+
+    /**
+     * Set the list of attachments for the email.
+     *
+     * @param AttachmentInterface[]|null $attachments An array of file paths or attachment objects.
+     *
+     * @return MailerInterface Returns the current instance for method chaining.
+     */
+    public function setAttachments(?array $attachments): self;
 
     /**
      * Set the recipient email address.

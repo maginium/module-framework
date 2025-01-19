@@ -113,6 +113,8 @@ trait HasLocalization
         }
 
         // Return the current model instance for method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

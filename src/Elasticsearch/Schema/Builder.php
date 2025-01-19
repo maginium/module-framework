@@ -125,6 +125,7 @@ class Builder
     {
         $this->connection->setIndexPrefix($value);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

@@ -238,6 +238,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         // Initialize the theme configuration for the avatar
         $this->initTheme();
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -354,6 +355,7 @@ class Avatar extends ObjectModel implements AvatarInterface
         // Validate and add the theme configuration
         $this->themes[$name] = $this->validateConfig($config);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -648,6 +650,7 @@ class Avatar extends ObjectModel implements AvatarInterface
 
         // If no initials were set, skip adding the initials text to the avatar
         if (empty($this->initials)) {
+            // Return the current instance to allow method chaining
             return $this;
         }
 
@@ -666,6 +669,7 @@ class Avatar extends ObjectModel implements AvatarInterface
             },
         );
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

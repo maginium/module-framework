@@ -53,6 +53,7 @@ class Address extends ObjectModel implements AddressInterface
         // Store the name in the DataObject using setData
         $this->setData(self::NAME, $name);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -70,6 +71,7 @@ class Address extends ObjectModel implements AddressInterface
         // Store the email in the DataObject using setData
         $this->setData(self::EMAIL, $email);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

@@ -112,13 +112,13 @@ class SerializableClosure extends BaseSerializableClosure implements Serializabl
     /**
      * Serialize a closure into a string format.
      *
-     * @param  Closure  $closure  Closure to be serialized.
+     * @param  Closure|SerializableClosureInterface  $closure  Closure to be serialized.
      *
      * @throws InvalidArgumentException If the provided data is not a callable.
      *
      * @return string The serialized closure string.
      */
-    public function serialize(Closure $closure): string
+    public function serialize(Closure|SerializableClosureInterface $closure): string
     {
         if (! is_callable($closure)) {
             throw InvalidArgumentException::make('The provided argument is not a valid closure.');

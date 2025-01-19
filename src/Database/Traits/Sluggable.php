@@ -73,6 +73,7 @@ trait Sluggable
         // Assign the slug value to the model's data.
         $this->setData($this->getSlugKey(), $slug);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

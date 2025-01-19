@@ -60,6 +60,7 @@ trait HasHeaders
 
         $this->setData(MailerInterface::HEADERS, $headers);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

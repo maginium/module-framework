@@ -223,6 +223,7 @@ class Resizer implements ResizerInterface
         // Reset the image to the original
         $this->image = $this->originalImage;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -250,6 +251,8 @@ class Resizer implements ResizerInterface
         ], $options);
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -332,6 +335,8 @@ class Resizer implements ResizerInterface
         }
 
         // Return the instance for method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -346,6 +351,7 @@ class Resizer implements ResizerInterface
     {
         // If sharpness is out of range (0-100), return the image unmodified
         if ($sharpness <= 0 || $sharpness > 100) {
+            // Return the current instance to allow method chaining
             return $this;
         }
 
@@ -372,6 +378,8 @@ class Resizer implements ResizerInterface
         $this->image = $image;
 
         // Return the instance with the sharpened image for method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -419,6 +427,7 @@ class Resizer implements ResizerInterface
         // Store the cropped image
         $this->image = $imageResized;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -475,6 +484,7 @@ class Resizer implements ResizerInterface
     {
         $this->options[$option] = $value;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

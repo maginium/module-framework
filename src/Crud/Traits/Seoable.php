@@ -144,6 +144,8 @@ trait Seoable
         }
 
         // Return the current instance to allow for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -367,6 +369,7 @@ trait Seoable
         // Assign the canonical URL to the model.
         $this->setData(self::CANONICAL, $canonical);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

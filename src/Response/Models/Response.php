@@ -50,6 +50,7 @@ class Response extends ObjectModel implements ResponseInterface
             }
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

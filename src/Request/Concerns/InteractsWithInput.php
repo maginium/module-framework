@@ -141,6 +141,7 @@ trait InteractsWithInput
     {
         $this->getHeaders()->addHeaderLine($key, $value);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -333,6 +334,8 @@ trait InteractsWithInput
         }
 
         // If neither the key exists nor a default is provided, return the current instance.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -437,6 +440,8 @@ trait InteractsWithInput
         }
 
         // If the key is empty and no default callback is provided, return the current instance.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -485,6 +490,8 @@ trait InteractsWithInput
         }
 
         // If the key is present and no default callback is provided, return the current instance.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -849,6 +856,8 @@ trait InteractsWithInput
         dump(Validator::isEmpty($keys) ? $this->only($keys) : $this->all());
 
         // Return the current instance for chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

@@ -207,6 +207,7 @@ class DeferredCallbackCollection implements ArrayAccess, Countable
             ->values()
             ->all();
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

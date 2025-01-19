@@ -317,6 +317,8 @@ class FilesystemManager extends MultipleInstanceManager implements FactoryInterf
         $this->instances[$name] = $disk;
 
         // Return $this to allow for method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -400,6 +402,8 @@ class FilesystemManager extends MultipleInstanceManager implements FactoryInterf
         $this->customCreators[$driver] = $callback;
 
         // Return $this to allow for method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

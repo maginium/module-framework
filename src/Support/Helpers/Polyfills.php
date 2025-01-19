@@ -419,7 +419,7 @@ if (! function_exists('Maginium\Framework\Support\magento_binary')) {
      */
     function magento_binary()
     {
-        return Application::DEFAULT_PHP_BINARY;
+        return Application::DEFAULT_MAGENTO_BINARY;
     }
 }
 

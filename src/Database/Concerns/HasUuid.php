@@ -49,6 +49,7 @@ trait HasUuid
     {
         $this->setData($this->getUuidKey(), $uuid);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

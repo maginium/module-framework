@@ -13,6 +13,7 @@ use Maginium\Framework\Log\Interfaces\FactoryInterface;
 use Maginium\Framework\Log\Interfaces\LoggerInterface;
 use Maginium\Framework\Support\Facades\Config;
 use Maginium\Framework\Support\MultipleInstanceManager;
+use Override;
 use Psr\Log\LoggerInterface as PsrLogInterface;
 use Throwable;
 
@@ -83,6 +84,7 @@ class LogManager extends MultipleInstanceManager implements FactoryInterface
      *
      * @return mixed The resolved logger instance.
      */
+    #[Override]
     protected function get($name, $config = null): mixed
     {
         try {

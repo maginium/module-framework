@@ -6,13 +6,14 @@ namespace Maginium\Framework\Support\Facades;
 
 use Maginium\Framework\Concurrency\ConcurrencyManager;
 use Maginium\Framework\Concurrency\ForkDriver;
+use Maginium\Framework\Concurrency\Interfaces\DriverInterface;
 use Maginium\Framework\Concurrency\ProcessDriver;
 use Maginium\Framework\Concurrency\SyncDriver;
 use Maginium\Framework\Defer\DeferredCallback;
 use Maginium\Framework\Support\Facade;
 
 /**
- * @method static mixed driver(string|null $name = null)
+ * @method static DriverInterface driver(string|null $name = null)
  * @method static ProcessDriver createProcessDriver(array $config)
  * @method static ForkDriver createForkDriver(array $config)
  * @method static SyncDriver createSyncDriver(array $config)

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Maginium\Framework\Mail\Models;
 
 use Closure;
-use Magento\Framework\Mail\Mailable;
+use Magento\Framework\Mail\Message;
 use Maginium\Foundation\Exceptions\RuntimeException;
 use Maginium\Framework\Database\ObjectModel;
 use Maginium\Framework\Mail\Interfaces\Data\AttachmentInterface;
+use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Storage;
 
@@ -29,7 +30,7 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @var Closure
      */
-    protected Closure $resolver;
+    protected ?Closure $resolver;
 
     /**
      * Attachment constructor.
@@ -42,11 +43,12 @@ class Attachment extends ObjectModel implements AttachmentInterface
      * @param array $attributes The attributes to initialize the attachment object with.
      * @param Closure|null $resolver A closure that defines the attachment's behavior (optional).
      */
-    public function __construct($attributes = [], ?Closure $resolver = null)
+    public function __construct(array $attributes = [], ?Closure $resolver = null)
     {
-        // Initialize the parent construct
+        // Call the parent constructor to initialize the base class properties.
         parent::__construct($attributes);
 
+        // Assign the resolver closure, if provided, to allow for behavior customization.
         $this->resolver = $resolver;
     }
 
@@ -60,14 +62,15 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @param string $path The path to the file to be attached.
      *
-     * @return static Returns a new instance of the Attachment class.
+     * @return AttachmentInterface Returns a new instance of the Attachment class.
      */
-    public static function fromPath(string $path): self
+    public static function fromPath(string $path): AttachmentInterface
     {
         // Return a new Attachment instance with a resolver that handles the path
-        return new static(function($attachment, $pathStrategy) use ($path) {
-            $pathStrategy($path, $attachment);
-        });
+        return Container::make(static::class, arguments: [
+            'resolver' => function($attachment, $pathStrategy) use ($path) {
+                $pathStrategy($path, $attachment);
+            }]);
     }
 
     /**
@@ -79,9 +82,9 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @param string $url The URL of the file to be attached.
      *
-     * @return static Returns a new instance of the Attachment class.
+     * @return AttachmentInterface Returns a new instance of the Attachment class.
      */
-    public static function fromUrl(string $url): self
+    public static function fromUrl(string $url): AttachmentInterface
     {
         // Leverage fromPath method for URL, as URLs can be treated as paths
         return static::fromPath($url);
@@ -97,9 +100,9 @@ class Attachment extends ObjectModel implements AttachmentInterface
      * @param Closure $data The closure to retrieve the in-memory attachment data.
      * @param string|null $name Optional custom name for the attachment file.
      *
-     * @return static Returns an instance of the Attachment class.
+     * @return AttachmentInterface Returns an instance of the Attachment class.
      */
-    public static function fromData(Closure $data, ?string $name = null): self
+    public static function fromData(Closure $data, ?string $name = null): AttachmentInterface
     {
         return Container::make(static::class, [
             'resolver' => fn($attachment, $pathStrategy, $dataStrategy) => $dataStrategy($data, $attachment),
@@ -114,9 +117,9 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @param string $path The path to the file to be attached.
      *
-     * @return static Returns an instance of the Attachment class.
+     * @return AttachmentInterface Returns an instance of the Attachment class.
      */
-    public static function fromStorage(string $path): self
+    public static function fromStorage(string $path): AttachmentInterface
     {
         return static::fromStorageDisk(null, $path);
     }
@@ -130,9 +133,9 @@ class Attachment extends ObjectModel implements AttachmentInterface
      * @param string|null $disk The storage disk where the file is stored (e.g., 'local', 's3'). Defaults to null.
      * @param string $path The path to the file on the specified storage disk.
      *
-     * @return static Returns an instance of the Attachment class.
+     * @return AttachmentInterface Returns an instance of the Attachment class.
      */
-    public static function fromStorageDisk(?string $disk, string $path): self
+    public static function fromStorageDisk(?string $disk, string $path): AttachmentInterface
     {
         return Container::make(static::class, [
             'resolver' => function($attachment, $pathStrategy, $dataStrategy) use ($disk, $path) {
@@ -169,10 +172,33 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @return $this Returns the current instance of Attachment for method chaining.
      */
-    public function as(?string $name): self
+    public function as(?string $name): AttachmentInterface
     {
-        $this->setData(AttachmentInterface::AS, $name);
+        return $this->setAs($name);
+    }
 
+    /**
+     * Get the file name for the attachment.
+     *
+     * @return string
+     */
+    public function getAs(): string
+    {
+        return $this->getData(static::AS);
+    }
+
+    /**
+     * Set the file name for the attachment.
+     *
+     * @param string $as The file name.
+     *
+     * @return AttachmentInterface
+     */
+    public function setAs(string $as): AttachmentInterface
+    {
+        $this->setData(static::AS, $as);
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -186,34 +212,33 @@ class Attachment extends ObjectModel implements AttachmentInterface
      *
      * @return $this Returns the current instance of Attachment for method chaining.
      */
-    public function withMime(string $mime): self
+    public function withMime(string $mime): AttachmentInterface
     {
-        $this->setData(AttachmentInterface::MIME, $mime);
-
-        return $this;
+        return $this->setMime($mime);
     }
 
     /**
-     * Retrieve the list of attachments for the email.
+     * Get the MIME type for the attachment.
      *
-     * @return AttachmentInterface[]|null
+     * @return string
      */
-    public function getAttachments(): ?array
+    public function getMime(): string
     {
-        return $this->getData(static::ATTACHMENTS);
+        return $this->getData(static::MIME);
     }
 
     /**
-     * Set the list of attachments for the email.
+     * Set the MIME type for the attachment.
      *
-     * @param AttachmentInterface[]|null $attachments An array of file paths or attachment objects.
+     * @param string $mime The MIME type.
      *
-     * @return AttachmentInterface Returns the current instance for method chaining.
+     * @return AttachmentInterface
      */
-    public function setAttachments(?array $attachments): AttachmentInterface
+    public function setMime(string $mime): AttachmentInterface
     {
-        $this->setData(static::ATTACHMENTS, $attachments);
+        $this->setData(static::MIME, $mime);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -234,12 +259,12 @@ class Attachment extends ObjectModel implements AttachmentInterface
     }
 
     /**
-     * Attach the attachment to a built-in mail type (e.g., Mailable).
+     * Attach the attachment to a built-in mail type (e.g., MailerInterface).
      *
-     * This method allows attaching the current attachment to a Mailable, including optional parameters for file name
+     * This method allows attaching the current attachment to a MailerInterface, including optional parameters for file name
      * and MIME type. If no parameters are provided, the attachment's properties are used.
      *
-     * @param Mailable $mail The mail object to which the attachment will be added.
+     * @param MailerInterface $mail The mail object to which the attachment will be added.
      * @param array $options Optional additional options for the attachment (e.g., 'as' for filename, 'mime' for MIME type).
      *
      * @throws RuntimeException If the filename is not provided.
@@ -282,12 +307,12 @@ class Attachment extends ObjectModel implements AttachmentInterface
      * This method compares the current attachment with another attachment to check if they are equivalent based on
      * the file name and MIME type. Useful for deduplicating attachments.
      *
-     * @param self $attachment The attachment to compare with the current one.
+     * @param AttachmentInterface $attachment The attachment to compare with the current one.
      * @param array $options Optional options to override the comparison (e.g., 'as' for filename, 'mime' for MIME type).
      *
      * @return bool Returns true if the attachments are equivalent, false otherwise.
      */
-    public function isEquivalent(self $attachment, array $options = []): bool
+    public function isEquivalent(AttachmentInterface $attachment, array $options = []): bool
     {
         return $this->attachWith(
             // Compare the file path with the other attachment

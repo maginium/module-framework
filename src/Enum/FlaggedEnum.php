@@ -125,7 +125,7 @@ abstract class FlaggedEnum extends Enum
             0, // Initial carry value is 0 (no flags set)
         );
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -147,7 +147,7 @@ abstract class FlaggedEnum extends Enum
             // Otherwise, use the flag directly
             : $flag);
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -168,7 +168,7 @@ abstract class FlaggedEnum extends Enum
             $this->addFlag($flag);
         }
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -203,7 +203,7 @@ abstract class FlaggedEnum extends Enum
             // Otherwise, use the flag directly
             : $flag);
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -224,7 +224,7 @@ abstract class FlaggedEnum extends Enum
             $this->removeFlag($flag);
         }
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 

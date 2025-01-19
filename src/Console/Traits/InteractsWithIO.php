@@ -514,6 +514,8 @@ trait InteractsWithIO
         $this->getOutput()->newLine($count);
 
         // Return the instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

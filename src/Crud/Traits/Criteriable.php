@@ -76,6 +76,7 @@ trait Criteriable
         // Add criterion to the criteria list.
         $this->addCriterion($criterion, 'criteria');
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -91,6 +92,7 @@ trait Criteriable
         // Remove the criterion by its name.
         unset($this->criteria[$this->getCriterionName($criterion)]);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -108,6 +110,7 @@ trait Criteriable
             $this->removeCriterion($criterion);
         });
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -123,6 +126,7 @@ trait Criteriable
         // Add all criteria to the list.
         $this->addCriteria($criteria, 'criteria');
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -138,6 +142,7 @@ trait Criteriable
             $this->criteria = []; // Reset the criteria list to an empty array.
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -153,6 +158,7 @@ trait Criteriable
         // Add criteria to the default criteria list.
         $this->addCriteria($criteria, 'defaultCriteria');
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -193,6 +199,7 @@ trait Criteriable
     {
         $this->skipCriteria = $flag; // Set the skipCriteria flag.
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -208,6 +215,7 @@ trait Criteriable
     {
         $this->skipDefaultCriteria = $flag; // Set the skipDefaultCriteria flag.
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -363,6 +371,7 @@ trait Criteriable
         // Add the criterion to the specified list using its normalized name as the key.
         $this->{$list}[$this->getCriterionName($criterion)] = $criterion;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

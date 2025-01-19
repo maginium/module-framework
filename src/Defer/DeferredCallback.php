@@ -99,7 +99,7 @@ class DeferredCallback
         // Set the name for the deferred callback.
         $this->name = $name;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -118,7 +118,7 @@ class DeferredCallback
         // Set the always property to determine invocation behavior.
         $this->always = $always;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

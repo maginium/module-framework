@@ -68,6 +68,8 @@ trait SetterAttributes
         $this->key(ResponseInterface::HEADERS)->setData($key, $value);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -88,6 +90,8 @@ trait SetterAttributes
         $this->setData(ResponseInterface::META, $meta);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -108,6 +112,8 @@ trait SetterAttributes
         $this->setData(ResponseInterface::STATUS_CODE, $statusCode);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -127,6 +133,8 @@ trait SetterAttributes
         $this->setData(ResponseInterface::MESSAGE, $message);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -165,6 +173,8 @@ trait SetterAttributes
         }
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -189,6 +199,7 @@ trait SetterAttributes
         if ($exception instanceof AbstractAggregateException) {
             $this->setData(ResponseInterface::ERRORS, $exception->getErrors());
 
+            // Return the current instance to allow method chaining
             return $this;
         }
 
@@ -202,6 +213,7 @@ trait SetterAttributes
             }
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -221,6 +233,8 @@ trait SetterAttributes
         $this->setData(ResponseInterface::ERRORS, $errors);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -253,6 +267,8 @@ trait SetterAttributes
         $this->setData(ResponseInterface::HEADERS, $mergedHeaders);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

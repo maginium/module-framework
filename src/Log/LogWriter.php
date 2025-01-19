@@ -78,6 +78,7 @@ class LogWriter
     {
         $this->message = $message;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -101,6 +102,7 @@ class LogWriter
     {
         $this->data = $data;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -124,6 +126,7 @@ class LogWriter
     {
         $this->fileName = $fileName;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -147,6 +150,7 @@ class LogWriter
     {
         $this->path = $path;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -171,6 +175,7 @@ class LogWriter
     {
         $this->context = Json::encode($context);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

@@ -32,6 +32,8 @@ trait AttributeSetter
         if (Validator::isString($theme) || Validator::isArray($theme)) {
             if (Validator::isString($theme) && ! Arr::keyExists($theme, $this->themes)) {
                 // Return the current instance if the theme is invalid
+
+                // Return the current instance to allow method chaining
                 return $this;
             }
 
@@ -42,6 +44,7 @@ trait AttributeSetter
         // Initialize theme if it's valid
         $this->initTheme();
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -57,6 +60,7 @@ trait AttributeSetter
         // Set background color using `setData` method and constant key
         $this->setData(AvatarInterface::BACKGROUND, $hex);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -72,6 +76,7 @@ trait AttributeSetter
         // Set foreground color using `setData` method and constant key
         $this->setData(AvatarInterface::FOREGROUND, $hex);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -95,6 +100,7 @@ trait AttributeSetter
         $this->setData(AvatarInterface::WIDTH, $width);
         $this->setData(AvatarInterface::HEIGHT, $height);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -110,6 +116,7 @@ trait AttributeSetter
         // Set font size using `setData` method and constant key
         $this->setData(AvatarInterface::FONT_SIZE, $size);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -125,6 +132,7 @@ trait AttributeSetter
         // Set font family using `setData` method and constant key
         $this->setData(AvatarInterface::FONT_FAMILY, $font);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -147,6 +155,7 @@ trait AttributeSetter
         $this->setData(AvatarInterface::BORDER_COLOR, $color);
         $this->setData(AvatarInterface::BORDER_RADIUS, $radius);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -162,6 +171,7 @@ trait AttributeSetter
         // Set border radius using `setData` method and constant key
         $this->setData(AvatarInterface::BORDER_RADIUS, $radius);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -177,6 +187,7 @@ trait AttributeSetter
         // Set shape using `setData` method and constant key
         $this->setData(AvatarInterface::SHAPE, $shape);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -192,6 +203,7 @@ trait AttributeSetter
         // Set characters using `setData` method and constant key
         $this->setData(AvatarInterface::CHARS, $chars);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -209,6 +221,7 @@ trait AttributeSetter
             $this->setData(AvatarInterface::FONT, $font);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

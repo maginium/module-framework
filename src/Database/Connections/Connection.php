@@ -119,6 +119,7 @@ class Connection extends BaseConnection implements ConnectionInterface
     {
         $this->events = $events;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

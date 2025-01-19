@@ -83,6 +83,8 @@ trait HasRecipient
         $this->setData(MailerInterface::TO, $toAddress);
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -115,6 +117,8 @@ trait HasRecipient
         $this->setData(MailerInterface::FROM, $fromAddress);
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -138,6 +142,8 @@ trait HasRecipient
         $this->setData(MailerInterface::FROM, $fromAddress);
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -193,6 +199,8 @@ trait HasRecipient
         $this->setData(MailerInterface::REPLY_TO, $replyToAddress);
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -266,6 +274,7 @@ trait HasRecipient
             $this->addRecipient(MailerInterface::CC, $email, $name);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -339,6 +348,7 @@ trait HasRecipient
             $this->addRecipient(MailerInterface::BCC, $email, $name);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

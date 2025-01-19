@@ -59,6 +59,8 @@ trait Cacheable
         $this->cacheLifetime = $cacheLifetime;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -86,6 +88,8 @@ trait Cacheable
         $this->cacheClearEnabled = $status;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -120,6 +124,8 @@ trait Cacheable
         }
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -212,7 +218,7 @@ trait Cacheable
         // Clear the cache-specific properties to avoid interference with future operations.
         $this->cacheLifetime = null;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

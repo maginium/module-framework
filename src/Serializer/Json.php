@@ -84,10 +84,7 @@ class Json extends BaseJson implements JsonInterface
      */
     public function isValid(string $json): bool
     {
-        //  Attempt to decode the JSON string
-        json_decode($json);
-
         //  Check if there were no errors in decoding
-        return json_last_error() === JSON_ERROR_NONE;
+        return json_validate($json);
     }
 }

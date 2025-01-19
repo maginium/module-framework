@@ -173,6 +173,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->scopes[$name] = $parameters;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -213,6 +215,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->where[] = [$attribute, $operator, $value, $boolean ?: 'and'];
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -236,6 +240,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->whereIn[] = [$attribute, $values, $boolean ?: 'and', (bool)$not];
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -258,6 +264,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->whereNotIn[] = [$attribute, $values, $boolean ?: 'and'];
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -288,6 +296,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->connection = $name;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -320,6 +330,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->repositoryId = $repositoryId;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -356,6 +368,8 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         $this->relations = $relations;
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -379,7 +393,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // The last `$operator` & `$count` expressions are intentional to fix list() & Arr::pad() results
         $this->whereHas[] = [$relation, $callback, $operator ?: '>=', $count ?: 1];
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -397,7 +411,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // Store the offset value to be used later in the query building process.
         $this->offset = $offset;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -415,7 +429,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // Store the limit value to be used later in the query building process.
         $this->limit = $limit;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -434,7 +448,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // Store the attribute and direction for the order by condition.
         $this->orderBy[] = [$attribute, $direction ?: 'asc'];
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -452,7 +466,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // Merge the provided column(s) with the existing group by conditions.
         $this->groupBy = Arr::merge((array)$this->groupBy, Validator::isArray($column) ? $column : [$column]);
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -473,7 +487,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
         // Store the having condition along with the column, operator, value, and boolean logic.
         $this->having[] = [$column, $operator, $value, $boolean ?: 'and'];
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -589,7 +603,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
             $this->flushCriteria();
         }
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -751,6 +765,7 @@ abstract class AbstractRepository implements CacheableInterface, RepositoryInter
             // If scope exists, apply it with the provided parameters
             $this->scope($method, $parameters);
 
+            // Return the current instance to allow method chaining
             return $this;
         }
 

@@ -292,6 +292,7 @@ class Event extends BaseEvent
     {
         $this->description = Str::lower($description);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

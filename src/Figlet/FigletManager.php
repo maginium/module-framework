@@ -165,6 +165,8 @@ class FigletManager implements FigletInterface
         echo $this->render($text) . PHP_EOL;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -184,6 +186,8 @@ class FigletManager implements FigletInterface
         $this->backgroundColor = $color;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -203,6 +207,8 @@ class FigletManager implements FigletInterface
         $this->fontColor = $color;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -222,6 +228,8 @@ class FigletManager implements FigletInterface
         $this->fontName = $fontName;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -241,6 +249,8 @@ class FigletManager implements FigletInterface
         $this->fontDir = $fontDir;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -260,6 +270,8 @@ class FigletManager implements FigletInterface
         $this->stretching = $stretching;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

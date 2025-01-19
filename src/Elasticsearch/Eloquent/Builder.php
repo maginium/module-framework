@@ -6,10 +6,10 @@ namespace Maginium\Framework\Elasticsearch\Eloquent;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Eloquent\Builder as BaseEloquentBuilder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\HigherOrderTapProxy;
+use Maginium\Framework\Database\Eloquent\Builder as BaseEloquentBuilder;
 use Maginium\Framework\Database\Eloquent\Model;
 use Maginium\Framework\Elasticsearch\Collection\ElasticCollection;
 use Maginium\Framework\Elasticsearch\Concerns\BuildsQueries;
@@ -535,6 +535,7 @@ class Builder extends BaseEloquentBuilder
     {
         $this->query->filterGeoBox($field, $topLeft, $bottomRight);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -551,6 +552,7 @@ class Builder extends BaseEloquentBuilder
     {
         $this->query->filterGeoPoint($field, $distance, $geoPoint);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -566,6 +568,7 @@ class Builder extends BaseEloquentBuilder
     {
         $this->query->searchQuery($term, $boostFactor);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

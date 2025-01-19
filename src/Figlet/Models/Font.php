@@ -36,6 +36,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::NAME, $name);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -60,6 +61,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::FILE_COLLECTION, $fileCollection);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -84,6 +86,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::SIGNATURE, $signature);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -108,6 +111,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::HARD_BLANK, $hardBlank);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -132,6 +136,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::HEIGHT, $height);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -156,6 +161,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::MAX_LENGTH, $maxLength);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -180,6 +186,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::OLD_LAYOUT, $oldLayout);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -204,6 +211,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::COMMENT_LINES, $commentLines);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -228,6 +236,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::PRINT_DIRECTION, $printDirection);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -252,6 +261,7 @@ class Font extends ObjectModel implements FontInterface
     {
         $this->setData(self::FULL_LAYOUT, $fullLayout);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

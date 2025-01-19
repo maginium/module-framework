@@ -68,6 +68,7 @@ abstract class CacheEvent
     {
         $this->storeName = $storeName;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -92,6 +93,7 @@ abstract class CacheEvent
     {
         $this->key = $key;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -116,6 +118,7 @@ abstract class CacheEvent
     {
         $this->tags = $tags;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

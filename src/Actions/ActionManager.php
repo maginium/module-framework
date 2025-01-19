@@ -58,6 +58,7 @@ class ActionManager
     {
         $this->backtraceLimit = $backtraceLimit;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -72,6 +73,7 @@ class ActionManager
     {
         $this->designPatterns = $designPatterns;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -96,6 +98,7 @@ class ActionManager
     {
         $this->designPatterns[] = $designPattern;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

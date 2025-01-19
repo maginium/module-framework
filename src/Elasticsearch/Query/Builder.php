@@ -628,6 +628,7 @@ class Builder extends BaseBuilder
             $this->distinctType = 2;
         }
 
+        // Return the current instance to allow method chaining
         return $this; // Return the current instance for method chaining
     }
 
@@ -865,8 +866,10 @@ class Builder extends BaseBuilder
     {
         // Compile the 'where' conditions of the query
         $wheres = $this->compileWheres();
+
         // Compile any additional query options (e.g., limits, sorts)
         $options = $this->compileOptions();
+
         // Compile the columns to be selected (or use empty array by default)
         $columns = $this->compileColumns([]);
 
@@ -915,6 +918,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -938,6 +942,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -961,6 +966,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -992,6 +998,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1010,6 +1017,7 @@ class Builder extends BaseBuilder
         $type = 'regex';
         $this->wheres[] = compact('column', 'type', 'expression', 'boolean');
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1030,6 +1038,7 @@ class Builder extends BaseBuilder
 
         $this->wheres[] = compact('column', 'type', 'boolean', 'values', 'not');
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1046,6 +1055,7 @@ class Builder extends BaseBuilder
     {
         $boolean = 'and';
         $query = $this->newQuery();
+
         // Execute the callback to build the nested query
         $callBack($query);
         $wheres = $query->compileWheres();
@@ -1059,6 +1069,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1076,6 +1087,7 @@ class Builder extends BaseBuilder
     {
         $boolean = 'and';
         $query = $this->newQuery();
+
         // Execute the callback to build the nested query
         $callBack($query);
         $wheres = $query->compileWheres();
@@ -1088,6 +1100,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1105,6 +1118,7 @@ class Builder extends BaseBuilder
     {
         $boolean = 'and';
         $query = $this->newQuery();
+
         // Execute the callback to build the nested query
         $callBack($query);
         $wheres = $query->compileWheres();
@@ -1117,6 +1131,7 @@ class Builder extends BaseBuilder
             'boolean' => $boolean,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1230,6 +1245,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1256,6 +1272,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1282,6 +1299,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1308,6 +1326,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1334,6 +1353,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1360,6 +1380,7 @@ class Builder extends BaseBuilder
             'options' => $options,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1531,6 +1552,7 @@ class Builder extends BaseBuilder
         // Assign the highlight options to the current query builder
         $this->highlights = $highlight;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1566,6 +1588,7 @@ class Builder extends BaseBuilder
 
         $this->_attachOption('fuzziness', $depth); // Attach the fuzziness option to the query
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1596,6 +1619,7 @@ class Builder extends BaseBuilder
 
         $this->_attachOption('minimum_should_match', $value); // Attach the minimum match value to the query
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1623,6 +1647,7 @@ class Builder extends BaseBuilder
         }
         $this->_attachOption('boost', $value);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1657,6 +1682,7 @@ class Builder extends BaseBuilder
             'order' => $direction,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1676,6 +1702,7 @@ class Builder extends BaseBuilder
         $currentColOrder[$key] = $value;
         $this->orders[$column] = $currentColOrder;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1721,6 +1748,7 @@ class Builder extends BaseBuilder
             'type' => $type,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1742,6 +1770,7 @@ class Builder extends BaseBuilder
             'mode' => $mode,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1761,6 +1790,7 @@ class Builder extends BaseBuilder
             'seed' => $seed,
         ];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -1782,6 +1812,7 @@ class Builder extends BaseBuilder
         $this->addSelect($groups);
         $this->distinctType = 1;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -2315,8 +2346,10 @@ class Builder extends BaseBuilder
     {
         // Compile where conditions for the query.
         $wheres = $this->compileWheres();
+
         // Compile additional options for the query.
         $options = $this->compileOptions();
+
         // Compile selected columns for the query.
         $columns = $this->compileColumns($columns);
 
@@ -2422,8 +2455,10 @@ class Builder extends BaseBuilder
     {
         // Compile where conditions for the delete query.
         $wheres = $this->compileWheres();
+
         // Compile additional options for the delete query.
         $options = $this->compileOptions();
+
         // Perform the delete operation.
         $result = $this->connection->deleteAll($wheres, $options);
 
@@ -2454,6 +2489,7 @@ class Builder extends BaseBuilder
 
         // Compile where conditions for the update query.
         $wheres = $this->compileWheres();
+
         // Perform the update operation using the specified method.
         $result = $this->connection->{$method}($wheres, $values, $options, $this->refresh);
 

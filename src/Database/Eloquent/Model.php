@@ -6,6 +6,7 @@ namespace Maginium\Framework\Database\Eloquent;
 
 use Illuminate\Contracts\Database\Eloquent\Builder as BaseBuilder;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Illuminate\Database\Eloquent\Model as BaseModel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Scope;
@@ -13,6 +14,7 @@ use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\AbstractModel;
 use Maginium\Foundation\Exceptions\RuntimeException;
 use Maginium\Framework\Database\Concerns\HasAttributes;
+use Maginium\Framework\Database\Concerns\HasEvents;
 use Maginium\Framework\Database\Concerns\HasTimestamps;
 use Maginium\Framework\Database\Eloquent\Docs\ModelDocs;
 use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
@@ -24,8 +26,10 @@ use Maginium\Framework\Elasticsearch\Eloquent\Model as ElasticModel;
 use Maginium\Framework\Support\Facades\Container;
 use Maginium\Framework\Support\Facades\Event;
 use Maginium\Framework\Support\Reflection;
+use Maginium\Framework\Support\Str;
 use Maginium\Framework\Support\Traits\DataObject;
 use Maginium\Framework\Support\Validator;
+use Override;
 
 /**
  * Class Model.
@@ -37,6 +41,8 @@ use Maginium\Framework\Support\Validator;
  * @property string $slugKey
  *
  * @mixin ModelDocs
+ * @mixin AbstractModel
+ * @mixin AbstractExtensibleModel
  */
 class Model extends BaseModel implements ModelInterface
 {
@@ -47,6 +53,8 @@ class Model extends BaseModel implements ModelInterface
 
     // Adding Attributes functionality for the model.
     use HasAttributes;
+    // Adding custom logic for model events.
+    use HasEvents;
     // Handles timestamp fields (`created_at`, `updated_at`).
     use HasTimestamps;
     // Handles unique identifiers for the model.
@@ -79,7 +87,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @var class-string<ElasticModel>|null
      */
-    protected ?string $elasticModel = null;
+    protected static ?string $elasticModel = null;
 
     /**
      * The class name of the base model associated with this instance.
@@ -88,7 +96,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @var class-string<AbstractModel>|class-string<AbstractExtensibleModel>|null
      */
-    protected ?string $baseModel = null;
+    protected static ?string $baseModel = null;
 
     /**
      * The class name of the Data Transfer Object (DTO) associated with this instance.
@@ -130,7 +138,7 @@ class Model extends BaseModel implements ModelInterface
     public static function make(array $attributes = []): ModelInterface
     {
         // Create a new instance of the model with the given attributes
-        $instance = Container::make(self::class, ['data' => $attributes]);
+        $instance = Container::make(static::class, ['data' => $attributes]);
 
         // Return the created instance
         return $instance;
@@ -148,7 +156,7 @@ class Model extends BaseModel implements ModelInterface
         // First we will just create a fresh instance of this model, and then we can set the
         // connection on the model so that it is used for the queries we execute, as well
         // as being set on every relation we retrieve without a custom connection name.
-        $instance = new static;
+        $instance = static::make();
 
         $instance->setConnection($connection);
 
@@ -204,15 +212,70 @@ class Model extends BaseModel implements ModelInterface
     }
 
     /**
+     * Retrieve the instance of the base model associated with this class.
+     *
+     * This method resolves the factory class associated with the base model,
+     * invokes its `create` method, and passes the given arguments.
+     *
+     * @param array $args Arguments to pass to the factory's create method.
+     *
+     * @throws RuntimeException If the factory class is not found or cannot be resolved.
+     *
+     * @return AbstractModel|AbstractExtensibleModel|null The created instance of the base model or null if not set.
+     */
+    public static function toBase(array $args = []): AbstractModel|AbstractExtensibleModel|null
+    {
+        // Create new instance to call statically
+        $instance = Container::make(static::class);
+
+        // Ensure the base model is defined
+        if (empty($instance->getBaseModel())) {
+            return null;
+        }
+
+        // Construct the factory class name
+        $factoryClass = "{$instance->getBaseModel()}Factory";
+
+        // Resolve the factory class from the container
+        $factory = Container::resolve($factoryClass);
+
+        // Validate the resolved factory
+        if (! Reflection::methodExists($factory, 'create')) {
+            throw RuntimeException::make("The factory class '{$factoryClass}' does not have a 'create' method.");
+        }
+
+        // Create and return the base model instance
+        return $factory->create($args);
+    }
+
+    /**
+     * Retrieve the instance of the base model associated with this class.
+     *
+     * This method resolves the factory class associated with the base model,
+     * invokes its `create` method, and passes the given arguments.
+     *
+     * @param array $args Arguments to pass to the factory's create method.
+     *
+     * @throws RuntimeException If the factory class is not found or cannot be resolved.
+     *
+     * @return string|null The created instance of the base model or null if not set.
+     */
+    public static function getBaseModel(array $args = []): ?string
+    {
+        return static::$baseModel;
+    }
+
+    /**
      * Create a new Eloquent Collection instance.
      *
      * @param  array  $models
      *
      * @return Collection
      */
-    public function newCollection(array $models = [])
+    #[Override]
+    public function newCollection(array $models = []): Collection
     {
-        return new Collection($models);
+        return Container::make(Collection::class, ['items' => $models]);
     }
 
     /**
@@ -220,9 +283,105 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public static function query()
+    #[Override]
+    public static function query(): Builder
     {
-        return (new static)->newQuery();
+        return static::make()->newQuery();
+    }
+
+    /**
+     * Set the connection associated with the model.
+     *
+     * @param  string|null  $name
+     *
+     * @return ModelInterface
+     */
+    public function setConnection($name): ModelInterface
+    {
+        return parent::setConnection($name);
+    }
+
+    /**
+     * Create a new instance of the given model.
+     *
+     * @param  array  $attributes
+     * @param  bool  $exists
+     *
+     * @return static
+     */
+    #[Override]
+    public function newInstance($attributes = [], $exists = false)
+    {
+        // This method just provides a convenient way for us to generate fresh model
+        // instances of this current model. It is particularly useful during the
+        // hydration of new objects via the Eloquent query builder instances.
+        $model = static::make();
+
+        $model->exists = $exists;
+
+        $model->setConnection(
+            $this->getConnectionName(),
+        );
+
+        $model->setTable($this->getTable());
+
+        $model->mergeCasts($this->casts);
+
+        $model->fill((array)$attributes);
+
+        return $model;
+    }
+
+    /**
+     * Set the table (index) associated with the model.
+     *
+     * This method allows explicitly setting the Elasticsearch index name. In Elasticsearch, the term `index` is used to represent
+     * the equivalent of a database table in relational models, so the `table` property is unset to avoid confusion.
+     *
+     * @param string $index The name of the Elasticsearch index.
+     *
+     * @return ModelInterface The current instance of the model.
+     */
+    public function setTable($index): ModelInterface
+    {
+        return parent::setTable($index);
+    }
+
+    /**
+     * Merge new casts with existing casts on the model.
+     *
+     * @param  array  $casts
+     *
+     * @return ModelInterface
+     */
+    public function mergeCasts($casts): ModelInterface
+    {
+        return parent::mergeCasts($casts);
+    }
+
+    /**
+     * Fill the model with an array of attributes.
+     *
+     * @param  array  $attributes
+     *
+     * @throws MassAssignmentException ModelInterfacen
+     *
+     * @return ModelInterface
+     */
+    public function fill(array $attributes): ModelInterface
+    {
+        return parent::fill($attributes);
+    }
+
+    /**
+     * Get the primary key for the model.
+     *
+     * @return string
+     */
+    #[Override]
+    public function getKeyName(): string
+    {
+        return $this->primaryKey;
     }
 
     /**
@@ -238,6 +397,7 @@ class Model extends BaseModel implements ModelInterface
             $this->setRawAttributes($fresh->getAttributes(), true);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -249,6 +409,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return string|null The event prefix for the model.
      */
+    #[Override]
     public function getEventPrefix(): ?string
     {
         return static::$eventPrefix;
@@ -262,6 +423,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return string|null The event object type.
      */
+    #[Override]
     public function getEventObject(): ?string
     {
         return static::$eventObject;
@@ -285,47 +447,14 @@ class Model extends BaseModel implements ModelInterface
     }
 
     /**
-     * Retrieve the instance of the base model associated with this class.
-     *
-     * This method resolves the factory class associated with the base model,
-     * invokes its `create` method, and passes the given arguments.
-     *
-     * @param array $args Arguments to pass to the factory's create method.
-     *
-     * @throws RuntimeException If the factory class is not found or cannot be resolved.
-     *
-     * @return string|null The created instance of the base model or null if not set.
-     */
-    public function getBaseModel(array $args = []): ?string
-    {
-        // Ensure the base model is defined
-        if (empty($this->baseModel)) {
-            return null;
-        }
-
-        // Construct the factory class name
-        $factoryClass = "{$this->baseModel}Factory";
-
-        // Resolve the factory class from the container
-        $factory = Container::resolve($factoryClass);
-
-        // Validate the resolved factory
-        if (! Reflection::methodExists($factory, 'create')) {
-            throw RuntimeException::make("The factory class '{$factoryClass}' does not have a 'create' method.");
-        }
-
-        // Create and return the base model instance
-        return $factory->create($args);
-    }
-
-    /**
      * Retrieve the class name of the Elastic model associated with this instance.
      *
      * @return ElasticModel|null The class name of the Elastic model or null if not set.
      */
+    #[Override]
     public function getElasticModel(): ?ElasticModel
     {
-        return $this->elasticModel;
+        return static::$elasticModel;
     }
 
     /**
@@ -333,6 +462,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return DataTransferObject|null The class name of the DTO or null if not set.
      */
+    #[Override]
     public function getDtoClass(): ?DataTransferObject
     {
         return $this->dtoClass;
@@ -349,6 +479,7 @@ class Model extends BaseModel implements ModelInterface
     {
         $this->baseModel = $baseModel;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -363,6 +494,7 @@ class Model extends BaseModel implements ModelInterface
     {
         $this->elasticModel = $elasticModel;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -377,6 +509,7 @@ class Model extends BaseModel implements ModelInterface
     {
         $this->dtoClass = $dtoClass;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -385,7 +518,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public function newQuery()
+    #[Override]
+    public function newQuery(): Builder
     {
         return $this->registerGlobalScopes($this->newQueryWithoutScopes());
     }
@@ -393,9 +527,10 @@ class Model extends BaseModel implements ModelInterface
     /**
      * Get a new query builder that doesn't have any global scopes or eager loading.
      *
-     * @return Builder|static
+     * @return Builder
      */
-    public function newModelQuery()
+    #[Override]
+    public function newModelQuery(): Builder
     {
         return $this->newEloquentBuilder(
             $this->newBaseQueryBuilder(),
@@ -407,7 +542,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public function newQueryWithoutRelationships()
+    #[Override]
+    public function newQueryWithoutRelationships(): Builder
     {
         return $this->registerGlobalScopes($this->newModelQuery());
     }
@@ -419,7 +555,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public function registerGlobalScopes($builder)
+    #[Override]
+    public function registerGlobalScopes($builder): Builder
     {
         foreach ($this->getGlobalScopes() as $identifier => $scope) {
             $builder->withGlobalScope($identifier, $scope);
@@ -433,7 +570,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder|static
      */
-    public function newQueryWithoutScopes()
+    #[Override]
+    public function newQueryWithoutScopes(): Builder
     {
         return $this->newModelQuery()
             ->with($this->with)
@@ -447,7 +585,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public function newQueryWithoutScope($scope)
+    #[Override]
+    public function newQueryWithoutScope($scope): Builder
     {
         return $this->newQuery()->withoutGlobalScope($scope);
     }
@@ -459,7 +598,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    public function newQueryForRestoration($ids)
+    #[Override]
+    public function newQueryForRestoration($ids): Builder
     {
         return $this->newQueryWithoutScopes()->whereKey($ids);
     }
@@ -471,7 +611,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder|static
      */
-    public function newEloquentBuilder($query)
+    #[Override]
+    public function newEloquentBuilder($query): Builder
     {
         return Container::make(Builder::class, ['query' => $query]);
     }
@@ -485,7 +626,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Relation
      */
-    public function resolveRouteBindingQuery($query, $value, $field = null)
+    #[Override]
+    public function resolveRouteBindingQuery($query, $value, $field = null): Relation
     {
         return $query->where($field ?? $this->getRouteKeyName(), $value);
     }
@@ -501,6 +643,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return array The model's data as an associative array.
      */
+    #[Override]
     public function toDataArray(array $keys = ['*']): array
     {
         // Get the initial data source (either `dataArray` or model data)
@@ -516,6 +659,32 @@ class Model extends BaseModel implements ModelInterface
     }
 
     /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    #[Override]
+    public function getTable(): string
+    {
+        return $this->table ?? Str::snake(Str::pluralStudly(Reflection::getShortName($this)));
+    }
+
+    /**
+     * Set the primary key for the model.
+     *
+     * @param  string  $key
+     *
+     * @return ModelInterface
+     */
+    #[Override]
+    public function setKeyName($key): ModelInterface
+    {
+        $this->primaryKey = $key;
+
+        return $this;
+    }
+
+    /**
      * Fire the given event for the model.
      *
      * @param  string  $event
@@ -523,7 +692,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return mixed
      */
-    protected function fireModelEvent($event, $halt = true)
+    #[Override]
+    protected function fireModelEvent($event, $halt = true): mixed
     {
         // First, we will get the proper method to call on the event dispatcher, and then we
         // will attempt to fire a custom, object based event for the given event. If that
@@ -568,10 +738,11 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return mixed|null
      */
-    protected function fireCustomModelEvent($event, $method)
+    #[Override]
+    protected function fireCustomModelEvent($event, $method): mixed
     {
         if (! isset($this->dispatchesEvents[$event])) {
-            return;
+            return null;
         }
 
         $result = Event::{$method}(new $this->dispatchesEvents[$event]($this));
@@ -579,6 +750,8 @@ class Model extends BaseModel implements ModelInterface
         if ($result !== null) {
             return $result;
         }
+
+        return null;
     }
 
     /**
@@ -588,7 +761,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return bool
      */
-    protected function performUpdate(BaseBuilder $query)
+    #[Override]
+    protected function performUpdate(BaseBuilder $query): bool
     {
         // If the updating event returns false, we will cancel the update operation so
         // developers can hook Validation systems into their models and cancel this
@@ -627,7 +801,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    protected function setKeysForSelectQuery($query)
+    #[Override]
+    protected function setKeysForSelectQuery($query): Builder
     {
         $query->where($this->getKeyName(), '=', $this->getKeyForSelectQuery());
 
@@ -641,7 +816,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return Builder
      */
-    protected function setKeysForSaveQuery($query)
+    #[Override]
+    protected function setKeysForSaveQuery($query): Builder
     {
         $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
 
@@ -655,7 +831,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return bool
      */
-    protected function performInsert(BaseBuilder $query)
+    #[Override]
+    protected function performInsert(BaseBuilder $query): bool
     {
         if ($this->usesUniqueIds()) {
             $this->setUniqueIds();
@@ -713,7 +890,8 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return void
      */
-    protected function insertAndSetId(BaseBuilder $query, $attributes)
+    #[Override]
+    protected function insertAndSetId(BaseBuilder $query, $attributes): void
     {
         $id = $query->insertGetId($attributes, $keyName = $this->getKeyName());
 
@@ -734,6 +912,7 @@ class Model extends BaseModel implements ModelInterface
      *
      * @return mixed The result of the dynamic method call.
      */
+    #[Override]
     public function __call($method, $parameters): mixed
     {
         // Check if the method is supported dynamically using the `hasMethod` function.

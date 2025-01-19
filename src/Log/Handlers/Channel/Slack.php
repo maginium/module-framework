@@ -145,6 +145,7 @@ class Slack extends SlackWebhookHandler
 
         // Clean up extra data before sending it to Slack
         $record['extra'] = [];
+
         // Add context data to the record
         $record['context'] = $this->getContext();
 

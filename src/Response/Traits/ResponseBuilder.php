@@ -58,6 +58,8 @@ trait ResponseBuilder
         $this->reset();
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -81,6 +83,8 @@ trait ResponseBuilder
         $this->response->setMeta($meta);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -103,6 +107,8 @@ trait ResponseBuilder
         $this->response->setPayload($data);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -125,6 +131,8 @@ trait ResponseBuilder
         $this->response->setMessage($message instanceof Phrase ? $message->render() : $message);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -147,6 +155,8 @@ trait ResponseBuilder
         $this->response->setStatusCode($statusCode);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -169,6 +179,8 @@ trait ResponseBuilder
         $this->response->setCause($cause);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -192,6 +204,8 @@ trait ResponseBuilder
         $this->response->setHeaders($headers);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -214,6 +228,8 @@ trait ResponseBuilder
         $this->response->setErrors($errors);
 
         // Return the current instance to support method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

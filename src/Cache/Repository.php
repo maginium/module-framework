@@ -941,6 +941,8 @@ class Repository implements ArrayAccess, CacheInterface
         $this->default = $seconds;
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

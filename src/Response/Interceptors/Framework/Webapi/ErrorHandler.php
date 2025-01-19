@@ -109,7 +109,9 @@ class ErrorHandler extends BaseResponse
     //     // Finalize the response with the last processed status code and error body.
     //     $this->finalizeResponse($statusCode, $responseBuilder->toJson());
 
-    //     return $this;
+    //
+    // Return the current instance to allow method chaining
+    // return $this;
     // }
 
     /**

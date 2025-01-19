@@ -69,6 +69,7 @@ class FilterList
         // Retain only the specified filters.
         $this->filters = collect($this->filters)->only($filters)->all();
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

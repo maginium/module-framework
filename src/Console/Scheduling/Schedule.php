@@ -237,6 +237,7 @@ class Schedule extends BaseSchedule implements ScheduleInterface
             $this->schedulingMutex->useStore($store);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

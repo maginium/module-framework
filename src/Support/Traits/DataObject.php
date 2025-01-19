@@ -41,6 +41,7 @@ trait DataObject
         // Join all parts of the key with a dot and store it
         $this->currentKey = implode('.', $keys);
 
+        // Return the current instance to allow method chaining
         return $this;  // Allow method chaining
     }
 
@@ -245,6 +246,8 @@ trait DataObject
         }
 
         // Allow method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -262,6 +265,7 @@ trait DataObject
         if ($this->attributes === []) {
             $this->setData($arr);
 
+            // Return the current instance to allow method chaining
             return $this;
         }
 
@@ -269,6 +273,7 @@ trait DataObject
             $this->setData($index, $value);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -293,6 +298,7 @@ trait DataObject
             }
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -349,6 +355,7 @@ trait DataObject
         $method = 'set' . ($key !== null ? str_replace('_', '', ucwords($key, '_')) : '');
         $this->{$method}($args);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

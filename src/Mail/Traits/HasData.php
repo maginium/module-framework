@@ -61,6 +61,7 @@ trait HasData
 
         $this->setData(MailerInterface::TEMPLATE_DATA, $templateData);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

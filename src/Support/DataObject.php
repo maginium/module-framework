@@ -52,6 +52,7 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         // Join all parts of the key with a dot and store it
         $this->currentKey = implode('.', $keys);
 
+        // Return the current instance to allow method chaining
         return $this;  // Allow method chaining
     }
 
@@ -282,6 +283,8 @@ class DataObject extends BaseDataObject implements DataObjectInterface
         }
 
         // Allow method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

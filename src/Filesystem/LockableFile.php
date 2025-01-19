@@ -94,6 +94,7 @@ class LockableFile
         // Flush the output to ensure data is written.
         fflush($this->handle);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -110,6 +111,7 @@ class LockableFile
         // Truncate the file to zero length.
         ftruncate($this->handle, 0);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -130,6 +132,7 @@ class LockableFile
 
         $this->isLocked = true;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -150,6 +153,7 @@ class LockableFile
 
         $this->isLocked = true;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -166,6 +170,7 @@ class LockableFile
             $this->isLocked = false;
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

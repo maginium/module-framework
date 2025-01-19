@@ -73,6 +73,7 @@ class DatabaseServiceProvider extends ServiceProvider
         // Loops through each database connection and registers it with the Capsule manager.
         // foreach ($connections as $name => $config) {
         //     $capsule->addConnection($config, $name);
+
         // }
 
         // Makes the Capsule manager globally accessible.

@@ -95,6 +95,7 @@ class Logger implements LoggerInterface
     {
         $this->context = Php::recursiveArrayMerge($this->context, $context);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -109,6 +110,7 @@ class Logger implements LoggerInterface
     {
         $this->context = [];
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

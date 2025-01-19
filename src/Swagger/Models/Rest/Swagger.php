@@ -67,6 +67,7 @@ class Swagger extends MagentoSwagger
     public function setInfo($info)
     {
         if (! Validator::isArray($info)) {
+            // Return the current instance to allow method chaining
             return $this;
         }
 
@@ -94,6 +95,7 @@ class Swagger extends MagentoSwagger
             $this->_data['info']['license'] = $info['license'];
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

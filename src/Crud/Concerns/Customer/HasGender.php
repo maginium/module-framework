@@ -72,6 +72,8 @@ trait HasGender
         $this->setData(CustomerInterface::GENDER, Genders::getKey($gender));
 
         // Return the current instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

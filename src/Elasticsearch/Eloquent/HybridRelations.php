@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Elasticsearch\Eloquent;
 
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Maginium\Framework\Database\Query\Builder as QueryBuilder;
 use Maginium\Framework\Elasticsearch\Eloquent\Model as EloquentModel;
 use Maginium\Framework\Elasticsearch\Relations\BelongsTo;
@@ -245,9 +244,9 @@ trait HybridRelations
      *
      * @param  QueryBuilder  $query
      *
-     * @return EloquentBuilder
+     * @return Builder
      */
-    public function newEloquentBuilder($query)
+    public function newEloquentBuilder($query): Builder
     {
         //@phpstan-ignore-next-line
         if (is_subclass_of($this, EloquentModel::class)) {
@@ -255,7 +254,7 @@ trait HybridRelations
         }
 
         // Return the default Eloquent builder instance
-        return Container::make(EloquentBuilder::class, ['query' => $query]);
+        return Container::make(Builder::class, ['query' => $query]);
     }
 
     /**

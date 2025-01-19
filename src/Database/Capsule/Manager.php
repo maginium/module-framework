@@ -179,6 +179,7 @@ class Manager
     {
         $this->saveDatabaseConfig(['fetch_mode' => $fetchMode]);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

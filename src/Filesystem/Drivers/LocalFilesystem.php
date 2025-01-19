@@ -106,6 +106,7 @@ class LocalFilesystem extends DriverFilesystem
         // Assign the disk name.
         $this->disk = $disk;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -123,6 +124,7 @@ class LocalFilesystem extends DriverFilesystem
         $this->shouldServeSignedUrls = $serve;
         $this->urlGeneratorResolver = $urlGeneratorResolver;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

@@ -40,6 +40,7 @@ trait HasDateOfBirth
     {
         $this->setData(CustomerInterface::DOB, $dateOfBirth);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -68,6 +69,7 @@ trait HasDateOfBirth
 
         $this->unsetData(CustomerInterface::DOB);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

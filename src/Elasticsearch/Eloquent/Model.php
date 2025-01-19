@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Carbon;
 use Magento\Elasticsearch\Model\Adapter\Index\IndexNameResolver;
 use Maginium\Framework\Database\Eloquent\Model as BaseModel;
+use Maginium\Framework\Database\Interfaces\Data\ModelInterface;
 use Maginium\Framework\Elasticsearch\Connection;
 use Maginium\Framework\Elasticsearch\Eloquent\Docs\ModelDocs;
 use Maginium\Framework\Elasticsearch\Meta\ModelMetaData;
@@ -169,14 +170,15 @@ abstract class Model extends BaseModel
      *
      * @param string $index The name of the Elasticsearch index.
      *
-     * @return $this The current instance of the model.
+     * @return ModelInterface The current instance of the model.
      */
-    public function setTable($index)
+    public function setTable($index): ModelInterface
     {
         // Set the model's `index` to the provided value and unset the `table` property used in standard Eloquent models.
         $this->index = $index;
         unset($this->table);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -254,6 +256,7 @@ abstract class Model extends BaseModel
         // Create a new ModelMetaData instance and assign it to the model's metadata.
         $this->_meta = Container::make(ModelMetaData::class, ['meta' => $meta]);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -639,6 +642,7 @@ abstract class Model extends BaseModel
         //     $connection = clone static::resolveConnection($this->getConnectionName());
 
         //     return $connection;
+
         // }
 
         // Otherwise, fetch the connection from the container.

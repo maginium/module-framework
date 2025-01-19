@@ -67,13 +67,13 @@ interface SerializableClosureInterface
     /**
      * Serialize a closure into a string format.
      *
-     * @param  Closure  $closure  Closure to be serialized.
+     * @param  Closure|SerializableClosureInterface  $closure  Closure to be serialized.
      *
      * @throws InvalidArgumentException If the provided data is not a callable.
      *
      * @return string The serialized closure string.
      */
-    public function serialize(Closure $closure): string;
+    public function serialize(Closure|self $closure): string;
 
     /**
      * Unserialize a string back into a closure.

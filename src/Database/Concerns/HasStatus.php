@@ -80,7 +80,7 @@ trait HasStatus
         // Set the status value in the model's data
         $this->setData($this->getStatusKey(), $status);
 
-        // Return the current model instance for method chaining
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -113,7 +113,7 @@ trait HasStatus
         // Unset the status data
         $this->unsetData($this->getStatusKey());
 
-        // Return the current model instance for method chaining
+        // Return the current instance to allow method chaining
         return $this;
     }
 

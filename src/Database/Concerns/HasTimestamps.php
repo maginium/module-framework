@@ -37,6 +37,7 @@ trait HasTimestamps
     {
         $this->setData(static::getCreatedAtColumn(), $createdAt);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -65,6 +66,7 @@ trait HasTimestamps
     {
         $this->setData(static::getUpdatedAtColumn(), $updatedAt);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

@@ -165,6 +165,7 @@ class Cloudwatch extends CloudWatchHandler
     {
         // Clean up extra data before sending it to Cloudwatch
         $record['extra'] = [];
+
         // Add context data to the record
         $record['context'] = $this->getContext();
 

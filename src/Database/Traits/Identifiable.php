@@ -42,6 +42,7 @@ trait Identifiable
         // Assign the ID to the model.
         $this->setData($this->getKeyname(), $id);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

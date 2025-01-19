@@ -80,6 +80,8 @@ trait Scopeable
         $this->scopeId = $scopeId;
 
         // Return the current instance to allow chaining of methods.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -108,6 +110,8 @@ trait Scopeable
         $this->scope = $scope ?? $this->scope;
 
         // Return the current instance to allow chaining of methods.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Concerns;
 
-use Illuminate\Support\Collection;
 use Maginium\Framework\Support\Validator;
 
 /**

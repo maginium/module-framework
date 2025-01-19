@@ -60,9 +60,11 @@ class EventManager implements EventInterface
     public function dispatch(string $eventName, array $data = []): void
     {
         $this->eventManager->dispatch($eventName, $data);
+
         // // Validate event name and data
         // if (empty($eventName)) {
         //     throw InvalidArgumentException::make(__('Event name cannot be empty.'));
+
         // }
 
         // // Publish the event data to the message queue

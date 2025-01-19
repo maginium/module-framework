@@ -462,6 +462,7 @@ class RedisStore extends TaggableStore implements LockableInterface, StoreInterf
     {
         $this->lockConnection = $connection;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

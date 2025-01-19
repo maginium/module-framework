@@ -45,6 +45,8 @@ trait Dumpable
         dump($this, ...$args);
 
         // Return the current object to enable method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

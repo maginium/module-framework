@@ -402,6 +402,7 @@ class FileStore implements LockableInterface, StoreInterface
     {
         $this->directory = $directory;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -416,6 +417,7 @@ class FileStore implements LockableInterface, StoreInterface
     {
         $this->lockDirectory = $lockDirectory;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

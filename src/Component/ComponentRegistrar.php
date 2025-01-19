@@ -80,6 +80,7 @@ class ComponentRegistrar extends BaseComponentRegistrar implements ComponentRegi
         // if (static::isComponentAutoloadedPSR4($componentName)) {
         //     // Skip registration if the component is already autoloaded
         //     return;
+
         // }
 
         // Ensure that the component is not already registered by calling the parent register method

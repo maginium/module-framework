@@ -188,6 +188,8 @@ class MediaManager implements MediaInterface
         $this->fileUrl = rtrim(parse_url($fileUrl, PHP_URL_PATH), '/');
 
         // Return the instance to allow method chaining.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 

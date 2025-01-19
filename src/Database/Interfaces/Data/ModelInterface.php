@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Maginium\Framework\Database\Interfaces\Data;
 
+use Illuminate\Database\Eloquent\MassAssignmentException;
 use Magento\Framework\Model\AbstractExtensibleModel;
 use Magento\Framework\Model\AbstractModel;
+use Maginium\Foundation\Exceptions\RuntimeException;
 use Maginium\Foundation\Interfaces\DataObjectInterface;
+use Maginium\Framework\Database\Eloquent\Builder;
 use Maginium\Framework\Database\Interfaces\HasTimestampsInterface;
 use Maginium\Framework\Database\Interfaces\IdentifiableInterface;
 use Maginium\Framework\Database\Interfaces\SearchableInterface;
@@ -44,9 +47,27 @@ interface ModelInterface extends DataObjectInterface, HasTimestampsInterface, Id
      *
      * @param array $args Arguments to pass to the factory's create method.
      *
+     * @throws RuntimeException If the factory class is not found or cannot be resolved.
+     *
      * @return AbstractModel|AbstractExtensibleModel|null The created instance of the base model or null if not set.
      */
-    public function getBaseModel(array $args = []): mixed;
+    public static function toBase(array $args = []): AbstractModel|AbstractExtensibleModel|null;
+
+    /**
+     * Retrieve the instance of the base model associated with this class.
+     *
+     * @throws RuntimeException If the factory class is not found or cannot be resolved.
+     *
+     * @return string|null The created instance of the base model or null if not set.
+     */
+    public static function getBaseModel(): ?string;
+
+    /**
+     * Begin querying the model.
+     *
+     * @return Builder
+     */
+    public static function query(): Builder;
 
     /**
      * Retrieve the class name of the Elastic model associated with this instance.
@@ -94,4 +115,69 @@ interface ModelInterface extends DataObjectInterface, HasTimestampsInterface, Id
      * @return array The model's data as an array.
      */
     public function toDataArray(array $keys = ['*']): array;
+
+    /**
+     * Get the primary key for the model.
+     *
+     * @return string
+     */
+    public function getKeyName(): string;
+
+    /**
+     * Set the connection associated with the model.
+     *
+     * @param  string|null  $name
+     *
+     * @return ModelInterface
+     */
+    public function setConnection($name): self;
+
+    /**
+     * Get a new instance of the query builder.
+     *
+     * @return Builder
+     */
+    public function newQuery(): Builder;
+
+    /**
+     * Set the table (index) associated with the model.
+     *
+     * This method allows explicitly setting the Elasticsearch index name. In Elasticsearch, the term `index` is used to represent
+     * the equivalent of a database table in relational models, so the `table` property is unset to avoid confusion.
+     *
+     * @param string $index The name of the Elasticsearch index.
+     *
+     * @return ModelInterface The current instance of the model.
+     */
+    public function setTable($index): self;
+
+    /**
+     * Merge new casts with existing casts on the model.
+     *
+     * @param  array  $casts
+     *
+     * @return ModelInterface
+     */
+    public function mergeCasts($casts): self;
+
+    /**
+     * Fill the model with an array of attributes.
+     *
+     * @param  array  $attributes
+     *
+     * @throws MassAssignmentException ModelInterfacen
+     *
+     * @return ModelInterface
+     */
+    public function fill(array $attributes): self;
+
+    /**
+     * Get the table (index) name for the model.
+     *
+     * This method overrides the standard Eloquent method to return the Elasticsearch index name instead of
+     * the traditional database table name.
+     *
+     * @return string The Elasticsearch index name.
+     */
+    public function getTable(): string;
 }

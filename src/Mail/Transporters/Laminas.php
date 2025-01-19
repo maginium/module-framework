@@ -21,10 +21,7 @@ use Magento\Framework\Mail\Template\TransportBuilder as BaseTransportBuilder;
 use Magento\Framework\Mail\TransportInterfaceFactory;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Translate\Inline\StateInterface;
-use Maginium\Foundation\Enums\Directions;
-use Maginium\Foundation\Enums\Locales;
 use Maginium\Foundation\Exceptions\Exception;
-use Maginium\Foundation\Exceptions\InvalidArgumentException;
 use Maginium\Foundation\Exceptions\MailException;
 use Maginium\Foundation\Exceptions\NoSuchEntityException;
 use Maginium\Framework\Log\Facades\Log;
@@ -34,13 +31,8 @@ use Maginium\Framework\Mail\Interfaces\MailerInterface;
 use Maginium\Framework\Mail\Interfaces\Transporters\LaminasInterface;
 use Maginium\Framework\Support\Arr;
 use Maginium\Framework\Support\DataObject;
-use Maginium\Framework\Support\Facades\Config;
-use Maginium\Framework\Support\Facades\Filesystem;
-use Maginium\Framework\Support\Facades\Media;
-use Maginium\Framework\Support\Facades\StoreManager;
 use Maginium\Framework\Support\Reflection;
 use Maginium\Framework\Support\Validator;
-use Maginium\Store\Interfaces\Data\StoreInterface;
 use Mirasvit\Report\Model\Mail\Template\TransportBuilderInterface as MirasvitLaminasInterface;
 
 class Laminas extends BaseTransportBuilder implements LaminasInterface
@@ -159,6 +151,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
     {
         $this->subject = $subject;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -183,6 +176,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
     {
         $this->headers = $headers;
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -228,7 +222,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
         // Add the newly created attachment to the internal attachments list.
         $this->attachments[] = $attachment;
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -251,7 +245,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
         // Clear the headers list to ensure no leftover headers are sent in the next email.
         $this->headers = [];
 
-        // Return the current instance for method chaining.
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -275,10 +269,10 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
 
         try {
             // Resolve the appropriate store ID (fall back to default if not provided)
-            $storeId = $this->getStoreId($mailer->getStoreId());
+            $storeId = $mailer->getStoreId();
 
             // Prepare and configure the email template for the specified store
-            $this->prepareEmailTemplate($mailer->getTemplateId(), storeId: $storeId);
+            $this->setTemplateIdentifier($mailer->getTemplateId());
 
             // Set the template variables based on the provided data
             $templateData = DataObject::make($mailer->getTemplateData() ?? [])->toArray();
@@ -332,7 +326,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
             }
 
             // Add attachments if provided
-            //  $this->addAttachments($mailer->getAttachments());
+            // $this->addAttachments($mailer->getAttachments());
 
             // Send the email using the transport object
             $this->getTransport()->sendMessage();
@@ -384,6 +378,7 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
             $this->message = $this->rebuildEmailMessage($parts);
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -481,98 +476,6 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
     }
 
     /**
-     * Prepare the email content for sending.
-     *
-     * This method prepares the email template, considering special conditions such as Right-To-Left (RTL) direction
-     * for specific locales.
-     *
-     * @param string $templateId The email template identifier.
-     * @param int $storeId The store ID for which the email is being sent.
-     *
-     * @throws InvalidArgumentException If email content is empty.
-     *
-     * @return void
-     */
-    private function prepareEmailTemplate(string $templateId, int $storeId): void
-    {
-        // Append RTL direction to template if needed based on locale or configuration
-        if ($this->shouldAppendRtlDirection($templateId, $storeId)) {
-            $templateId .= Directions::RTL; // Modify template ID for RTL locales
-        }
-
-        // Set the prepared template identifier for the email transport builder
-        $this->setTemplateIdentifier($templateId);
-    }
-
-    /**
-     * Check if RTL direction should be appended to the template ID.
-     *
-     * This method determines whether the template should have RTL (Right-to-Left) direction based on
-     * the store locale or specific configuration settings.
-     *
-     * @param string $templateId The template ID.
-     * @param int $storeId The store ID.
-     *
-     * @return bool Whether RTL direction should be appended.
-     */
-    private function shouldAppendRtlDirection(string &$templateId, int $storeId): bool
-    {
-        // Get the locale of the store
-        $storeLocale = $this->getStoreLocale($storeId);
-
-        // Set the scope of the configuration to the store ID
-        Config::setScopeId($storeId);
-
-        // Check if RTL should be appended based on configuration or store locale
-        return Config::getBool(static::XML_PATH_MAILER_IS_RTL)
-            || (isset($storeLocale) && Locales::isRtl($storeLocale)); // Returns true if RTL is required
-    }
-
-    /**
-     * Get the store locale based on the provided or default store ID.
-     *
-     * This method determines the locale of a store based on the provided store ID. If no store ID is provided,
-     * it will use the default store's ID to fetch the locale.
-     *
-     * @param int|null $storeId The store ID. If null, the default store ID will be used.
-     *
-     * @return string|null The locale of the store. Returns null if no store is found.
-     */
-    private function getStoreLocale(?int $storeId): ?string
-    {
-        // If no store ID is provided, use the default store's ID and return its locale
-        if (! $storeId) {
-            /** @var StoreInterface $defaultStore */
-            $defaultStore = StoreManager::getStore();
-            $storeId = $defaultStore->getId();
-
-            return $defaultStore->getLocale();
-        }
-
-        // If a specific store ID is provided, return the locale of that store
-        /** @var StoreInterface $specifiedStore */
-        $specifiedStore = StoreManager::getStore($storeId);
-
-        return $specifiedStore->getLocale();
-    }
-
-    /**
-     * Get the store ID based on the provided or default store ID.
-     *
-     * This method resolves the store ID by either returning the provided store ID
-     * or the default store ID if none is provided.
-     *
-     * @param int|null $storeId The store ID. If null, the default store ID will be used.
-     *
-     * @return int The resolved store ID.
-     */
-    private function getStoreId(?int $storeId): int
-    {
-        // Return the provided store ID or the default store ID if none is provided
-        return $storeId ?: (int)StoreManager::getStore()->getId();
-    }
-
-    /**
      * Merge template options with default values.
      *
      * This method merges the provided template options with a set of default template options.
@@ -598,117 +501,5 @@ class Laminas extends BaseTransportBuilder implements LaminasInterface
 
         // Merge the provided options with default options and return the result
         return Arr::merge($defaultTemplateOptions, $templateOptions ?? []);
-    }
-
-    /**
-     * Add attachments to the email.
-     *
-     * This method processes and adds attachments to the email from the provided URLs.
-     *
-     * @param array|DataObject|null $attachments List of attachment URLs or a DataObject containing attachment data.
-     */
-    private function addAttachments(array|DataObject|null $attachments): void
-    {
-        // If no attachments are provided, return early to avoid unnecessary processing
-        if (Validator::isEmpty($attachments)) {
-            return;
-        }
-
-        // If attachments are in a DataObject, extract the data from it
-        if ($attachments instanceof DataObject) {
-            $attachments = $attachments->getData();
-        }
-
-        // If attachments are not an array, log an error and exit the method
-        if (! is_array($attachments)) {
-            Log::error('Invalid attachment format. Expected an array or DataObject.');
-
-            return;
-        }
-
-        // Process each attachment URL and add it to the email transport builder
-        foreach ($attachments as $url) {
-            $this->processAttachment($url);
-        }
-    }
-
-    /**
-     * Process an individual attachment.
-     *
-     * This method builds the attachment data from the URL, checks its validity,
-     * and then adds it to the transport builder if valid.
-     *
-     * @param string $url The attachment URL.
-     */
-    private function processAttachment(string $url): void
-    {
-        try {
-            // Build the attachment data using the provided URL
-            $attachmentData = $this->buildAttachmentData($url);
-
-            // If valid attachment data is returned, add it to the transport builder
-            if ($attachmentData) {
-                $this->addAttachment(
-                    $attachmentData['content'],
-                    $attachmentData['type'],
-                    $attachmentData['disposition'],
-                    $attachmentData['encoding'],
-                    $attachmentData['filename'],
-                );
-            } else {
-                Log::warning("Attachment data could not be built for URL: {$url}");
-            }
-        } catch (Exception $e) {
-            // Log any errors and skip the current attachment if processing fails
-            Log::error('Error processing attachment from URL: ' . $url . ' - ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * Build the attachment data from a given URL.
-     *
-     * This method fetches the file content, determines its MIME type, and prepares the attachment data.
-     *
-     * @param string $url The URL of the attachment.
-     *
-     * @return array|null The attachment data, or null if an error occurred.
-     */
-    private function buildAttachmentData(string $url): ?array
-    {
-        try {
-            // Fetch the absolute file path from the URL
-            $absolutePath = Media::absolutePath($url);
-
-            // Retrieve the file content
-            $fileContent = Filesystem::get($absolutePath);
-
-            // If file content is not found, throw an exception
-            if ($fileContent === false) {
-                throw new Exception("Failed to fetch file content from URL: {$absolutePath}");
-            }
-
-            // Extract the filename and MIME type from the file
-            $fileName = Filesystem::basename($absolutePath);
-            $mimeType = Filesystem::mimeType($absolutePath);
-
-            // If MIME type is not detected, default to octet-stream
-            if ($mimeType === false) {
-                $mimeType = Mime::TYPE_OCTETSTREAM;
-            }
-
-            // Return the attachment data array
-            return [
-                'content' => $fileContent,
-                'filename' => $fileName,
-                'type' => $mimeType,
-                'disposition' => Mime::DISPOSITION_ATTACHMENT,
-                'encoding' => Mime::ENCODING_BASE64,
-            ];
-        } catch (Exception $e) {
-            // Log the error if there is an issue building the attachment data
-            Log::error('Error building attachment data from URL: ' . $url . ' - ' . $e->getMessage());
-
-            return null;
-        }
     }
 }

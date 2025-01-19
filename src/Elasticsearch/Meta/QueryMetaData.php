@@ -555,6 +555,7 @@ final class QueryMetaData
     {
         $errorMessage = $error;
         $this->success = false;
+
         // Decode the error message into structured details
         $details = $this->_decodeError($errorMessage);
         $error = [

@@ -111,6 +111,7 @@ class Request extends BaseHttp implements RequestInterface
     {
         $this->getInputSource()->add($input);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -264,6 +265,8 @@ class Request extends BaseHttp implements RequestInterface
         $this->setContent($value);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -367,6 +370,8 @@ class Request extends BaseHttp implements RequestInterface
     public function instance()
     {
         // Simply return the current request instance.
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -670,6 +675,7 @@ class Request extends BaseHttp implements RequestInterface
         // Replaces the request's input source with the provided data.
         $this->getInputSource()->replace($input);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

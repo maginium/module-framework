@@ -45,6 +45,8 @@ class Header extends ObjectModel implements HeaderInterface
         $this->setData(self::KEY, $key);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -79,6 +81,8 @@ class Header extends ObjectModel implements HeaderInterface
         $this->setData(self::VALUE, $value);
 
         // Return the current instance for method chaining
+
+        // Return the current instance to allow method chaining
         return $this;
     }
 }

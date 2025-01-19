@@ -211,6 +211,7 @@ class DriverFilesystem implements CloudInterface
             }
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -236,6 +237,7 @@ class DriverFilesystem implements CloudInterface
             );
         }
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
@@ -254,6 +256,7 @@ class DriverFilesystem implements CloudInterface
             "Directory [{$path}] is not empty.",
         );
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 

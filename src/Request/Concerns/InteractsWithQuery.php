@@ -171,6 +171,7 @@ trait InteractsWithQuery
         // Set param via parent method
         parent::setParam($key, $value);
 
+        // Return the current instance to allow method chaining
         return $this;
     }
 
